@@ -36,8 +36,27 @@ public class Init
             projectName = solutionName;
         }
 
-        CreateProjectAndSolution(outputDir, solutionName, projectName);
+        var options = new[] { "src", "tests", "samples", "docs", "build", "config" };
+        const int minimum = 0;
+        var selectedFolders = Prompt
+            .MultiSelect("Create folders", options, minimum: minimum, defaultValues: options)
+            .ToList();
+
+        CreateFolders(outputDir, solutionName, selectedFolders);
+
+        string solutionOutputDir = selectedFolders.Contains("src")
+            ? Path.Combine(outputDir, solutionName, "src")
+            : Path.Combine(outputDir, solutionName);
+
+        CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
         return 0;
+    }
+
+    private static void CreateFolders(string outputDir, string solutionName, List<string> folders)
+    {
+        var mainFolder = Path.Combine(outputDir, solutionName);
+        Directory.CreateDirectory(mainFolder);
+        folders.ForEach(folder => Directory.CreateDirectory(Path.Combine(mainFolder, folder)));
     }
 
     private static void CreateProjectAndSolution(
@@ -46,10 +65,9 @@ public class Init
         string projectName
     )
     {
-        RunCommand("dotnet", $"new sln --output \"{solutionName}\"", solutionOutputDir);
-        var solutionDir = Path.Combine(solutionOutputDir, solutionName);
-        RunCommand("dotnet", $"new console --output \"{projectName}\"", solutionDir);
-        RunCommand("dotnet", $"sln add \"{projectName}\"", solutionDir);
+        RunCommand("dotnet", $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir}\"");
+        RunCommand("dotnet", $"new console --output \"{projectName}\"", solutionOutputDir);
+        RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
     }
 
     private static void RunCommand(string command, string arguments, string workingDirectory = "")
