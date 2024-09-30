@@ -7,4 +7,9 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+      <PackageReference Include="Sharprompt" Version="2.4.5" />
+    </ItemGroup>
+
 </Project>
