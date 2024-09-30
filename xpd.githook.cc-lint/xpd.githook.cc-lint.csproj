@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>xpd.githook.cc_lint</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    </ItemGroup>
+    
+    <Target Name="CopyOutputToArtifactsDir" AfterTargets="Build">
+        <PropertyGroup>
+            <ArtifactsDir>../Artifacts</ArtifactsDir>            
+        </PropertyGroup>
+        <ItemGroup>
+            <OutputFiles Include="$(OutputPath)*.*" />
+        </ItemGroup>
+        <Message Text="Current Output Directory: $(OutputPath)" Importance="high" />
+        <Message Text="ArtifactsDir: $(ArtifactsDir)" Importance="high" />
+        <Message Text="OutputFiles: @(OutputFiles)" Importance="high" />
+        <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(ArtifactsDir)" />
+    </Target>
+
+</Project>

@@ -2,6 +2,18 @@
    "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
    "tasks": [
       {
+         "name": "commit-message-linter",
+         "group": "commit-msg",
+         "command": "dotnet",
+         "args": [
+            "Artifacts/xpd.githook.cc-lint.dll",
+            "--commit-file",
+            "${args}",
+            "--cc-options-file",
+            "conventionalcommit.json"
+         ]
+      },
+      {
          "name": "format-staged-files-with-csharpier",
          "group": "pre-commit",
          "command": "dotnet",
