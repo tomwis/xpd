@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CFADD125
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests", "..\tests\xpd.tests\xpd.tests.csproj", "{8B55C578-0E54-4429-995A-06A1E6017D2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.convention-tests", "..\tests\xpd.convention-tests\xpd.convention-tests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,9 +42,14 @@ Global
 		{8B55C578-0E54-4429-995A-06A1E6017D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B55C578-0E54-4429-995A-06A1E6017D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B55C578-0E54-4429-995A-06A1E6017D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{414537EE-FB3F-4406-8731-BDB70B5846F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{414537EE-FB3F-4406-8731-BDB70B5846F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{414537EE-FB3F-4406-8731-BDB70B5846F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{414537EE-FB3F-4406-8731-BDB70B5846F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9546EA7F-CE6E-4813-A4F6-63021D2A4884} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
 		{8B55C578-0E54-4429-995A-06A1E6017D2A} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
+		{414537EE-FB3F-4406-8731-BDB70B5846F1} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
 	EndGlobalSection
 EndGlobal

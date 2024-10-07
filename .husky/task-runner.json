@@ -2,6 +2,12 @@
    "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
    "tasks": [
       {
+         "name": "run-convention-tests",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [ "test", "tests/xpd.convention-tests" ]
+      },
+      {
          "name": "commit-message-linter",
          "group": "commit-msg",
          "command": "dotnet",
