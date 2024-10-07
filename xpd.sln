@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E
 		conventionalcommit.json = conventionalcommit.json
 		.gitignore = .gitignore
 		Directory.Packages.props = Directory.Packages.props
+		.husky\task-runner.json = .husky\task-runner.json
 	EndProjectSection
 EndProject
 Global
