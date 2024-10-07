@@ -1,26 +1,25 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Reflection;
 using CommandLine;
-using Sharprompt;
 using xpd.Exceptions;
 
 namespace xpd;
 
 [Verb("init")]
-public class Init(IFileSystem fileSystem)
+public class Init(IFileSystem fileSystem, IInputRequestor inputRequestor)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
+    private readonly IInputRequestor _inputRequestor = inputRequestor;
 
     public Init()
-        : this(new FileSystem()) { }
+        : this(new FileSystem(), new InputRequestor()) { }
 
     [Option('o', "output", Required = false, HelpText = "Parent folder for solution.")]
     public string? Output { get; set; }
 
     public int Parse(Init args)
     {
-        var solutionName = Prompt.Input<string>("Enter solution name");
+        var solutionName = _inputRequestor.GetSolutionName();
         if (string.IsNullOrEmpty(solutionName))
         {
             Console.WriteLine("Solution name is required.");
@@ -36,19 +35,14 @@ public class Init(IFileSystem fileSystem)
             return 1;
         }
 
-        var projectName = Prompt.Input<string>("Enter project name", solutionName);
+        var projectName = _inputRequestor.GetProjectName(solutionName);
         if (string.IsNullOrEmpty(projectName))
         {
             Console.WriteLine("Project name will be the same as solution name.");
             projectName = solutionName;
         }
 
-        var options = new[] { "src", "tests", "samples", "docs", "build", "config" };
-        const int minimum = 0;
-        var selectedFolders = Prompt
-            .MultiSelect("Create folders", options, minimum: minimum, defaultValues: options)
-            .ToList();
-
+        var selectedFolders = _inputRequestor.GetFoldersToCreate();
         CreateFolders(outputDir, solutionName, selectedFolders);
 
         string solutionOutputDir = selectedFolders.Contains("src")
