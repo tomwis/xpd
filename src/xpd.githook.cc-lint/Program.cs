@@ -29,6 +29,24 @@ public class Program
     {
         var commitMessage = File.ReadAllLines(commitMessageFileName);
         var commitSubject = commitMessage[0];
+        PrintCommit(commitMessage);
+        SubjectLengthValidation(commitSubject);
+        TypeValidation(conventionalCommitOptionsFileName, commitSubject);
+        DescriptionNotEmptyValidation(commitSubject);
+
+        var lines = commitMessage.Length;
+        if (lines == 1)
+        {
+            Console.WriteLine("1 line commit. Checks finished.");
+            return;
+        }
+
+        BlankLineBetweenSubjectAndBodyValidation(commitMessage);
+        BodyNotEmptyValidation(lines, commitMessage);
+    }
+
+    private static void PrintCommit(string[] commitMessage)
+    {
         Console.WriteLine("Commit message with line numbers:");
         for (int i = 0; i < commitMessage.Length; ++i)
         {
@@ -36,6 +54,10 @@ public class Program
         }
 
         Console.WriteLine();
+    }
+
+    private static void SubjectLengthValidation(string commitSubject)
+    {
         if (commitSubject.Length > SubjectMaxLength)
         {
             throw new CommitFormatException(
@@ -46,7 +68,13 @@ public class Program
         Console.WriteLine(
             $"Subject length check passed ({commitSubject.Length}/{SubjectMaxLength} characters) {Checkmark}"
         );
+    }
 
+    private static void TypeValidation(
+        string conventionalCommitOptionsFileName,
+        string commitSubject
+    )
+    {
         var typesFileContent = File.ReadAllText(conventionalCommitOptionsFileName);
         var ccConfig = JsonSerializer.Deserialize<ConventionalCommitConfig>(typesFileContent);
         if (ccConfig is null)
@@ -70,7 +98,10 @@ public class Program
         }
 
         Console.WriteLine($"Type ({commitType}) check passed {Checkmark}");
+    }
 
+    private static void DescriptionNotEmptyValidation(string commitSubject)
+    {
         var commitDescription = commitSubject.Split(':')[1];
         if (string.IsNullOrWhiteSpace(commitDescription))
         {
@@ -78,21 +109,20 @@ public class Program
         }
 
         Console.WriteLine($"Description not empty check passed {Checkmark}");
+    }
 
-        var lines = commitMessage.Length;
-        if (lines == 1)
-        {
-            Console.WriteLine("1 line commit. Checks finished.");
-            return;
-        }
-
+    private static void BlankLineBetweenSubjectAndBodyValidation(string[] commitMessage)
+    {
         if (!string.IsNullOrWhiteSpace(commitMessage[1]))
         {
             throw new CommitFormatException("There must be blank line between header and body.");
         }
 
         Console.WriteLine($"Blank line between subject and body check passed {Checkmark}");
+    }
 
+    private static void BodyNotEmptyValidation(int lines, string[] commitMessage)
+    {
         if (lines >= 3 && string.IsNullOrWhiteSpace(commitMessage[2]))
         {
             throw new CommitFormatException("Body cannot be empty.");
