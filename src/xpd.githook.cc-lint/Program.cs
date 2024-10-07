@@ -11,6 +11,9 @@ namespace xpd.githook.cc_lint;
 
 public class Program
 {
+    private const char Checkmark = '\u2714';
+    private const int SubjectMaxLength = 90;
+
     public static void Main(string[] args)
     {
         Parser
@@ -22,23 +25,27 @@ public class Program
             .WithNotParsed(errors => { });
     }
 
-    const int HeaderMaxLength = 90;
-
     private static void Run(string commitMessageFileName, string conventionalCommitOptionsFileName)
     {
         var commitMessage = File.ReadAllLines(commitMessageFileName);
-        var commitHeader = commitMessage[0];
+        var commitSubject = commitMessage[0];
+        Console.WriteLine("Commit message with line numbers:");
         for (int i = 0; i < commitMessage.Length; ++i)
         {
-            Console.WriteLine($"{i}: {commitMessage[i]}");
+            Console.WriteLine($"    {i}: {commitMessage[i]}");
         }
 
-        if (commitHeader.Length > HeaderMaxLength)
+        Console.WriteLine();
+        if (commitSubject.Length > SubjectMaxLength)
         {
             throw new CommitFormatException(
-                $"Commit title too long ({commitHeader.Length} characters). Should have max {HeaderMaxLength}."
+                $"Commit subject is too long ({commitSubject.Length} characters). Should have max {SubjectMaxLength} characters."
             );
         }
+
+        Console.WriteLine(
+            $"Subject length check passed ({commitSubject.Length}/{SubjectMaxLength} characters) {Checkmark}"
+        );
 
         var typesFileContent = File.ReadAllText(conventionalCommitOptionsFileName);
         var ccConfig = JsonSerializer.Deserialize<ConventionalCommitConfig>(typesFileContent);
@@ -53,7 +60,7 @@ public class Program
             .Select(p => p.Name.ToLowerInvariant())
             .ToList();
 
-        var commitType = commitHeader.Split(':')[0].Split('(')[0];
+        var commitType = commitSubject.Split(':')[0].Split('(')[0];
 
         if (names.All(t => t != commitType))
         {
@@ -62,16 +69,20 @@ public class Program
             );
         }
 
-        var commitSubject = commitHeader.Split(':')[1];
-        if (string.IsNullOrWhiteSpace(commitSubject))
+        Console.WriteLine($"Type ({commitType}) check passed {Checkmark}");
+
+        var commitDescription = commitSubject.Split(':')[1];
+        if (string.IsNullOrWhiteSpace(commitDescription))
         {
-            throw new CommitFormatException("Commit subject cannot be empty.");
+            throw new CommitFormatException("Commit description cannot be empty.");
         }
 
+        Console.WriteLine($"Description not empty check passed {Checkmark}");
+
         var lines = commitMessage.Length;
-        Console.WriteLine($"lines: {lines}");
         if (lines == 1)
         {
+            Console.WriteLine("1 line commit. Checks finished.");
             return;
         }
 
@@ -80,9 +91,13 @@ public class Program
             throw new CommitFormatException("There must be blank line between header and body.");
         }
 
+        Console.WriteLine($"Blank line between subject and body check passed {Checkmark}");
+
         if (lines >= 3 && string.IsNullOrWhiteSpace(commitMessage[2]))
         {
             throw new CommitFormatException("Body cannot be empty.");
         }
+
+        Console.WriteLine($"Body not empty check passed {Checkmark}");
     }
 }
