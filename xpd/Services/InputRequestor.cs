@@ -1,6 +1,7 @@
 using Sharprompt;
+using xpd.Interfaces;
 
-namespace xpd;
+namespace xpd.Services;
 
 public class InputRequestor : IInputRequestor
 {

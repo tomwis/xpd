@@ -1,18 +1,24 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using CommandLine;
-using xpd.Exceptions;
+using xpd.Interfaces;
+using xpd.Services;
 
 namespace xpd;
 
 [Verb("init")]
-public class Init(IFileSystem fileSystem, IInputRequestor inputRequestor)
+public class Init(
+    IFileSystem fileSystem,
+    IInputRequestor inputRequestor,
+    IProcessProvider processProvider
+)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly IInputRequestor _inputRequestor = inputRequestor;
+    private readonly IProcessProvider _processProvider = processProvider;
 
     public Init()
-        : this(new FileSystem(), new InputRequestor()) { }
+        : this(new FileSystem(), new InputRequestor(), new ProcessProvider()) { }
 
     [Option('o', "output", Required = false, HelpText = "Parent folder for solution.")]
     public string? Output { get; set; }
@@ -62,7 +68,7 @@ public class Init(IFileSystem fileSystem, IInputRequestor inputRequestor)
         );
     }
 
-    private static void CreateProjectAndSolution(
+    private void CreateProjectAndSolution(
         string solutionOutputDir,
         string solutionName,
         string projectName
@@ -73,7 +79,7 @@ public class Init(IFileSystem fileSystem, IInputRequestor inputRequestor)
         RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
     }
 
-    private static void RunCommand(string command, string arguments, string workingDirectory = "")
+    private void RunCommand(string command, string arguments, string workingDirectory = "")
     {
         ProcessStartInfo processInfo = new ProcessStartInfo
         {
@@ -85,15 +91,7 @@ public class Init(IFileSystem fileSystem, IInputRequestor inputRequestor)
             WorkingDirectory = workingDirectory,
         };
 
-        using var process = Process.Start(processInfo);
-
-        if (process is null)
-        {
-            throw new ProcessException(
-                "Failed to start process. Id '{command}' installed and in PATH?"
-            );
-        }
-
+        using var process = _processProvider.Start(processInfo);
         var result = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
         Console.WriteLine($"Output of command: {result}");

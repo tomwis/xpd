@@ -1,4 +1,4 @@
-namespace xpd;
+namespace xpd.Interfaces;
 
 public interface IInputRequestor
 {
