@@ -10,7 +10,7 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" />
       <PackageReference Include="Sharprompt" />
-      <PackageReference Include="System.IO.Abstractions" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
     </ItemGroup>
 
 </Project>
