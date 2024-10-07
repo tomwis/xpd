@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using CommandLine;
+using xpd.Enums;
 using xpd.Interfaces;
+using xpd.Models;
 using xpd.Services;
 
 namespace xpd;
@@ -23,13 +25,13 @@ public class Init(
     [Option('o', "output", Required = false, HelpText = "Parent folder for solution.")]
     public string? Output { get; set; }
 
-    public int Parse(Init args)
+    public InitResult Parse(Init args)
     {
         var solutionName = _inputRequestor.GetSolutionName();
         if (string.IsNullOrEmpty(solutionName))
         {
             Console.WriteLine("Solution name is required.");
-            return 1;
+            return InitResult.WithError(InitError.SolutionNameRequired);
         }
 
         var outputDir = args.Output ?? _fileSystem.Directory.GetCurrentDirectory();
@@ -38,7 +40,7 @@ public class Init(
         if (solutionDirectoryInfo.Exists)
         {
             Console.WriteLine($"Directory '{solutionName}' already exists in current directory.");
-            return 1;
+            return InitResult.WithError(InitError.SolutionNameExists);
         }
 
         var projectName = _inputRequestor.GetProjectName(solutionName);
@@ -56,7 +58,7 @@ public class Init(
             : _fileSystem.Path.Combine(outputDir, solutionName);
 
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
-        return 0;
+        return InitResult.Success(solutionName, projectName, solutionOutputDir, selectedFolders);
     }
 
     private void CreateFolders(string outputDir, string solutionName, List<string> folders)

@@ -7,6 +7,13 @@ public class Program
     public static void Main(string[] args)
     {
         var result = Parser.Default.ParseArguments(args, typeof(Init));
-        var exitCode = result.MapResult((Init opts) => new Init().Parse(opts), errs => 0);
+        var exitCode = result.MapResult(
+            (Init opts) =>
+            {
+                var initResult = new Init().Parse(opts);
+                return (int)(initResult.Error ?? 0);
+            },
+            errs => 0
+        );
     }
 }
