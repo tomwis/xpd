@@ -14,7 +14,7 @@
     
     <Target Name="CopyOutputToArtifactsDir" AfterTargets="Build">
         <PropertyGroup>
-            <ArtifactsDir>../artifacts</ArtifactsDir>            
+            <ArtifactsDir>../../artifacts</ArtifactsDir>            
         </PropertyGroup>
         <ItemGroup>
             <OutputFiles Include="$(OutputPath)*.*" />
