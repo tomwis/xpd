@@ -10,6 +10,7 @@
     <ItemGroup>
       <PackageReference Include="CommandLineParser" />
       <PackageReference Include="Sharprompt" />
+      <PackageReference Include="System.IO.Abstractions" />
     </ItemGroup>
 
 </Project>

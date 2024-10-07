@@ -5,6 +5,7 @@
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Sharprompt" Version="2.4.5" />
+    <PackageVersion Include="System.IO.Abstractions" Version="21.0.29" />
   </ItemGroup>
   <ItemGroup Label="Tests">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
