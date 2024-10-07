@@ -10,7 +10,7 @@ public class Options
         Required = true,
         HelpText = "Provide file with commit message to validate."
     )]
-    public string CommitMessageFileName { get; set; }
+    public string CommitMessageFileName { get; set; } = null!;
 
     [Option(
         'o',
@@ -18,5 +18,5 @@ public class Options
         Required = true,
         HelpText = "Provide file name of conventional commit options in json format."
     )]
-    public string ConventionalCommitOptionsFileName { get; set; }
+    public string ConventionalCommitOptionsFileName { get; set; } = null!;
 }

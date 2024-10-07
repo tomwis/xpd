@@ -1,20 +1,42 @@
+using System.Text.Json.Serialization;
+
 namespace xpd.githook.cc_lint;
 
 public class ConventionalCommitConfig
 {
-    public CommitTypes types { get; set; }
+    [JsonPropertyName("types")]
+    public CommitTypes Types { get; set; } = null!;
 
     public class CommitTypes
     {
-        public object refactor { get; set; }
-        public object fix { get; set; }
-        public object feat { get; set; }
-        public object build { get; set; }
-        public object chore { get; set; }
-        public object style { get; set; }
-        public object test { get; set; }
-        public object docs { get; set; }
-        public object perf { get; set; }
-        public object revert { get; set; }
+        [JsonPropertyName("refactor")]
+        public object Refactor { get; set; } = null!;
+
+        [JsonPropertyName("fix")]
+        public object Fix { get; set; } = null!;
+
+        [JsonPropertyName("feat")]
+        public object Feat { get; set; } = null!;
+
+        [JsonPropertyName("build")]
+        public object Build { get; set; } = null!;
+
+        [JsonPropertyName("chore")]
+        public object Chore { get; set; } = null!;
+
+        [JsonPropertyName("style")]
+        public object Style { get; set; } = null!;
+
+        [JsonPropertyName("test")]
+        public object Test { get; set; } = null!;
+
+        [JsonPropertyName("docs")]
+        public object Docs { get; set; } = null!;
+
+        [JsonPropertyName("perf")]
+        public object Perf { get; set; } = null!;
+
+        [JsonPropertyName("revert")]
+        public object Revert { get; set; } = null!;
     }
 }

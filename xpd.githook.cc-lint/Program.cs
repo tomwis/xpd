@@ -42,10 +42,20 @@ public class Program
 
         var typesFileContent = File.ReadAllText(conventionalCommitOptionsFileName);
         var ccConfig = JsonSerializer.Deserialize<ConventionalCommitConfig>(typesFileContent);
-        var names = ccConfig.types.GetType().GetProperties().Select(p => p.Name);
+        if (ccConfig is null)
+        {
+            throw new JsonException("Couldn't deserialize conventional commit config.");
+        }
+
+        var names = ccConfig
+            .Types.GetType()
+            .GetProperties()
+            .Select(p => p.Name.ToLowerInvariant())
+            .ToList();
+
         var commitType = commitHeader.Split(':')[0].Split('(')[0];
 
-        if (!names.Any(t => t == commitType))
+        if (names.All(t => t != commitType))
         {
             throw new CommitFormatException(
                 $"Commit type is not on accepted list. Current: {commitType}. Should be one of: {string.Join(", ", names)}"
