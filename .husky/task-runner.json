@@ -10,7 +10,7 @@
             "--commit-file",
             "${args}",
             "--cc-options-file",
-            "conventionalcommit.json"
+            "config/conventionalcommit.json"
          ]
       },
       {

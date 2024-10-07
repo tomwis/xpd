@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.githook.cc-lint.tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E47-E562-4E1B-A5C6-999BCCE9C3EC}"
 	ProjectSection(SolutionItems) = preProject
-		conventionalcommit.json = ..\conventionalcommit.json
+		conventionalcommit.json = ..\config\conventionalcommit.json
 		.gitignore = ..\.gitignore
 		Directory.Packages.props = ..\Directory.Packages.props
 		.husky\task-runner.json = ..\.husky\task-runner.json
