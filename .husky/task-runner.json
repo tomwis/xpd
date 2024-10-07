@@ -6,7 +6,7 @@
          "group": "commit-msg",
          "command": "dotnet",
          "args": [
-            "Artifacts/xpd.githook.cc-lint.dll",
+            "artifacts/xpd.githook.cc-lint.dll",
             "--commit-file",
             "${args}",
             "--cc-options-file",
