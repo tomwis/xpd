@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using CommandLine;
 using Sharprompt;
+using xpd.Exceptions;
 
 namespace xpd;
 
@@ -82,9 +83,17 @@ public class Init
             WorkingDirectory = workingDirectory,
         };
 
-        using Process? process = Process.Start(processInfo);
-        string result = process.StandardOutput.ReadToEnd();
+        using var process = Process.Start(processInfo);
+
+        if (process is null)
+        {
+            throw new ProcessException(
+                "Failed to start process. Id '{command}' installed and in PATH?"
+            );
+        }
+
+        var result = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        Console.WriteLine("Output of command: " + result);
+        Console.WriteLine($"Output of command: {result}");
     }
 }
