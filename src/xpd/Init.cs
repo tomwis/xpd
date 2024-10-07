@@ -36,10 +36,12 @@ public class Init(
 
         var outputDir = args.Output ?? _fileSystem.Directory.GetCurrentDirectory();
         var solutionPath = _fileSystem.Path.Combine(outputDir, solutionName);
-        var solutionDirectoryInfo = new DirectoryInfo(solutionPath);
+        var solutionDirectoryInfo = _fileSystem.DirectoryInfo.New(solutionPath);
         if (solutionDirectoryInfo.Exists)
         {
-            Console.WriteLine($"Directory '{solutionName}' already exists in current directory.");
+            Console.WriteLine(
+                $"Directory '{solutionName}' already exists in current directory ({outputDir})."
+            );
             return InitResult.WithError(InitError.SolutionNameExists);
         }
 
@@ -96,6 +98,6 @@ public class Init(
         using var process = _processProvider.Start(processInfo);
         var result = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        Console.WriteLine($"Output of command: {result}");
+        Console.WriteLine($"Output of command '{command} {arguments}': {result}");
     }
 }
