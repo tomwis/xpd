@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Xml.Linq;
 using CommandLine;
 using xpd.Enums;
 using xpd.Interfaces;
@@ -53,19 +54,30 @@ public class Init(
         }
 
         var selectedFolders = _inputRequestor.GetFoldersToCreate();
-        CreateFolders(outputDir, solutionName, selectedFolders);
+        var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
+        CreateFolders(mainFolder, selectedFolders);
 
         string solutionOutputDir = selectedFolders.Contains("src")
             ? _fileSystem.Path.Combine(outputDir, solutionName, "src")
-            : _fileSystem.Path.Combine(outputDir, solutionName);
+            : mainFolder;
 
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
+        CreateDirectoryBuildTargets(mainFolder);
         return InitResult.Success(solutionName, projectName, solutionOutputDir, selectedFolders);
     }
 
-    private void CreateFolders(string outputDir, string solutionName, List<string> folders)
+    private void CreateDirectoryBuildTargets(string mainFolder)
     {
-        var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
+        var directoryBuildTargetsFile = _fileSystem.Path.Combine(
+            mainFolder,
+            "Directory.Build.targets"
+        );
+        var doc = new XDocument(new XElement("Project"));
+        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, doc.ToString());
+    }
+
+    private void CreateFolders(string mainFolder, List<string> folders)
+    {
         _fileSystem.Directory.CreateDirectory(mainFolder);
         folders.ForEach(folder =>
             _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Combine(mainFolder, folder))

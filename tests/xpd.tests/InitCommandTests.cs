@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO.Abstractions.TestingHelpers;
+using System.Xml.Linq;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
@@ -236,6 +237,52 @@ public class InitCommandTests
             "src"
         );
         result.SolutionOutputDir.Should().Be(expected);
+    }
+
+    [Test]
+    public void DirectoryBuildTargetsIsCreated()
+    {
+        // Arrange
+        const string solutionName = "SomeSolution";
+        var inputRequestor = Substitute.For<IInputRequestor>();
+        inputRequestor.GetSolutionName().Returns(solutionName);
+        inputRequestor.GetFoldersToCreate().Returns([]);
+        var mockFileSystem = new MockFileSystem();
+        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var expected = mockFileSystem.Path.Combine(
+            result.SolutionOutputDir!,
+            "Directory.Build.targets"
+        );
+        mockFileSystem.File.Exists(expected).Should().BeTrue();
+    }
+
+    [Test]
+    public void WhenDirectoryBuildTargetsIsCreated_ThenItHasProjectsTagAsRoot()
+    {
+        // Arrange
+        const string solutionName = "SomeSolution";
+        var inputRequestor = Substitute.For<IInputRequestor>();
+        inputRequestor.GetSolutionName().Returns(solutionName);
+        inputRequestor.GetFoldersToCreate().Returns([]);
+        var mockFileSystem = new MockFileSystem();
+        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var directoryBuildTargetsFile = mockFileSystem.Path.Combine(
+            result.SolutionOutputDir!,
+            "Directory.Build.targets"
+        );
+        var fileContent = mockFileSystem.File.ReadAllText(directoryBuildTargetsFile);
+        var xdoc = XDocument.Parse(fileContent);
+        xdoc.Root!.Name.LocalName.Should().Be("Project");
     }
 
     private static MockFileSystem GetFileSystemWithSln(string currentDir, string solutionPath)
