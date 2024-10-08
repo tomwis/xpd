@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -7,6 +8,37 @@ namespace xpd.convention_tests;
 
 public class HuskyTaskRunnerTests
 {
+    [Test]
+    public void ArtifactsDirPathShouldBeCorrect()
+    {
+        // Arrange
+        const string artifactsDir = "ArtifactsDir";
+        var rootFolder = GetRootRepoFolder();
+        var csprojPath = Path.Combine(
+            rootFolder,
+            "src",
+            "xpd.githook.cc-lint",
+            "xpd.githook.cc-lint.csproj"
+        );
+        var csprojDir = new FileInfo(csprojPath).DirectoryName!;
+
+        // Act
+        var csprojContent = File.ReadAllText(csprojPath);
+        var csprojXml = XDocument.Parse(csprojContent);
+        var artifactsDirProperty = csprojXml
+            .Root?.Descendants("PropertyGroup")
+            .SelectMany(pg => pg.Elements())
+            .Single(e => e.Name == artifactsDir);
+
+        // Assert
+        artifactsDirProperty.Should().NotBeNull();
+        var artifactsDirPath = Path.GetFullPath(
+            Path.Combine(csprojDir, artifactsDirProperty!.Value)
+        );
+        var artifactsParentDir = Path.GetDirectoryName(artifactsDirPath);
+        artifactsParentDir.Should().Be(rootFolder);
+    }
+
     [Test]
     public void PathToConventionalCommitConfigShouldBeCorrect()
     {
