@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Xml.Linq;
 using FluentAssertions;
@@ -16,11 +17,7 @@ public class InitCommandTests
     {
         // Arrange
         const string solutionName = "NonEmptySolutionName";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns(new List<string>());
-
-        var init = new Init(new MockFileSystem(), inputRequestor, GetProcessProvider());
+        var init = GetSubject(solutionName);
 
         // Act
         var result = init.Parse(init);
@@ -34,14 +31,7 @@ public class InitCommandTests
     public void WhenSolutionNameIsEmpty_ThenReturnSolutionNameRequiredError()
     {
         // Arrange
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(string.Empty);
-
-        var init = new Init(
-            new MockFileSystem(),
-            inputRequestor,
-            Substitute.For<IProcessProvider>()
-        );
+        var init = GetSubject(solutionName: string.Empty);
 
         // Act
         var result = init.Parse(init);
@@ -58,17 +48,12 @@ public class InitCommandTests
         const string outputDir = "/OutputDir";
         const string currentDir = "/CurrentDir";
         const string solutionPath = $"{outputDir}/{solutionName}/{solutionName}.sln";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
 
-        var init = new Init(
-            GetFileSystemWithSln(currentDir, solutionPath),
-            inputRequestor,
-            Substitute.For<IProcessProvider>()
-        )
-        {
-            Output = outputDir,
-        };
+        var init = GetSubject(
+            solutionName,
+            fileSystem: GetFileSystemWithSln(currentDir, solutionPath),
+            outputDir: outputDir
+        );
 
         // Act
         var result = init.Parse(init);
@@ -84,13 +69,10 @@ public class InitCommandTests
         const string solutionName = "SomeSolution";
         const string currentDir = "/CurrentDir";
         const string solutionPath = $"{currentDir}/{solutionName}/{solutionName}.sln";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
 
-        var init = new Init(
-            GetFileSystemWithSln(currentDir, solutionPath),
-            inputRequestor,
-            Substitute.For<IProcessProvider>()
+        var init = GetSubject(
+            solutionName,
+            fileSystem: GetFileSystemWithSln(currentDir, solutionPath)
         );
 
         // Act
@@ -107,19 +89,13 @@ public class InitCommandTests
         const string solutionName = "SomeSolution";
         const string outputDir = "/OutputDir";
         const string currentDir = "/CurrentDir";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns(new List<string>());
 
         var mockFileSystem = new MockFileSystem(
             new Dictionary<string, MockFileData>(),
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
 
-        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider())
-        {
-            Output = outputDir,
-        };
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem, outputDir: outputDir);
 
         // Act
         var result = init.Parse(init);
@@ -135,16 +111,13 @@ public class InitCommandTests
         // Arrange
         const string solutionName = "SomeSolution";
         const string currentDir = "/CurrentDir";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns(new List<string>());
 
         var mockFileSystem = new MockFileSystem(
             new Dictionary<string, MockFileData>(),
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
 
-        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem);
 
         // Act
         var result = init.Parse(init);
@@ -160,11 +133,7 @@ public class InitCommandTests
         // Arrange
         const string solutionName = "SomeSolution";
         const string projectName = "SomeProject";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
-        inputRequestor.GetFoldersToCreate().Returns(new List<string>());
-        var init = new Init(new MockFileSystem(), inputRequestor, GetProcessProvider());
+        var init = GetSubject(solutionName, projectName);
 
         // Act
         var result = init.Parse(init);
@@ -179,11 +148,7 @@ public class InitCommandTests
     {
         // Arrange
         const string solutionName = "SomeSolution";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
-        inputRequestor.GetFoldersToCreate().Returns(new List<string>());
-        var init = new Init(new MockFileSystem(), inputRequestor, GetProcessProvider());
+        var init = GetSubject(solutionName, projectName);
 
         // Act
         var result = init.Parse(init);
@@ -202,11 +167,7 @@ public class InitCommandTests
     public void WhenFolderIsSelected_ThenCreateItInRootFolder(params string[] selectedFolders)
     {
         // Arrange
-        const string solutionName = "SomeSolution";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns(selectedFolders.ToList());
-        var init = new Init(new MockFileSystem(), inputRequestor, GetProcessProvider());
+        var init = GetSubject(foldersToCreate: selectedFolders);
 
         // Act
         var result = init.Parse(init);
@@ -221,11 +182,8 @@ public class InitCommandTests
     {
         // Arrange
         const string solutionName = "SomeSolution";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns(["src"]);
         var mockFileSystem = new MockFileSystem();
-        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: ["src"]);
 
         // Act
         var result = init.Parse(init);
@@ -243,21 +201,14 @@ public class InitCommandTests
     public void DirectoryBuildTargetsIsCreated()
     {
         // Arrange
-        const string solutionName = "SomeSolution";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns([]);
         var mockFileSystem = new MockFileSystem();
-        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+        var init = GetSubject(fileSystem: mockFileSystem);
 
         // Act
         var result = init.Parse(init);
 
         // Assert
-        var expected = mockFileSystem.Path.Combine(
-            result.SolutionOutputDir!,
-            "Directory.Build.targets"
-        );
+        var expected = mockFileSystem.Path.Combine(result.MainFolder!, "Directory.Build.targets");
         mockFileSystem.File.Exists(expected).Should().BeTrue();
     }
 
@@ -265,24 +216,87 @@ public class InitCommandTests
     public void WhenDirectoryBuildTargetsIsCreated_ThenItHasProjectsTagAsRoot()
     {
         // Arrange
-        const string solutionName = "SomeSolution";
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetFoldersToCreate().Returns([]);
         var mockFileSystem = new MockFileSystem();
-        var init = new Init(mockFileSystem, inputRequestor, GetProcessProvider());
+        var init = GetSubject(fileSystem: mockFileSystem);
 
         // Act
         var result = init.Parse(init);
 
         // Assert
         var directoryBuildTargetsFile = mockFileSystem.Path.Combine(
-            result.SolutionOutputDir!,
+            result.MainFolder!,
             "Directory.Build.targets"
         );
         var fileContent = mockFileSystem.File.ReadAllText(directoryBuildTargetsFile);
         var xdoc = XDocument.Parse(fileContent);
         xdoc.Root!.Name.LocalName.Should().Be("Project");
+    }
+
+    [Test]
+    public void WhenDirectoryPackagesPropsIsCreated_ThenItHasManagePackageVersionsCentrallyPropertySetToTrue()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var init = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var directoryPackagesPropsFile = mockFileSystem.Path.Combine(
+            result.MainFolder!,
+            "Directory.Packages.props"
+        );
+        var fileContent = mockFileSystem.File.ReadAllText(directoryPackagesPropsFile);
+        var xdoc = XDocument.Parse(fileContent);
+        var managePackageVersionsCentrallyProperty = xdoc.Root!.Elements("PropertyGroup")
+            .Single(pg => pg.Element("ManagePackageVersionsCentrally") != null);
+
+        managePackageVersionsCentrallyProperty.Value.Should().Be("true");
+    }
+
+    [TestCase("App")]
+    [TestCase("Tests")]
+    public void WhenDirectoryPackagesPropsIsCreated_ThenItHasItemGroupsWithLabels(
+        string itemGroupLabel
+    )
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var init = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var directoryPackagesPropsFile = mockFileSystem.Path.Combine(
+            result.MainFolder!,
+            "Directory.Packages.props"
+        );
+        var fileContent = mockFileSystem.File.ReadAllText(directoryPackagesPropsFile);
+        var xdoc = XDocument.Parse(fileContent);
+        var itemGroup = xdoc.Root!.Elements("ItemGroup")
+            .Single(ig => ig.Attribute("Label")?.Value == itemGroupLabel);
+
+        itemGroup.Should().NotBeNull();
+    }
+
+    private static Init GetSubject(
+        string? solutionName = null,
+        string? projectName = null,
+        IFileSystem? fileSystem = null,
+        string[]? foldersToCreate = null,
+        string? outputDir = null
+    )
+    {
+        solutionName ??= "SomeSolution";
+        fileSystem ??= new MockFileSystem();
+        foldersToCreate ??= [];
+        var inputRequestor = Substitute.For<IInputRequestor>();
+        inputRequestor.GetSolutionName().Returns(solutionName);
+        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
+        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
+        return new Init(fileSystem, inputRequestor, GetProcessProvider()) { Output = outputDir };
     }
 
     private static MockFileSystem GetFileSystemWithSln(string currentDir, string solutionPath)

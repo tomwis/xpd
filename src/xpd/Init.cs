@@ -63,17 +63,14 @@ public class Init(
 
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
         CreateDirectoryBuildTargets(mainFolder);
-        return InitResult.Success(solutionName, projectName, solutionOutputDir, selectedFolders);
-    }
-
-    private void CreateDirectoryBuildTargets(string mainFolder)
-    {
-        var directoryBuildTargetsFile = _fileSystem.Path.Combine(
+        CreateDirectoryPackagesProps(mainFolder);
+        return InitResult.Success(
+            solutionName,
+            projectName,
             mainFolder,
-            "Directory.Build.targets"
+            solutionOutputDir,
+            selectedFolders
         );
-        var doc = new XDocument(new XElement("Project"));
-        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, doc.ToString());
     }
 
     private void CreateFolders(string mainFolder, List<string> folders)
@@ -93,6 +90,36 @@ public class Init(
         RunCommand("dotnet", $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir}\"");
         RunCommand("dotnet", $"new console --output \"{projectName}\"", solutionOutputDir);
         RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
+    }
+
+    private void CreateDirectoryBuildTargets(string mainFolder)
+    {
+        var directoryBuildTargetsFile = _fileSystem.Path.Combine(
+            mainFolder,
+            "Directory.Build.targets"
+        );
+        var doc = new XDocument(new XElement("Project"));
+        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, doc.ToString());
+    }
+
+    private void CreateDirectoryPackagesProps(string mainFolder)
+    {
+        var directoryPackagesPropsFile = _fileSystem.Path.Combine(
+            mainFolder,
+            "Directory.Packages.props"
+        );
+        var doc = new XDocument(
+            new XElement(
+                "Project",
+                new XElement(
+                    "PropertyGroup",
+                    new XElement("ManagePackageVersionsCentrally", "true")
+                ),
+                new XElement("ItemGroup", new XAttribute("Label", "App")),
+                new XElement("ItemGroup", new XAttribute("Label", "Tests"))
+            )
+        );
+        _fileSystem.File.WriteAllText(directoryPackagesPropsFile, doc.ToString());
     }
 
     private void RunCommand(string command, string arguments, string workingDirectory = "")
