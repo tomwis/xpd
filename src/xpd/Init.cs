@@ -64,6 +64,7 @@ public class Init(
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
         CreateDirectoryBuildTargets(mainFolder);
         CreateDirectoryPackagesProps(mainFolder);
+        InstallDotnetTools(mainFolder);
         return InitResult.Success(
             solutionName,
             projectName,
@@ -120,6 +121,12 @@ public class Init(
             )
         );
         _fileSystem.File.WriteAllText(directoryPackagesPropsFile, doc.ToString());
+    }
+
+    private void InstallDotnetTools(string mainFolder)
+    {
+        RunCommand("dotnet", "new tool-manifest", mainFolder);
+        RunCommand("dotnet", "tool install csharpier", mainFolder);
     }
 
     private void RunCommand(string command, string arguments, string workingDirectory = "")

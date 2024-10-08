@@ -268,6 +268,48 @@ public class InitCommandTests
             .Contain(element => element.Attribute("Label")!.Value == itemGroupLabel);
     }
 
+    [Test]
+    public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreated()
+    {
+        // Arrange
+        var processProvider = GetProcessProvider();
+        var init = GetSubject(processProvider: processProvider);
+
+        // Act
+        _ = init.Parse(init);
+
+        // Assert
+        AssertDotnetCommandWasCalled(processProvider, "new tool-manifest");
+    }
+
+    [Test]
+    public void WhenInitParseIsCalled_ThenDotnetToolsAreInstalled()
+    {
+        // Arrange
+        var processProvider = GetProcessProvider();
+        var init = GetSubject(processProvider: processProvider);
+
+        // Act
+        _ = init.Parse(init);
+
+        // Assert
+        AssertDotnetCommandWasCalled(processProvider, "tool install csharpier");
+    }
+
+    private static void AssertDotnetCommandWasCalled(
+        IProcessProvider processProvider,
+        string command
+    )
+    {
+        processProvider
+            .Received(1)
+            .Start(
+                Arg.Is<ProcessStartInfo>(info =>
+                    info.FileName == "dotnet" && info.Arguments == command
+                )
+            );
+    }
+
     private static XDocument GetXml(
         MockFileSystem mockFileSystem,
         string mainFolder,
@@ -284,17 +326,19 @@ public class InitCommandTests
         string? projectName = null,
         IFileSystem? fileSystem = null,
         string[]? foldersToCreate = null,
-        string? outputDir = null
+        string? outputDir = null,
+        IProcessProvider? processProvider = null
     )
     {
         solutionName ??= "SomeSolution";
         fileSystem ??= new MockFileSystem();
         foldersToCreate ??= [];
+        processProvider ??= GetProcessProvider();
         var inputRequestor = Substitute.For<IInputRequestor>();
         inputRequestor.GetSolutionName().Returns(solutionName);
         inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
         inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
-        return new Init(fileSystem, inputRequestor, GetProcessProvider()) { Output = outputDir };
+        return new Init(fileSystem, inputRequestor, processProvider) { Output = outputDir };
     }
 
     private static MockFileSystem GetFileSystemWithSln(string currentDir, string solutionPath)
