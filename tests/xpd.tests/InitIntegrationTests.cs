@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Services;
+using xpd.tests.Extensions;
 
 namespace xpd.tests;
 
@@ -32,10 +33,7 @@ public class InitIntegrationTests : InitTestsBase
         // Assert
         var path = Path.Combine(outputPath, solutionName, ".config", "dotnet-tools.json");
         File.Exists(path).Should().BeTrue();
-
-        var dotnetToolsJson = File.ReadAllText(path);
-        var dotnetTools = JsonSerializer.Deserialize<DotnetToolsManifest>(dotnetToolsJson);
-        dotnetTools!.Tools.Should().ContainKey("csharpier");
+        path.Deserialize<DotnetToolsManifest>().Tools.Should().ContainKey("csharpier");
     }
 
     public class DotnetToolsManifest

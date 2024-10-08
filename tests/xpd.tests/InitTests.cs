@@ -10,7 +10,7 @@ using xpd.Interfaces;
 
 namespace xpd.tests;
 
-public class InitCommandTests : InitTestsBase
+public class InitTests : InitTestsBase
 {
     [Test]
     public void WhenSolutionNameIsNotEmpty_ThenReturnSuccess()
