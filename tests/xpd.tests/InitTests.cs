@@ -293,6 +293,8 @@ public class InitTests : InitTestsBase
 
         // Assert
         AssertDotnetCommandWasCalled(processProvider, "tool install csharpier");
+        AssertDotnetCommandWasCalled(processProvider, "tool install husky");
+        AssertDotnetCommandWasCalled(processProvider, "husky install");
     }
 
     [Test]

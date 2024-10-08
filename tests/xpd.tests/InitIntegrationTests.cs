@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using NUnit.Framework;
+using xpd.Models;
 using xpd.Services;
 using xpd.tests.Extensions;
 
@@ -30,7 +31,9 @@ public class InitIntegrationTests : InitTestsBase
         // Assert
         var path = Path.Combine(outputPath, solutionName, ".config", "dotnet-tools.json");
         File.Exists(path).Should().BeTrue();
-        path.Deserialize<DotnetToolsManifest>().Tools.Should().ContainKey("csharpier");
+        var dotnetToolsManifest = path.Deserialize<DotnetToolsManifest>();
+        dotnetToolsManifest.Tools.Should().ContainKey("csharpier");
+        dotnetToolsManifest.Tools.Should().ContainKey("husky");
     }
 
     [Test]
@@ -52,6 +55,35 @@ public class InitIntegrationTests : InitTestsBase
         // Assert
         var path = Path.Combine(outputPath, solutionName, ".git");
         Directory.Exists(path).Should().BeTrue();
+    }
+
+    [Test]
+    public void WhenInitParseIsCalled_ThenHuskyHooksAreInstalled()
+    {
+        // Arrange
+        const string solutionName = "solutionName";
+        var outputPath = PrepareOutputDir();
+        var init = GetSubject(
+            solutionName,
+            fileSystem: new FileSystem(),
+            processProvider: new ProcessProvider(),
+            outputDir: outputPath
+        );
+
+        // Act
+        _ = init.Parse(init);
+
+        // Assert
+        var huskyPath = Path.Combine(outputPath, solutionName, ".husky");
+        Path.Combine(huskyPath, "task-runner.json").ToFile().Exists.Should().BeTrue();
+        Path.Combine(huskyPath, "pre-commit").ToFile().Exists.Should().BeTrue();
+        Path.Combine(huskyPath, "task-runner.json")
+            .Deserialize<TaskRunner>()
+            .Tasks.SingleOrDefault(IsCsharpierTask)
+            .Should()
+            .NotBeNull();
+
+        bool IsCsharpierTask(TaskRunnerTask task) => task.Arguments.Contains("csharpier");
     }
 
     private static string PrepareOutputDir()

@@ -1,8 +1,8 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using xpd.Models;
 
 namespace xpd.convention_tests;
 
@@ -26,7 +26,7 @@ public class HuskyTaskRunnerTests
             t.Name == "commit-message-linter"
         );
         var artifactsDirFromTaskRunner = commitMessageLinterTask
-            .Args.First()
+            .Arguments.First()
             .Split(Path.DirectorySeparatorChar)[0];
 
         artifactsDirFromCsproj.Should().Be(artifactsDirFromTaskRunner);
@@ -59,7 +59,7 @@ public class HuskyTaskRunnerTests
         var commitMessageLinterTask = taskRunner!.Tasks.Single(t =>
             t.Name == "commit-message-linter"
         );
-        var conventionalCommitConfigPath = commitMessageLinterTask.Args.Single(arg =>
+        var conventionalCommitConfigPath = commitMessageLinterTask.Arguments.Single(arg =>
             arg.Contains("conventionalcommit.json")
         );
 
@@ -131,20 +131,5 @@ public class HuskyTaskRunnerTests
 
         static bool HasGitFolder(string folder) =>
             Directory.EnumerateFileSystemEntries(folder).Any(f => f.EndsWith(".git"));
-    }
-
-    private class TaskRunner
-    {
-        [JsonPropertyName("tasks")]
-        public List<Task> Tasks { get; init; } = null!;
-    }
-
-    private class Task
-    {
-        [JsonPropertyName("name")]
-        public string Name { get; init; } = null!;
-
-        [JsonPropertyName("args")]
-        public List<string> Args { get; init; } = null!;
     }
 }

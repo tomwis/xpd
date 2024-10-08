@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Text.Json;
 using NSubstitute;
 using xpd.Interfaces;
+using xpd.Models;
 
 namespace xpd.tests;
 
@@ -19,21 +21,49 @@ public abstract class InitTestsBase
     {
         solutionName ??= "SomeSolution";
         fileSystem ??= new MockFileSystem();
+        var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
         foldersToCreate ??= [];
-        processProvider ??= GetProcessProvider();
+        processProvider ??= GetProcessProvider(
+            () => CreateTaskRunnerJson(fileSystem, currentDir, solutionName)
+        );
+
         var inputRequestor = Substitute.For<IInputRequestor>();
         inputRequestor.GetSolutionName().Returns(solutionName);
         inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
         inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
         return new Init(fileSystem, inputRequestor, processProvider) { Output = outputDir };
+
+        static string TaskRunnerJson() => JsonSerializer.Serialize(new TaskRunner { Tasks = [] });
+
+        static void CreateTaskRunnerJson(
+            IFileSystem fileSystem,
+            string currentDir,
+            string solutionName
+        )
+        {
+            if (fileSystem is MockFileSystem mockFileSystem)
+            {
+                mockFileSystem.AddFile(
+                    fileSystem.Path.Combine(currentDir, solutionName, ".husky", "task-runner.json"),
+                    new MockFileData(TaskRunnerJson())
+                );
+            }
+        }
     }
 
-    protected static IProcessProvider GetProcessProvider()
+    protected static IProcessProvider GetProcessProvider(Action? action = null)
     {
         var processProvider = Substitute.For<IProcessProvider>();
         var processWrapper = Substitute.For<IProcessWrapper>();
         processWrapper.StandardOutput.Returns(new StreamReader(new MemoryStream()));
-        processProvider.Start(Arg.Any<ProcessStartInfo>()).Returns(processWrapper);
+        var configuredCall = processProvider
+            .Start(Arg.Any<ProcessStartInfo>())
+            .Returns(processWrapper);
+
+        if (action is not null)
+        {
+            configuredCall.AndDoes(_ => action());
+        }
         return processProvider;
     }
 }

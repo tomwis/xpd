@@ -14,4 +14,8 @@
       <PackageReference Include="NUnit3TestAdapter" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\xpd\xpd.csproj" />
+    </ItemGroup>
+
 </Project>

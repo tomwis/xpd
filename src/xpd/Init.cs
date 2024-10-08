@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
+using System.Text.Json;
 using System.Xml.Linq;
 using CommandLine;
 using xpd.Enums;
@@ -66,6 +67,12 @@ public class Init(
         CreateDirectoryPackagesProps(mainFolder);
         InitializeGitRepository(mainFolder);
         InstallDotnetTools(mainFolder);
+        var huskyHooksResult = InitializeHuskyHooks(mainFolder);
+        if (huskyHooksResult is not null)
+        {
+            return huskyHooksResult;
+        }
+
         return InitResult.Success(
             solutionName,
             projectName,
@@ -128,6 +135,57 @@ public class Init(
     {
         RunCommand("dotnet", "new tool-manifest", mainFolder);
         RunCommand("dotnet", "tool install csharpier", mainFolder);
+        RunCommand("dotnet", "tool install husky", mainFolder);
+        RunCommand("dotnet", "husky install", mainFolder);
+    }
+
+    private InitResult? InitializeHuskyHooks(string mainFolder)
+    {
+        RunCommand(
+            "dotnet",
+            "husky add pre-commit -c \"dotnet husky run --group pre-commit\"",
+            mainFolder
+        );
+
+        var taskRunnerPath = _fileSystem.Path.Combine(mainFolder, ".husky", "task-runner.json");
+        if (!_fileSystem.File.Exists(taskRunnerPath))
+        {
+            Console.WriteLine(
+                "Warning: .husky/task-runner.json doesn't exist. Git hooks were not added."
+            );
+
+            return InitResult.WithError(InitError.HuskyTaskRunnerMissing);
+        }
+
+        var taskRunnerJson = _fileSystem.File.ReadAllText(taskRunnerPath);
+        var taskRunner = JsonSerializer.Deserialize<TaskRunner>(taskRunnerJson);
+
+        if (taskRunner is null)
+        {
+            Console.WriteLine(
+                "Warning: task-runner.json couldn't be parsed. Git hooks were not added."
+            );
+
+            return InitResult.WithError(InitError.HuskyTaskRunnerError);
+        }
+
+        taskRunner.Tasks.Clear();
+        taskRunner.Tasks.Add(
+            new TaskRunnerTask
+            {
+                Name = "format-staged-files-with-csharpier",
+                Group = "pre-commit",
+                Command = "dotnet",
+                Arguments = ["csharpier", "${staged}"],
+                Include = ["**/*.cs"],
+            }
+        );
+
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        taskRunnerJson = JsonSerializer.Serialize(taskRunner, options);
+        _fileSystem.File.WriteAllText(taskRunnerPath, taskRunnerJson);
+
+        return null;
     }
 
     private void InitializeGitRepository(string mainFolder)

@@ -9,4 +9,9 @@ public static class StringExtensions
         var json = File.ReadAllText(fileName);
         return JsonSerializer.Deserialize<T>(json)!;
     }
+
+    public static FileInfo ToFile(this string fileName)
+    {
+        return new FileInfo(fileName);
+    }
 }
