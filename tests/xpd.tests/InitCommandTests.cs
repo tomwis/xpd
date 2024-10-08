@@ -10,7 +10,7 @@ using xpd.Interfaces;
 
 namespace xpd.tests;
 
-public class InitCommandTests
+public class InitCommandTests : InitTestsBase
 {
     [Test]
     public void WhenSolutionNameIsNotEmpty_ThenReturnSuccess()
@@ -321,26 +321,6 @@ public class InitCommandTests
         return XDocument.Parse(fileContent);
     }
 
-    private static Init GetSubject(
-        string? solutionName = null,
-        string? projectName = null,
-        IFileSystem? fileSystem = null,
-        string[]? foldersToCreate = null,
-        string? outputDir = null,
-        IProcessProvider? processProvider = null
-    )
-    {
-        solutionName ??= "SomeSolution";
-        fileSystem ??= new MockFileSystem();
-        foldersToCreate ??= [];
-        processProvider ??= GetProcessProvider();
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
-        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
-        return new Init(fileSystem, inputRequestor, processProvider) { Output = outputDir };
-    }
-
     private static MockFileSystem GetFileSystemWithSln(string currentDir, string solutionPath)
     {
         return new MockFileSystem(
@@ -350,14 +330,5 @@ public class InitCommandTests
             },
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
-    }
-
-    private static IProcessProvider GetProcessProvider()
-    {
-        var processProvider = Substitute.For<IProcessProvider>();
-        var processWrapper = Substitute.For<IProcessWrapper>();
-        processWrapper.StandardOutput.Returns(new StreamReader(new MemoryStream()));
-        processProvider.Start(Arg.Any<ProcessStartInfo>()).Returns(processWrapper);
-        return processProvider;
     }
 }
