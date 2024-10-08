@@ -1,10 +1,4 @@
-﻿using System;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using CommandLine;
 
 namespace xpd.githook.cc_lint;

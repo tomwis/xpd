@@ -1,13 +1,8 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Xml.Linq;
-using FluentAssertions;
 using NSubstitute;
-using NUnit.Framework;
-using xpd.Enums;
 using xpd.Interfaces;
-using xpd.Services;
 
 namespace xpd.tests;
 
