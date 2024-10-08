@@ -64,6 +64,7 @@ public class Init(
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
         CreateDirectoryBuildTargets(mainFolder);
         CreateDirectoryPackagesProps(mainFolder);
+        InitializeGitRepository(mainFolder);
         InstallDotnetTools(mainFolder);
         return InitResult.Success(
             solutionName,
@@ -127,6 +128,11 @@ public class Init(
     {
         RunCommand("dotnet", "new tool-manifest", mainFolder);
         RunCommand("dotnet", "tool install csharpier", mainFolder);
+    }
+
+    private void InitializeGitRepository(string mainFolder)
+    {
+        RunCommand("git", "init", mainFolder);
     }
 
     private void RunCommand(string command, string arguments, string workingDirectory = "")

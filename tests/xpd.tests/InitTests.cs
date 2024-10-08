@@ -295,16 +295,39 @@ public class InitTests : InitTestsBase
         AssertDotnetCommandWasCalled(processProvider, "tool install csharpier");
     }
 
+    [Test]
+    public void WhenInitParseIsCalled_ThenGitRepositoryIsInitialized()
+    {
+        // Arrange
+        var processProvider = GetProcessProvider();
+        var init = GetSubject(processProvider: processProvider);
+
+        // Act
+        _ = init.Parse(init);
+
+        // Assert
+        AssertCommandWasCalled(processProvider, "git", "init");
+    }
+
     private static void AssertDotnetCommandWasCalled(
         IProcessProvider processProvider,
         string command
+    )
+    {
+        AssertCommandWasCalled(processProvider, "dotnet", command);
+    }
+
+    private static void AssertCommandWasCalled(
+        IProcessProvider processProvider,
+        string command,
+        string arguments
     )
     {
         processProvider
             .Received(1)
             .Start(
                 Arg.Is<ProcessStartInfo>(info =>
-                    info.FileName == "dotnet" && info.Arguments == command
+                    info.FileName == command && info.Arguments == arguments
                 )
             );
     }
