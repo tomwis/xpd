@@ -9,32 +9,42 @@ namespace xpd.convention_tests;
 public class HuskyTaskRunnerTests
 {
     [Test]
+    public void ArtifactsDirNameShouldBeTheSameInCcLintProjectAndTaskRunner()
+    {
+        const string artifactsDirPropertyName = "ArtifactsDir";
+        var rootFolder = GetRootRepoFolder();
+        var csprojPath = GetCcLintCsprojPath(rootFolder);
+        var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
+                csprojPath,
+                artifactsDirPropertyName
+            )
+            .Split(Path.DirectorySeparatorChar)
+            .Last();
+
+        var taskRunner = GetTaskRunner(rootFolder);
+        var commitMessageLinterTask = taskRunner!.Tasks.Single(t =>
+            t.Name == "commit-message-linter"
+        );
+        var artifactsDirFromTaskRunner = commitMessageLinterTask
+            .Args.First()
+            .Split(Path.DirectorySeparatorChar)[0];
+
+        artifactsDirFromCsproj.Should().Be(artifactsDirFromTaskRunner);
+    }
+
+    [Test]
     public void ArtifactsDirPathShouldBeCorrect()
     {
-        // Arrange
-        const string artifactsDir = "ArtifactsDir";
+        const string artifactsDirPropertyName = "ArtifactsDir";
         var rootFolder = GetRootRepoFolder();
-        var csprojPath = Path.Combine(
-            rootFolder,
-            "src",
-            "xpd.githook.cc-lint",
-            "xpd.githook.cc-lint.csproj"
-        );
+        var csprojPath = GetCcLintCsprojPath(rootFolder);
         var csprojDir = new FileInfo(csprojPath).DirectoryName!;
-
-        // Act
-        var csprojContent = File.ReadAllText(csprojPath);
-        var csprojXml = XDocument.Parse(csprojContent);
-        var artifactsDirProperty = csprojXml
-            .Root?.Descendants("PropertyGroup")
-            .SelectMany(pg => pg.Elements())
-            .Single(e => e.Name == artifactsDir);
-
-        // Assert
-        artifactsDirProperty.Should().NotBeNull();
-        var artifactsDirPath = Path.GetFullPath(
-            Path.Combine(csprojDir, artifactsDirProperty!.Value)
+        var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
+            csprojPath,
+            artifactsDirPropertyName
         );
+
+        var artifactsDirPath = Path.GetFullPath(Path.Combine(csprojDir, artifactsDirFromCsproj));
         var artifactsParentDir = Path.GetDirectoryName(artifactsDirPath);
         artifactsParentDir.Should().Be(rootFolder);
     }
@@ -59,6 +69,35 @@ public class HuskyTaskRunnerTests
             .BeTrue(
                 $"Path to conventionalcommit.json ({conventionalCommitConfigPath}) in commit-message-linter task in .husky/task-runner.json is incorrect."
             );
+    }
+
+    private static TaskRunner? GetTaskRunner(string rootFolder)
+    {
+        var taskRunnerPath = Path.Combine(rootFolder, ".husky", "task-runner.json");
+        var taskRunnerJson = File.ReadAllText(taskRunnerPath);
+        var taskRunner = JsonSerializer.Deserialize<TaskRunner>(taskRunnerJson);
+        return taskRunner;
+    }
+
+    private static string GetPropertyValueFromCsproj(string csprojPath, string propertyName)
+    {
+        var csprojXml = XDocument.Load(csprojPath);
+        var artifactsDirProperty = csprojXml
+            .Root!.Descendants("PropertyGroup")
+            .SelectMany(pg => pg.Descendants(propertyName))
+            .Single();
+        return artifactsDirProperty.Value;
+    }
+
+    private static string GetCcLintCsprojPath(string rootFolder)
+    {
+        var csprojPath = Path.Combine(
+            rootFolder,
+            "src",
+            "xpd.githook.cc-lint",
+            "xpd.githook.cc-lint.csproj"
+        );
+        return csprojPath;
     }
 
     private static string GetRootRepoFolder()
