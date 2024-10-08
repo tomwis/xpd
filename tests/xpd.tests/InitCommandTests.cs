@@ -223,13 +223,8 @@ public class InitCommandTests
         var result = init.Parse(init);
 
         // Assert
-        var directoryBuildTargetsFile = mockFileSystem.Path.Combine(
-            result.MainFolder!,
-            "Directory.Build.targets"
-        );
-        var fileContent = mockFileSystem.File.ReadAllText(directoryBuildTargetsFile);
-        var xdoc = XDocument.Parse(fileContent);
-        xdoc.Root!.Name.LocalName.Should().Be("Project");
+        var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Build.targets");
+        xdoc.Should().HaveRoot("Project");
     }
 
     [Test]
@@ -243,16 +238,13 @@ public class InitCommandTests
         var result = init.Parse(init);
 
         // Assert
-        var directoryPackagesPropsFile = mockFileSystem.Path.Combine(
-            result.MainFolder!,
-            "Directory.Packages.props"
-        );
-        var fileContent = mockFileSystem.File.ReadAllText(directoryPackagesPropsFile);
-        var xdoc = XDocument.Parse(fileContent);
-        var managePackageVersionsCentrallyProperty = xdoc.Root!.Elements("PropertyGroup")
-            .Single(pg => pg.Element("ManagePackageVersionsCentrally") != null);
-
-        managePackageVersionsCentrallyProperty.Value.Should().Be("true");
+        var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Packages.props");
+        xdoc.Should()
+            .HaveElement("PropertyGroup")
+            .Which.Should()
+            .HaveElement("ManagePackageVersionsCentrally")
+            .Which.Should()
+            .HaveValue("true");
     }
 
     [TestCase("App")]
@@ -269,16 +261,22 @@ public class InitCommandTests
         var result = init.Parse(init);
 
         // Assert
-        var directoryPackagesPropsFile = mockFileSystem.Path.Combine(
-            result.MainFolder!,
-            "Directory.Packages.props"
-        );
-        var fileContent = mockFileSystem.File.ReadAllText(directoryPackagesPropsFile);
-        var xdoc = XDocument.Parse(fileContent);
-        var itemGroup = xdoc.Root!.Elements("ItemGroup")
-            .Single(ig => ig.Attribute("Label")?.Value == itemGroupLabel);
+        var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Packages.props");
+        xdoc.Should()
+            .HaveElement("ItemGroup", Exactly.Twice())
+            .Which.Should()
+            .Contain(element => element.Attribute("Label")!.Value == itemGroupLabel);
+    }
 
-        itemGroup.Should().NotBeNull();
+    private static XDocument GetXml(
+        MockFileSystem mockFileSystem,
+        string mainFolder,
+        string fileName
+    )
+    {
+        var directoryPackagesPropsFile = mockFileSystem.Path.Combine(mainFolder, fileName);
+        var fileContent = mockFileSystem.File.ReadAllText(directoryPackagesPropsFile);
+        return XDocument.Parse(fileContent);
     }
 
     private static Init GetSubject(
