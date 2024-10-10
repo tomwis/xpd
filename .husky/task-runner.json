@@ -2,6 +2,12 @@
    "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
    "tasks": [
       {
+          "name": "build",
+          "group": "pre-commit",
+          "command": "dotnet",
+          "args": [ "build", "src/xpd.sln" ]
+      },
+      {
          "name": "run-convention-tests",
          "group": "pre-commit",
          "command": "dotnet",
