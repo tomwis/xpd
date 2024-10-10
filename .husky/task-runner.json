@@ -8,6 +8,12 @@
          "args": [ "test", "tests/xpd.convention-tests" ]
       },
       {
+         "name": "run-unit-tests",
+         "group": "pre-commit",
+         "command": "dotnet",
+         "args": [ "test", "tests/xpd.tests", "--filter", "FullyQualifiedName~UnitTests" ]
+      },
+      {
          "name": "commit-message-linter",
          "group": "commit-msg",
          "command": "dotnet",

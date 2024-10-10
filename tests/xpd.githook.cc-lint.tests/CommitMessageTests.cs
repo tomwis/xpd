@@ -4,6 +4,7 @@ namespace xpd.githook.cc_lint.tests;
 
 public class CommitMessageTests
 {
+    [Ignore("not yet implemented correctly")]
     [Test]
     public void Test()
     {

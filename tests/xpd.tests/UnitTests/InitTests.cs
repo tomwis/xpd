@@ -7,7 +7,7 @@ using NUnit.Framework;
 using xpd.Enums;
 using xpd.Interfaces;
 
-namespace xpd.tests;
+namespace xpd.tests.UnitTests;
 
 public class InitTests : InitTestsBase
 {

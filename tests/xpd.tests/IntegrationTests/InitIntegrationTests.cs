@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentAssertions;
@@ -8,7 +7,7 @@ using xpd.Models;
 using xpd.Services;
 using xpd.tests.Extensions;
 
-namespace xpd.tests;
+namespace xpd.tests.IntegrationTests;
 
 public class InitIntegrationTests : InitTestsBase
 {
