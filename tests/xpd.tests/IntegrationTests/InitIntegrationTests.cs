@@ -97,6 +97,6 @@ public class InitIntegrationTests : InitTestsBase
     public class DotnetToolsManifest
     {
         [JsonPropertyName("tools")]
-        public Dictionary<string, JsonObject> Tools { get; set; }
+        public Dictionary<string, JsonObject> Tools { get; set; } = null!;
     }
 }
