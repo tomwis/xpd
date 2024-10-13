@@ -11,4 +11,4 @@ indent_size = 4
 # Style
 # Language and unnecessary code rules
 # using directive preferences
-dotnet_diagnostic.IDE0005.severity = warning   # Remove unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = warning # Remove unnecessary using directives

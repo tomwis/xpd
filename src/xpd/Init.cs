@@ -73,6 +73,8 @@ public class Init(
             return huskyHooksResult;
         }
 
+        InitializeHuskyRestoreTarget(mainFolder);
+
         return InitResult.Success(
             solutionName,
             projectName,
@@ -80,6 +82,110 @@ public class Init(
             solutionOutputDir,
             selectedFolders
         );
+    }
+
+    private void InitializeHuskyRestoreTarget(string mainFolder)
+    {
+        var directoryBuildTargetsFile = _fileSystem.Path.Combine(
+            mainFolder,
+            "Directory.Build.targets"
+        );
+        var xmlText = _fileSystem.File.ReadAllText(directoryBuildTargetsFile);
+        var doc = XDocument.Parse(xmlText);
+        var root = doc.Root;
+        if (root is null)
+        {
+            root = new XElement("Project");
+            doc.Add(root);
+        }
+
+        var propertyGroup = new XElement(
+            "PropertyGroup",
+            new XElement("DirectoryBuildTargetsDir", "$(MSBuildThisFileDirectory)"),
+            new XElement(
+                "ToolListFile",
+                "$(DirectoryBuildTargetsDir)config/dotnet_tools_installed.txt"
+            ),
+            new XElement("MessageTag", "[Directory.Build.targets][$({MSBuildProjectName})]")
+        );
+        var dotnetToolsRestoreAndInstall = new XElement(
+            "Target",
+            new XAttribute("Name", "DotnetToolsRestoreAndInstall"),
+            new XAttribute("BeforeTargets", "Restore;CollectPackageReferences"),
+            Message("$(MessageTag) DirectoryBuildTargetsDir: $(DirectoryBuildTargetsDir)"),
+            Message("$(MessageTag) ToolListFile: $(ToolListFile)"),
+            new XElement(
+                "ReadLinesFromFile",
+                new XAttribute("File", "$(ToolListFile)"),
+                new XElement(
+                    "Output",
+                    new XAttribute("TaskParameter", "Lines"),
+                    new XAttribute("ItemName", "ToolLines")
+                )
+            ),
+            Message("$(MessageTag) Tool: %(ToolLines.Identity)"),
+            new XElement(
+                "PropertyGroup",
+                new XElement(
+                    "HuskyInstalled",
+                    new XAttribute("Condition", "'%(ToolLines.Identity)' == 'Husky'"),
+                    "true"
+                )
+            ),
+            Message("$(MessageTag) HuskyInstalled: $(HuskyInstalled)"),
+            new XElement(
+                "CallTarget",
+                new XAttribute("Targets", "HuskyRestoreAndInstall"),
+                new XAttribute("Condition", "'$(HUSKY)' != 0 AND '$(HuskyInstalled)' != 'true'")
+            )
+        );
+
+        var huskyRestoreAndInstall = new XElement(
+            "Target",
+            new XAttribute("Name", "HuskyRestoreAndInstall"),
+            Exec("dotnet tool restore"),
+            Exec("dotnet husky install", "$(DirectoryBuildTargetsDir)"),
+            SaveToFile("$(ToolListFile)", "Husky")
+        );
+
+        root.Add(propertyGroup);
+        root.Add(dotnetToolsRestoreAndInstall);
+        root.Add(huskyRestoreAndInstall);
+
+        var result = doc.ToString();
+        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, result);
+        return;
+
+        static XElement Message(string text)
+        {
+            return new XElement(
+                "Message",
+                new XAttribute("Text", text),
+                new XAttribute("Importance", "high")
+            );
+        }
+
+        static XElement Exec(string command, string? workingDirectory = null)
+        {
+            return new XElement(
+                "Exec",
+                new XAttribute("Command", command),
+                new XAttribute("StandardOutputImportance", "Low"),
+                new XAttribute("StandardErrorImportance", "High"),
+                workingDirectory is not null
+                    ? new XAttribute("WorkingDirectory", workingDirectory)
+                    : null
+            );
+        }
+
+        static XElement SaveToFile(string fileName, string content)
+        {
+            return new XElement(
+                "WriteLinesToFile",
+                new XAttribute("File", fileName),
+                new XAttribute("Lines", content)
+            );
+        }
     }
 
     private void CreateFolders(string mainFolder, List<string> folders)

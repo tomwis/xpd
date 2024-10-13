@@ -6,6 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using xpd.Enums;
 using xpd.Interfaces;
+using xpd.tests.Extensions;
 
 namespace xpd.tests.UnitTests;
 
@@ -309,6 +310,38 @@ public class InitTests : InitTestsBase
 
         // Assert
         AssertCommandWasCalled(processProvider, "git", "init");
+    }
+
+    [Test]
+    public void WhenInitParseIsCalled_ThenDirectoryBuildTargetsIsCorrectlyModified()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var init = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var xml = GetXml(mockFileSystem, result.MainFolder!, "Directory.Build.targets");
+        xml.Should().SetBasicProperties();
+        var targetElements = xml.Should().HaveElement("Target", Exactly.Twice()).Which.ToList();
+
+        targetElements
+            .First()
+            .Should()
+            .HaveAttribute("Name", "DotnetToolsRestoreAndInstall")
+            .And.HaveAttribute("BeforeTargets", "Restore;CollectPackageReferences")
+            .And.SetInstalledToolsFromCache()
+            .And.CallHuskyInstallIfNotInstalled();
+
+        targetElements
+            .Last()
+            .Should()
+            .HaveAttribute("Name", "HuskyRestoreAndInstall")
+            .And.RestoreDotnetTools()
+            .And.InstallHusky()
+            .And.SaveHuskyInstallToFile();
     }
 
     private static void AssertDotnetCommandWasCalled(
