@@ -324,6 +324,7 @@ public class InitTests : InitTestsBase
 
         // Assert
         var xml = GetXml(mockFileSystem, result.MainFolder!, "Directory.Build.targets");
+        Console.WriteLine(xml);
         xml.Should().SetBasicProperties();
         var targetElements = xml.Should().HaveElement("Target", Exactly.Twice()).Which.ToList();
 
