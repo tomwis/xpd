@@ -15,11 +15,9 @@ public class HuskyService(IFileSystem fileSystem)
     public void InitializeHuskyRestoreTarget(string mainFolder)
     {
         var msBuildXmlBuilder = new MsBuildXmlBuilder.Builders.MsBuildXmlBuilder();
-        var toolListFileValue = Path.Combine(
-            CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue(),
-            "config",
-            "dotnet_tools_installed.txt"
-        );
+        var toolListFileValue =
+            CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
+            + Path.Combine("config", "dotnet_tools_installed.txt");
         var messageTagValue =
             $"[Directory.Build.targets][{MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue()}]";
 
