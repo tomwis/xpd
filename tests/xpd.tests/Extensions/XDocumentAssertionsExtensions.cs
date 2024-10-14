@@ -90,7 +90,7 @@ public static class XDocumentAssertionsExtensions
         andWhichConstraint
             .Which.Should()
             .HaveAttribute("Targets", "HuskyRestoreAndInstall")
-            .And.HaveAttribute("Condition", "'$(HUSKY)' != 0 AND '$(HuskyInstalled)' != 'true'");
+            .And.HaveAttribute("Condition", "'$(HUSKY)' != '0' AND '$(HuskyInstalled)' != 'true'");
 
         return andWhichConstraint;
     }
