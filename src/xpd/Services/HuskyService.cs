@@ -6,7 +6,7 @@ using xpd.MsBuildXmlBuilder.Models;
 using xpd.MsBuildXmlBuilder.Properties;
 using xpd.MsBuildXmlBuilder.Tasks;
 
-namespace xpd;
+namespace xpd.Services;
 
 public class HuskyService(IFileSystem fileSystem)
 {
@@ -64,8 +64,14 @@ public class HuskyService(IFileSystem fileSystem)
                                 .With(
                                     i => i.Condition,
                                     Condition.And(
-                                        Condition.NotEquals("$(HUSKY)", 0.ToString()),
-                                        Condition.NotEquals("$(HuskyInstalled)", "true")
+                                        Condition.NotEquals(
+                                            CustomProperty.Husky.ToUnevaluatedValue(),
+                                            0.ToString()
+                                        ),
+                                        Condition.NotEquals(
+                                            CustomProperty.HuskyInstalled.ToUnevaluatedValue(),
+                                            "true"
+                                        )
                                     )
                                 )
                         );

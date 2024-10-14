@@ -35,6 +35,7 @@ public abstract class MsBuildTask : IMsBuildTask, IXmlSerializable
         var propertyInfos = instance
             .GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
         foreach (var property in propertyInfos)
         {
             var xmlIgnore = property.GetCustomAttribute<XmlIgnoreAttribute>();

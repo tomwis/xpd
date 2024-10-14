@@ -1,5 +1,7 @@
 using xpd.MsBuildXmlBuilder.Interfaces;
 
+// ReSharper disable InconsistentNaming
+
 namespace xpd.MsBuildXmlBuilder.Properties;
 
 internal sealed class MsBuildProperty : IPropertyName

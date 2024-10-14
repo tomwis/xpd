@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using xpd.MsBuildXmlBuilder.Attributes;
 
 namespace xpd.MsBuildXmlBuilder.Builders;
 
@@ -15,10 +14,14 @@ internal sealed class XmlBuilder<T>
     public XmlBuilder<T> With<TProp>(Expression<Func<T, TProp>> propertyExpression, TProp value)
     {
         if (propertyExpression.Body is not MemberExpression memberExpression)
-            throw new ArgumentException("Property expression is not valid.");
+            throw new ArgumentException(
+                $"Property expression is not valid. {propertyExpression} should refer to a property."
+            );
 
         if (memberExpression.Member is not PropertyInfo propertyInfo)
-            throw new ArgumentException("Expression does not refer to a property.");
+            throw new ArgumentException(
+                $"Expression {propertyExpression} does not refer to a property. Member type is {memberExpression.Member.MemberType}."
+            );
 
         propertyInfo.SetValue(Instance, value);
         return this;
@@ -28,8 +31,6 @@ internal sealed class XmlBuilder<T>
 
     private XElement ToXml()
     {
-        VerifyRequiredAttribute(Instance!);
-
         var serializer = new XmlSerializer(typeof(T));
         var settings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
 
@@ -41,46 +42,5 @@ internal sealed class XmlBuilder<T>
         var xml = XDocument.Parse(xmlText);
 
         return xml.Root!;
-    }
-
-    private static void VerifyRequiredAttribute(object instance)
-    {
-        var propertyInfos = instance
-            .GetType()
-            .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-        foreach (var propertyInfo in propertyInfos)
-        {
-            var attribute = propertyInfo.GetCustomAttribute<XmlRequiredAttribute>();
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (attribute is null)
-                continue;
-
-            var value = propertyInfo.GetValue(instance);
-            if (value is null)
-            {
-                throw new InvalidOperationException(
-                    $"Property '{propertyInfo.Name}' must be set before building the XML."
-                );
-            }
-
-            if (IsComplexType(propertyInfo.PropertyType))
-            {
-                VerifyRequiredAttribute(value);
-            }
-        }
-
-        return;
-
-        static bool IsComplexType(Type type)
-        {
-            return type is { IsPrimitive: false, IsEnum: false }
-                && type != typeof(string)
-                && type != typeof(decimal)
-                && type != typeof(DateTime)
-                && type != typeof(TimeSpan)
-                && type != typeof(Guid);
-        }
     }
 }

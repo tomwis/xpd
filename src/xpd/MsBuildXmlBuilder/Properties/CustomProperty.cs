@@ -9,6 +9,7 @@ internal sealed class CustomProperty : IPropertyName
     );
     public static readonly CustomProperty ToolListFile = new CustomProperty("ToolListFile");
     public static readonly CustomProperty HuskyInstalled = new CustomProperty("HuskyInstalled");
+    public static readonly CustomProperty Husky = new CustomProperty("HUSKY");
     public static readonly CustomProperty MessageTag = new CustomProperty("MessageTag");
 
     private readonly string _name;
