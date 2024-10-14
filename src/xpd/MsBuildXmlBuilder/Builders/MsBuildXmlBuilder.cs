@@ -1,5 +1,4 @@
 using System.Xml.Linq;
-using xpd.MsBuildXmlBuilder.Enums;
 
 namespace xpd.MsBuildXmlBuilder.Builders;
 
@@ -14,18 +13,20 @@ internal sealed class MsBuildXmlBuilder
         return this;
     }
 
-    public MsBuildXmlBuilder AddPropertyGroup(Action<PropertyGroupBuilder> propertyGroupBuilder)
+    public MsBuildXmlBuilder AddPropertyGroup(
+        Action<PropertyGroupBuilder> propertyGroupBuilderAction
+    )
     {
         var builder = new PropertyGroupBuilder();
-        propertyGroupBuilder(builder);
+        propertyGroupBuilderAction(builder);
         _project.Add(builder.Build());
         return this;
     }
 
-    public MsBuildXmlBuilder AddTarget(TargetName name, Action<TargetBuilder> targetBuilder)
+    public MsBuildXmlBuilder AddTarget(Action<TargetBuilder> targetBuilderAction)
     {
-        var builder = new TargetBuilder(name);
-        targetBuilder(builder);
+        var builder = new TargetBuilder();
+        targetBuilderAction(builder);
         _project.Add(builder.Build());
         return this;
     }

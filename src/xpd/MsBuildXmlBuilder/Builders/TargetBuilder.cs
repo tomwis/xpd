@@ -8,14 +8,15 @@ namespace xpd.MsBuildXmlBuilder.Builders;
 
 internal sealed class TargetBuilder
 {
-    private readonly XElement _target;
+    private readonly XElement _target = new("Target");
 
-    public TargetBuilder(TargetName name)
+    public TargetBuilder AddName(TargetName name)
     {
-        _target = new XElement("Target", new XAttribute("Name", name));
+        _target.Add(new XAttribute("Name", name));
+        return this;
     }
 
-    public TargetBuilder BeforeTargets(params TargetName[] beforeTargets)
+    public TargetBuilder AddBeforeTargets(params TargetName[] beforeTargets)
     {
         _target.Add(new XAttribute("BeforeTargets", string.Join(";", beforeTargets)));
         return this;

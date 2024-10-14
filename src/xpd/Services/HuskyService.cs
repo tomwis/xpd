@@ -29,71 +29,65 @@ public class HuskyService(IFileSystem fileSystem)
                 pg[CustomProperty.ToolListFile] = toolListFileValue;
                 pg[CustomProperty.MessageTag] = messageTagValue;
             })
-            .AddTarget(
-                TargetName.DotnetToolsRestoreAndInstall,
-                target =>
-                {
-                    const string outputItemName = "ToolLines";
-                    var messageTag = CustomProperty.MessageTag.ToUnevaluatedValue();
-                    target
-                        .BeforeTargets(TargetName.Restore, TargetName.CollectPackageReferences)
-                        .AddMessage(
-                            $"{messageTag} DirectoryBuildTargetsDir: {CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()}"
-                        )
-                        .AddMessage(
-                            $"{messageTag} ToolListFile: {CustomProperty.ToolListFile.ToUnevaluatedValue()}"
-                        )
-                        .AddReadLinesFromFile(
-                            CustomProperty.ToolListFile.ToUnevaluatedValue(),
-                            outputItemName
-                        )
-                        .AddMessage($"{messageTag} Tool: %({outputItemName}.Identity)")
-                        .AddPropertyGroup(
-                            new PropertyBuilder(
-                                CustomProperty.HuskyInstalled,
-                                "true"
-                            ).WithCondition(
-                                Condition.Equals($"%({outputItemName}.Identity)", "Husky")
-                            )
-                        )
-                        .AddMessage(
-                            $"{messageTag} HuskyInstalled: {CustomProperty.HuskyInstalled.ToUnevaluatedValue()}"
-                        )
-                        .AddTask<CallTarget>(task =>
-                            task.With(i => i.Targets, [TargetName.HuskyRestoreAndInstall])
-                                .With(
-                                    i => i.Condition,
-                                    Condition.And(
-                                        Condition.NotEquals(
-                                            CustomProperty.Husky.ToUnevaluatedValue(),
-                                            0.ToString()
-                                        ),
-                                        Condition.NotEquals(
-                                            CustomProperty.HuskyInstalled.ToUnevaluatedValue(),
-                                            "true"
-                                        )
-                                    )
-                                )
-                        );
-                }
-            )
-            .AddTarget(
-                TargetName.HuskyRestoreAndInstall,
-                target =>
-                    target
-                        .AddExec("dotnet tool restore")
-                        .AddExec(
-                            "dotnet husky install",
-                            CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
-                        )
-                        .AddWriteLinesToFile(
-                            CustomProperty.ToolListFile.ToUnevaluatedValue(),
-                            "Husky"
-                        )
-            );
+            .AddTarget(SetDotnetToolsRestoreAndInstallTarget)
+            .AddTarget(SetHuskyRestoreAndInstallTarget);
 
         var directoryBuildTargetsFile = Path.Combine(mainFolder, "Directory.Build.targets");
         var contents = msBuildXmlBuilder.ToString();
         _fileSystem.File.WriteAllText(directoryBuildTargetsFile, contents);
+    }
+
+    private static void SetDotnetToolsRestoreAndInstallTarget(TargetBuilder target)
+    {
+        const string outputItemName = "ToolLines";
+        var messageTag = CustomProperty.MessageTag.ToUnevaluatedValue();
+
+        target
+            .AddName(TargetName.DotnetToolsRestoreAndInstall)
+            .AddBeforeTargets(TargetName.Restore, TargetName.CollectPackageReferences)
+            .AddMessage(
+                $"{messageTag} DirectoryBuildTargetsDir: {CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()}"
+            )
+            .AddMessage(
+                $"{messageTag} ToolListFile: {CustomProperty.ToolListFile.ToUnevaluatedValue()}"
+            )
+            .AddReadLinesFromFile(CustomProperty.ToolListFile.ToUnevaluatedValue(), outputItemName)
+            .AddMessage($"{messageTag} Tool: %({outputItemName}.Identity)")
+            .AddPropertyGroup(
+                new PropertyBuilder(CustomProperty.HuskyInstalled, "true").WithCondition(
+                    Condition.Equals($"%({outputItemName}.Identity)", "Husky")
+                )
+            )
+            .AddMessage(
+                $"{messageTag} HuskyInstalled: {CustomProperty.HuskyInstalled.ToUnevaluatedValue()}"
+            )
+            .AddTask<CallTarget>(task =>
+                task.With(i => i.Targets, [TargetName.HuskyRestoreAndInstall])
+                    .With(
+                        i => i.Condition,
+                        Condition.And(
+                            Condition.NotEquals(
+                                CustomProperty.Husky.ToUnevaluatedValue(),
+                                0.ToString()
+                            ),
+                            Condition.NotEquals(
+                                CustomProperty.HuskyInstalled.ToUnevaluatedValue(),
+                                "true"
+                            )
+                        )
+                    )
+            );
+    }
+
+    private static void SetHuskyRestoreAndInstallTarget(TargetBuilder target)
+    {
+        target
+            .AddName(TargetName.HuskyRestoreAndInstall)
+            .AddExec("dotnet tool restore")
+            .AddExec(
+                "dotnet husky install",
+                CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
+            )
+            .AddWriteLinesToFile(CustomProperty.ToolListFile.ToUnevaluatedValue(), "Husky");
     }
 }
