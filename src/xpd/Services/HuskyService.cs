@@ -1,4 +1,7 @@
 using System.IO.Abstractions;
+using System.Text.Json;
+using xpd.Enums;
+using xpd.Models;
 using xpd.MsBuildXmlBuilder.Builders;
 using xpd.MsBuildXmlBuilder.Enums;
 using xpd.MsBuildXmlBuilder.Extensions;
@@ -8,9 +11,59 @@ using xpd.MsBuildXmlBuilder.Tasks;
 
 namespace xpd.Services;
 
-public class HuskyService(IFileSystem fileSystem)
+public class HuskyService(IFileSystem fileSystem, CommandService commandService)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
+    private readonly CommandService _commandService = commandService;
+
+    public InitResult? InitializeHuskyHooks(string mainFolder)
+    {
+        _commandService.RunCommand(
+            "dotnet",
+            "husky add pre-commit -c \"dotnet husky run --group pre-commit\"",
+            mainFolder
+        );
+
+        var taskRunnerPath = _fileSystem.Path.Combine(mainFolder, ".husky", "task-runner.json");
+        if (!_fileSystem.File.Exists(taskRunnerPath))
+        {
+            Console.WriteLine(
+                "Warning: .husky/task-runner.json doesn't exist. Git hooks were not added."
+            );
+
+            return InitResult.WithError(InitError.HuskyTaskRunnerMissing);
+        }
+
+        var taskRunnerJson = _fileSystem.File.ReadAllText(taskRunnerPath);
+        var taskRunner = JsonSerializer.Deserialize<TaskRunner>(taskRunnerJson);
+
+        if (taskRunner is null)
+        {
+            Console.WriteLine(
+                "Warning: task-runner.json couldn't be parsed. Git hooks were not added."
+            );
+
+            return InitResult.WithError(InitError.HuskyTaskRunnerError);
+        }
+
+        taskRunner.Tasks.Clear();
+        taskRunner.Tasks.Add(
+            new TaskRunnerTask
+            {
+                Name = "format-staged-files-with-csharpier",
+                Group = "pre-commit",
+                Command = "dotnet",
+                Arguments = ["csharpier", "${staged}"],
+                Include = ["**/*.cs"],
+            }
+        );
+
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        taskRunnerJson = JsonSerializer.Serialize(taskRunner, options);
+        _fileSystem.File.WriteAllText(taskRunnerPath, taskRunnerJson);
+
+        return null;
+    }
 
     public void InitializeHuskyRestoreTarget(string mainFolder)
     {

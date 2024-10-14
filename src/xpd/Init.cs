@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.IO.Abstractions;
-using System.Text.Json;
 using System.Xml.Linq;
 using CommandLine;
 using xpd.Enums;
@@ -20,6 +18,7 @@ public class Init(
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly IInputRequestor _inputRequestor = inputRequestor;
     private readonly IProcessProvider _processProvider = processProvider;
+    private readonly CommandService _commandService = new(processProvider);
 
     public Init()
         : this(new FileSystem(), new InputRequestor(), new ProcessProvider()) { }
@@ -67,13 +66,15 @@ public class Init(
         CreateDirectoryPackagesProps(mainFolder);
         InitializeGitRepository(mainFolder);
         InstallDotnetTools(mainFolder);
-        var huskyHooksResult = InitializeHuskyHooks(mainFolder);
+
+        var huskyService = new HuskyService(_fileSystem, _commandService);
+        var huskyHooksResult = huskyService.InitializeHuskyHooks(mainFolder);
         if (huskyHooksResult is not null)
         {
             return huskyHooksResult;
         }
 
-        new HuskyService(_fileSystem).InitializeHuskyRestoreTarget(mainFolder);
+        huskyService.InitializeHuskyRestoreTarget(mainFolder);
 
         return InitResult.Success(
             solutionName,
@@ -98,9 +99,16 @@ public class Init(
         string projectName
     )
     {
-        RunCommand("dotnet", $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir}\"");
-        RunCommand("dotnet", $"new console --output \"{projectName}\"", solutionOutputDir);
-        RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
+        _commandService.RunCommand(
+            "dotnet",
+            $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir}\""
+        );
+        _commandService.RunCommand(
+            "dotnet",
+            $"new console --output \"{projectName}\"",
+            solutionOutputDir
+        );
+        _commandService.RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
     }
 
     private void CreateDirectoryBuildTargets(string mainFolder)
@@ -135,81 +143,14 @@ public class Init(
 
     private void InstallDotnetTools(string mainFolder)
     {
-        RunCommand("dotnet", "new tool-manifest", mainFolder);
-        RunCommand("dotnet", "tool install csharpier", mainFolder);
-        RunCommand("dotnet", "tool install husky", mainFolder);
-        RunCommand("dotnet", "husky install", mainFolder);
-    }
-
-    private InitResult? InitializeHuskyHooks(string mainFolder)
-    {
-        RunCommand(
-            "dotnet",
-            "husky add pre-commit -c \"dotnet husky run --group pre-commit\"",
-            mainFolder
-        );
-
-        var taskRunnerPath = _fileSystem.Path.Combine(mainFolder, ".husky", "task-runner.json");
-        if (!_fileSystem.File.Exists(taskRunnerPath))
-        {
-            Console.WriteLine(
-                "Warning: .husky/task-runner.json doesn't exist. Git hooks were not added."
-            );
-
-            return InitResult.WithError(InitError.HuskyTaskRunnerMissing);
-        }
-
-        var taskRunnerJson = _fileSystem.File.ReadAllText(taskRunnerPath);
-        var taskRunner = JsonSerializer.Deserialize<TaskRunner>(taskRunnerJson);
-
-        if (taskRunner is null)
-        {
-            Console.WriteLine(
-                "Warning: task-runner.json couldn't be parsed. Git hooks were not added."
-            );
-
-            return InitResult.WithError(InitError.HuskyTaskRunnerError);
-        }
-
-        taskRunner.Tasks.Clear();
-        taskRunner.Tasks.Add(
-            new TaskRunnerTask
-            {
-                Name = "format-staged-files-with-csharpier",
-                Group = "pre-commit",
-                Command = "dotnet",
-                Arguments = ["csharpier", "${staged}"],
-                Include = ["**/*.cs"],
-            }
-        );
-
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        taskRunnerJson = JsonSerializer.Serialize(taskRunner, options);
-        _fileSystem.File.WriteAllText(taskRunnerPath, taskRunnerJson);
-
-        return null;
+        _commandService.RunCommand("dotnet", "new tool-manifest", mainFolder);
+        _commandService.RunCommand("dotnet", "tool install csharpier", mainFolder);
+        _commandService.RunCommand("dotnet", "tool install husky", mainFolder);
+        _commandService.RunCommand("dotnet", "husky install", mainFolder);
     }
 
     private void InitializeGitRepository(string mainFolder)
     {
-        RunCommand("git", "init", mainFolder);
-    }
-
-    private void RunCommand(string command, string arguments, string workingDirectory = "")
-    {
-        ProcessStartInfo processInfo = new ProcessStartInfo
-        {
-            FileName = command,
-            Arguments = arguments,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = workingDirectory,
-        };
-
-        using var process = _processProvider.Start(processInfo);
-        var result = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-        Console.WriteLine($"Output of command '{command} {arguments}': {result}");
+        _commandService.RunCommand("git", "init", mainFolder);
     }
 }
