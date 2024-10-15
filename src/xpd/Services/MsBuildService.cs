@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Xml.Linq;
+using xpd.Constants;
 
 namespace xpd.Services;
 
@@ -11,7 +12,7 @@ public class MsBuildService(IFileSystem fileSystem)
     {
         var directoryBuildTargetsFile = _fileSystem.Path.Combine(
             mainFolder,
-            "Directory.Build.targets"
+            FileConstants.DirectoryBuildTargets
         );
         var doc = new XDocument(new XElement("Project"));
         _fileSystem.File.WriteAllText(directoryBuildTargetsFile, doc.ToString());
@@ -21,7 +22,7 @@ public class MsBuildService(IFileSystem fileSystem)
     {
         var directoryPackagesPropsFile = _fileSystem.Path.Combine(
             mainFolder,
-            "Directory.Packages.props"
+            FileConstants.DirectoryPackagesProps
         );
         var doc = new XDocument(
             new XElement(

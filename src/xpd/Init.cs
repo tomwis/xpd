@@ -75,10 +75,9 @@ public class Init(
 
         _msBuildService.CreateDirectoryBuildTargets(mainFolder);
         _msBuildService.CreateDirectoryPackagesProps(mainFolder);
-        const string directoryPackagesProps = "Directory.Packages.props";
         string directoryPackagePropsFilePath = _fileSystem.Path.Combine(
             mainFolder,
-            directoryPackagesProps
+            FileConstants.DirectoryPackagesProps
         );
         var testProjectFilePath = _fileSystem.Path.Combine(
             testProjectPath,

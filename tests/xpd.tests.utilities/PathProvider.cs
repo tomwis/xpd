@@ -19,7 +19,7 @@ public static class PathProvider
 
         // Make additional checks for common files to make sure it is root repo folder
         var packagesPropsExists = new FileInfo(
-            Path.Combine(currentDir, "Directory.Packages.props")
+            Path.Combine(currentDir, FileConstants.DirectoryPackagesProps)
         ).Exists;
         var solutionExists = new DirectoryInfo(currentDir).GetFiles("*.sln").Length == 1;
         var solutionExistsInSrc =

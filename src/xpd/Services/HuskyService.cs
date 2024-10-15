@@ -71,9 +71,9 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
         var msBuildXmlBuilder = new MsBuildXmlBuilder.Builders.MsBuildXmlBuilder();
         var toolListFileValue =
             CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
-            + Path.Combine(OptionalFoldersConstants.ConfigDir, "dotnet_tools_installed.txt");
+            + Path.Combine(OptionalFoldersConstants.ConfigDir, FileConstants.DotnetToolsInstalled);
         var messageTagValue =
-            $"[Directory.Build.targets][{MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue()}]";
+            $"[{FileConstants.DirectoryBuildTargets}][{MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue()}]";
 
         msBuildXmlBuilder
             .AddPropertyGroup(pg =>
@@ -86,7 +86,10 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
             .AddTarget(SetDotnetToolsRestoreAndInstallTarget)
             .AddTarget(SetHuskyRestoreAndInstallTarget);
 
-        var directoryBuildTargetsFile = Path.Combine(mainFolder, "Directory.Build.targets");
+        var directoryBuildTargetsFile = Path.Combine(
+            mainFolder,
+            FileConstants.DirectoryBuildTargets
+        );
         var contents = msBuildXmlBuilder.ToString();
         _fileSystem.File.WriteAllText(directoryBuildTargetsFile, contents);
     }
