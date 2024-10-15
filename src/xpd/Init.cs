@@ -65,16 +65,22 @@ public class Init(
         var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
         CreateFolders(mainFolder, selectedFolders);
 
-        string solutionOutputDir = selectedFolders.Contains(OptionalFoldersConstants.SrcDir)
-            ? _fileSystem.Path.Combine(outputDir, solutionName, OptionalFoldersConstants.SrcDir)
-            : mainFolder;
+        var dotnetService = new DotnetService(_commandService, _fileSystem);
+        string solutionOutputDir = mainFolder;
+        string projectOutputDir = _fileSystem.Path.Combine(
+            mainFolder,
+            OptionalFoldersConstants.SrcDir
+        );
+        dotnetService.CreateProjectAndSolution(
+            solutionOutputDir,
+            solutionName,
+            projectOutputDir,
+            projectName
+        );
 
         string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
             ? _fileSystem.Path.Combine(mainFolder, OptionalFoldersConstants.TestsDir)
             : mainFolder;
-
-        var dotnetService = new DotnetService(_commandService, _fileSystem);
-        dotnetService.CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
         (string testProjectName, string testProjectPath) = dotnetService.CreateTestProject(
             solutionOutputDir,
             testsDir,

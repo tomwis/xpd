@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using NUnit.Framework;
+using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
 using xpd.tests.Extensions;
@@ -10,7 +11,7 @@ using xpd.tests.utilities;
 
 namespace xpd.tests.IntegrationTests;
 
-public class InitIntegrationTests : InitTestsBase
+public class InitIntegrationTests
 {
     [Test]
     public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreatedAndToolsAreInstalled()
@@ -20,9 +21,10 @@ public class InitIntegrationTests : InitTestsBase
         var outputPath = PrepareOutputDir();
         var init = GetSubject(
             solutionName,
-            fileSystem: new FileSystem(),
-            processProvider: new ProcessProvider(),
-            outputDir: outputPath
+            outputDir: outputPath,
+            new FileSystem(),
+            new ProcessProvider(),
+            new InputRequestor()
         );
 
         // Act
@@ -44,9 +46,10 @@ public class InitIntegrationTests : InitTestsBase
         var outputPath = PrepareOutputDir();
         var init = GetSubject(
             solutionName,
-            fileSystem: new FileSystem(),
-            processProvider: new ProcessProvider(),
-            outputDir: outputPath
+            outputDir: outputPath,
+            new FileSystem(),
+            new ProcessProvider(),
+            new InputRequestor()
         );
 
         // Act
@@ -65,9 +68,10 @@ public class InitIntegrationTests : InitTestsBase
         var outputPath = PrepareOutputDir();
         var init = GetSubject(
             solutionName,
-            fileSystem: new FileSystem(),
-            processProvider: new ProcessProvider(),
-            outputDir: outputPath
+            outputDir: outputPath,
+            new FileSystem(),
+            new ProcessProvider(),
+            new InputRequestor()
         );
 
         // Act
@@ -103,5 +107,20 @@ public class InitIntegrationTests : InitTestsBase
     {
         [JsonPropertyName("tools")]
         public Dictionary<string, JsonObject> Tools { get; set; } = null!;
+    }
+
+    private Init GetSubject(
+        string solutionName,
+        string outputDir,
+        IFileSystem fileSystem,
+        IProcessProvider processProvider,
+        IInputRequestor inputRequestor
+    )
+    {
+        return new Init(fileSystem, inputRequestor, processProvider)
+        {
+            Output = outputDir,
+            SolutionName = solutionName,
+        };
     }
 }

@@ -10,6 +10,7 @@ public class DotnetService(CommandService commandService, IFileSystem fileSystem
     public void CreateProjectAndSolution(
         string solutionOutputDir,
         string solutionName,
+        string projectOutputDir,
         string projectName
     )
     {
@@ -20,9 +21,15 @@ public class DotnetService(CommandService commandService, IFileSystem fileSystem
         _commandService.RunCommand(
             "dotnet",
             $"new console --output \"{projectName}\"",
+            projectOutputDir
+        );
+
+        string projectPath = _fileSystem.Path.Combine(projectOutputDir, projectName);
+        _commandService.RunCommand(
+            "dotnet",
+            $"sln add \"{projectPath}\" --in-root",
             solutionOutputDir
         );
-        _commandService.RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
     }
 
     public (string testProjectName, string testProjectPath) CreateTestProject(

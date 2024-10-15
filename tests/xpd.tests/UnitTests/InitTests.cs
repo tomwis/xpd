@@ -211,26 +211,6 @@ public class InitTests : InitTestsBase
     }
 
     [Test]
-    public void WhenSrcFolderIsCreated_ThenCreateSolutionInsideIt()
-    {
-        // Arrange
-        const string solutionName = "SomeSolution";
-        var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: [SrcDir]);
-
-        // Act
-        var result = init.Parse(init);
-
-        // Assert
-        var expected = mockFileSystem.Path.Combine(
-            mockFileSystem.Directory.GetCurrentDirectory(),
-            solutionName,
-            SrcDir
-        );
-        result.SolutionOutputDir.Should().Be(expected);
-    }
-
-    [Test]
     public void DirectoryBuildTargetsIsCreated()
     {
         // Arrange
