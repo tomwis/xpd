@@ -6,6 +6,7 @@ Xpd is a tool for initializing new dotnet project with convenient defaults. Ther
 - New folder for whole solution is created
 - New solution is created
 - New console project is created
+- New test project is created
 - Folders in root repo folder are created: src, tests, samples, docs, build, config
 - Git repository is initialized
 - Some dotnet tools are set up:
