@@ -66,9 +66,26 @@ public class Init(
             : mainFolder;
 
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
-        var testProjectPath = CreateTestProject(solutionOutputDir, testsDir, projectName);
+        (string testProjectName, string testProjectPath) = CreateTestProject(
+            solutionOutputDir,
+            testsDir,
+            projectName
+        );
         CreateDirectoryBuildTargets(mainFolder);
         CreateDirectoryPackagesProps(mainFolder);
+        const string directoryPackagesProps = "Directory.Packages.props";
+        string directoryPackagePropsFilePath = _fileSystem.Path.Combine(
+            mainFolder,
+            directoryPackagesProps
+        );
+        var testProjectFilePath = _fileSystem.Path.Combine(
+            testProjectPath,
+            $"{testProjectName}.csproj"
+        );
+        MovePackageVersionsToDirectoryPackagesProps(
+            testProjectFilePath,
+            directoryPackagePropsFilePath
+        );
         InitializeGitRepository(mainFolder);
         InstallDotnetTools(mainFolder);
 
@@ -117,7 +134,7 @@ public class Init(
         _commandService.RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
     }
 
-    private string CreateTestProject(
+    private (string testProjectName, string testProjectPath) CreateTestProject(
         string solutionOutputDir,
         string testsOutputDir,
         string projectName
@@ -133,7 +150,58 @@ public class Init(
             solutionOutputDir
         );
 
-        return testProjectPath;
+        return (testProjectName, testProjectPath);
+    }
+
+    private void MovePackageVersionsToDirectoryPackagesProps(
+        string csprojFilePath,
+        string directoryPackagePropsFilePath
+    )
+    {
+        var csprojContent = _fileSystem.File.ReadAllText(csprojFilePath);
+        var csprojXml = XDocument.Parse(csprojContent);
+        var xmlRoot = csprojXml.Root!;
+
+        var packageReferences = xmlRoot
+            .Descendants("PackageReference")
+            .Select(pr =>
+            {
+                var attributes = new
+                {
+                    Include = pr.Attribute("Include")?.Value,
+                    Version = pr.Attribute("Version")?.Value,
+                };
+                pr.Attribute("Version")?.Remove();
+                return attributes;
+            })
+            .Where(pr => pr.Include is not null && pr.Version is not null)
+            .ToList();
+
+        _fileSystem.File.WriteAllText(csprojFilePath, csprojXml.ToString());
+
+        var directoryPackagesPropsContent = _fileSystem.File.ReadAllText(
+            directoryPackagePropsFilePath
+        );
+        var directoryPackagesPropsXml = XDocument.Parse(directoryPackagesPropsContent);
+        var propsRoot = directoryPackagesPropsXml.Root!;
+        var itemGroup = propsRoot
+            .Elements("ItemGroup")
+            .First(ig => ig.Attribute("Label")?.Value == "Tests");
+
+        packageReferences.ForEach(pr =>
+        {
+            itemGroup.Add(
+                new XElement(
+                    "PackageVersion",
+                    new XAttribute("Include", pr.Include!),
+                    new XAttribute("Version", pr.Version!)
+                )
+            );
+        });
+        _fileSystem.File.WriteAllText(
+            directoryPackagePropsFilePath,
+            directoryPackagesPropsXml.ToString()
+        );
     }
 
     private void CreateDirectoryBuildTargets(string mainFolder)

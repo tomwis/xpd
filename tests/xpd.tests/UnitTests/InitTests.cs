@@ -273,44 +273,41 @@ public class InitTests : InitTestsBase
     public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreated()
     {
         // Arrange
-        var processProvider = GetProcessProvider();
-        var init = GetSubject(processProvider: processProvider);
+        var init = GetSubject();
 
         // Act
         _ = init.Parse(init);
 
         // Assert
-        AssertDotnetCommandWasCalled(processProvider, "new tool-manifest");
+        AssertDotnetCommandWasCalled(ProcessProvider, "new tool-manifest");
     }
 
     [Test]
     public void WhenInitParseIsCalled_ThenDotnetToolsAreInstalled()
     {
         // Arrange
-        var processProvider = GetProcessProvider();
-        var init = GetSubject(processProvider: processProvider);
+        var init = GetSubject();
 
         // Act
         _ = init.Parse(init);
 
         // Assert
-        AssertDotnetCommandWasCalled(processProvider, "tool install csharpier");
-        AssertDotnetCommandWasCalled(processProvider, "tool install husky");
-        AssertDotnetCommandWasCalled(processProvider, "husky install");
+        AssertDotnetCommandWasCalled(ProcessProvider, "tool install csharpier");
+        AssertDotnetCommandWasCalled(ProcessProvider, "tool install husky");
+        AssertDotnetCommandWasCalled(ProcessProvider, "husky install");
     }
 
     [Test]
     public void WhenInitParseIsCalled_ThenGitRepositoryIsInitialized()
     {
         // Arrange
-        var processProvider = GetProcessProvider();
-        var init = GetSubject(processProvider: processProvider);
+        var init = GetSubject();
 
         // Act
         _ = init.Parse(init);
 
         // Assert
-        AssertCommandWasCalled(processProvider, "git", "init");
+        AssertCommandWasCalled(ProcessProvider, "git", "init");
     }
 
     [Test]

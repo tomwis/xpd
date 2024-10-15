@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 using NSubstitute;
 using xpd.Interfaces;
 using xpd.Models;
@@ -11,7 +12,9 @@ namespace xpd.tests;
 
 public abstract class InitTestsBase
 {
-    protected static Init GetSubject(
+    protected IProcessProvider ProcessProvider { get; private set; } = null!;
+
+    protected Init GetSubject(
         string? solutionName = null,
         string? projectName = null,
         IFileSystem? fileSystem = null,
@@ -24,9 +27,17 @@ public abstract class InitTestsBase
         fileSystem ??= new MockFileSystem();
         var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
         foldersToCreate ??= [];
-        processProvider ??= GetProcessProvider(
-            () => CreateTaskRunnerJson(fileSystem, currentDir, solutionName)
-        );
+        ProcessProvider = processProvider ??= GetProcessProvider(() =>
+        {
+            CreateTaskRunnerJson(fileSystem, currentDir, solutionName);
+            CreateTestsCsproj(
+                fileSystem,
+                currentDir,
+                solutionName,
+                string.IsNullOrEmpty(projectName) ? solutionName : projectName,
+                foldersToCreate
+            );
+        });
 
         var inputRequestor = Substitute.For<IInputRequestor>();
         inputRequestor.GetSolutionName().Returns(solutionName);
@@ -49,6 +60,33 @@ public abstract class InitTestsBase
                     new MockFileData(TaskRunnerJson())
                 );
             }
+        }
+
+        static void CreateTestsCsproj(
+            IFileSystem fileSystem,
+            string currentDir,
+            string solutionName,
+            string projectName,
+            string[] selectedFolders
+        )
+        {
+            if (fileSystem is not MockFileSystem mockFileSystem)
+            {
+                return;
+            }
+
+            string testsCsproj = $"{projectName}.Tests.csproj";
+            string testsDir = selectedFolders.Contains("tests") ? "tests" : string.Empty;
+            var csproj = new XDocument(new XElement("Project"));
+            var testProjectPath = Path.Combine(
+                currentDir,
+                solutionName,
+                testsDir,
+                $"{projectName}.Tests",
+                testsCsproj
+            );
+
+            mockFileSystem.AddFile(testProjectPath, new MockFileData(csproj.ToString()));
         }
     }
 
