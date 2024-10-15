@@ -16,7 +16,7 @@ using static xpd.Constants.OptionalFoldersConstants;
 
 namespace xpd.tests.UnitTests;
 
-public class InitTests
+public class InitHandlerTests
 {
     private IProcessProvider ProcessProvider { get; set; } = null!;
 
@@ -26,11 +26,11 @@ public class InitTests
     {
         // Arrange
         const string expectedSolutionName = "SolutionNameFromUserInput";
-        var init = GetSubject(expectedSolutionName);
-        init.SolutionName = solutionNameArg;
+        var initHandler = GetSubject(expectedSolutionName);
+        var init = new Init { SolutionName = solutionNameArg };
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(init);
 
         // Assert
         result.SolutionName.Should().Be(expectedSolutionName);
@@ -41,10 +41,11 @@ public class InitTests
     {
         // Arrange
         const string solutionNameFromArg = "ExpectedSolutionName";
-        var init = GetSubjectForSolutionArgTest(solutionNameFromArg);
+        var initHandler = GetSubjectForSolutionArgTest(solutionNameFromArg);
+        var init = new Init { SolutionName = solutionNameFromArg };
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(init);
 
         // Assert
         result.SolutionName.Should().Be(solutionNameFromArg);
@@ -55,10 +56,10 @@ public class InitTests
     {
         // Arrange
         const string solutionName = "NonEmptySolutionName";
-        var init = GetSubject(solutionName);
+        var initHandler = GetSubject(solutionName);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         result.Error.Should().BeNull();
@@ -69,10 +70,10 @@ public class InitTests
     public void WhenSolutionNameIsEmpty_ThenReturnSolutionNameRequiredError()
     {
         // Arrange
-        var init = GetSubject(solutionName: string.Empty);
+        var initHandler = GetSubject(solutionName: string.Empty);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         result.Error.Should().Be(InitError.SolutionNameRequired);
@@ -87,14 +88,16 @@ public class InitTests
         const string currentDir = "/CurrentDir";
         const string solutionPath = $"{outputDir}/{solutionName}/{solutionName}.sln";
 
-        var init = GetSubject(
+        var initHandler = GetSubject(
             solutionName,
             fileSystem: GetFileSystemWithSln(currentDir, solutionPath),
             outputDir: outputDir
         );
 
+        var init = new Init { Output = outputDir };
+
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(init);
 
         // Assert
         result.Error.Should().Be(InitError.SolutionNameExists);
@@ -108,13 +111,13 @@ public class InitTests
         const string currentDir = "/CurrentDir";
         const string solutionPath = $"{currentDir}/{solutionName}/{solutionName}.sln";
 
-        var init = GetSubject(
+        var initHandler = GetSubject(
             solutionName,
             fileSystem: GetFileSystemWithSln(currentDir, solutionPath)
         );
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         result.Error.Should().Be(InitError.SolutionNameExists);
@@ -133,10 +136,15 @@ public class InitTests
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
 
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem, outputDir: outputDir);
+        var initHandler = GetSubject(
+            solutionName,
+            fileSystem: mockFileSystem,
+            outputDir: outputDir
+        );
+        var init = new Init { Output = outputDir };
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(init);
 
         // Assert
         var expected = mockFileSystem.Path.Combine(outputDir, solutionName);
@@ -155,10 +163,10 @@ public class InitTests
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
 
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem);
+        var initHandler = GetSubject(solutionName, fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var expected = mockFileSystem.Path.Combine(currentDir, solutionName);
@@ -170,10 +178,10 @@ public class InitTests
     {
         // Arrange
         const string solutionName = "SomeSolution";
-        var init = GetSubject(solutionName);
+        var initHandler = GetSubject(solutionName);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         result.ProjectName.Should().Be(solutionName);
@@ -183,10 +191,10 @@ public class InitTests
     public void CreateDefaultFoldersInMainFolder()
     {
         // Arrange
-        var init = GetSubject();
+        var initHandler = GetSubject();
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         result.CreatedFolders.Should().HaveCount(6);
@@ -200,10 +208,10 @@ public class InitTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var expected = mockFileSystem.Path.Combine(result.MainFolder!, "Directory.Build.targets");
@@ -215,10 +223,10 @@ public class InitTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Build.targets");
@@ -230,10 +238,10 @@ public class InitTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Packages.props");
@@ -253,10 +261,10 @@ public class InitTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var xdoc = GetXml(mockFileSystem, result.MainFolder!, "Directory.Packages.props");
@@ -270,10 +278,10 @@ public class InitTests
     public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreated()
     {
         // Arrange
-        var init = GetSubject();
+        var initHandler = GetSubject();
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(new Init());
 
         // Assert
         AssertDotnetCommandWasCalled(ProcessProvider, "new tool-manifest");
@@ -283,10 +291,10 @@ public class InitTests
     public void WhenInitParseIsCalled_ThenDotnetToolsAreInstalled()
     {
         // Arrange
-        var init = GetSubject();
+        var initHandler = GetSubject();
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(new Init());
 
         // Assert
         AssertDotnetCommandWasCalled(ProcessProvider, "tool install csharpier");
@@ -298,10 +306,10 @@ public class InitTests
     public void WhenInitParseIsCalled_ThenGitRepositoryIsInitialized()
     {
         // Arrange
-        var init = GetSubject();
+        var initHandler = GetSubject();
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(new Init());
 
         // Assert
         AssertCommandWasCalled(ProcessProvider, "git", "init");
@@ -312,10 +320,10 @@ public class InitTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var xml = GetXml(mockFileSystem, result.MainFolder!, "Directory.Build.targets");
@@ -346,10 +354,10 @@ public class InitTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         const string solutionName = "SomeSolution";
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem);
+        var initHandler = GetSubject(solutionName, fileSystem: mockFileSystem);
 
         // Act
-        var result = init.Parse(init);
+        var result = initHandler.Parse(new Init());
 
         // Assert
         var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
@@ -362,10 +370,10 @@ public class InitTests
     public void WhenRunCommandReturnsError_ThenThrowException()
     {
         // Arrange
-        var init = GetSubject(processProvider: GetProcessProvider(errors: "any error"));
+        var initHandler = GetSubject(processProvider: GetProcessProvider(errors: "any error"));
 
         // Act && Assert
-        init.Invoking(i => i.Parse(init)).Should().Throw<CommandException>();
+        initHandler.Invoking(i => i.Parse(new Init())).Should().Throw<CommandException>();
     }
 
     private static void AssertDotnetCommandWasCalled(
@@ -413,7 +421,7 @@ public class InitTests
         );
     }
 
-    private static Init GetSubjectForSolutionArgTest(string solutionNameFromArg)
+    private static InitHandler GetSubjectForSolutionArgTest(string solutionNameFromArg)
     {
         var fileSystem = new MockFileSystem();
         var currentDir = fileSystem.Directory.GetCurrentDirectory();
@@ -424,13 +432,10 @@ public class InitTests
         });
 
         var inputRequestor = Substitute.For<IInputRequestor>();
-        return new Init(fileSystem, inputRequestor, processProvider)
-        {
-            SolutionName = solutionNameFromArg,
-        };
+        return new InitHandler(fileSystem, inputRequestor, processProvider);
     }
 
-    private Init GetSubject(
+    private InitHandler GetSubject(
         string? solutionName = null,
         string? projectName = null,
         IFileSystem? fileSystem = null,
@@ -454,11 +459,7 @@ public class InitTests
 
         var inputRequestor = Substitute.For<IInputRequestor>();
         inputRequestor.GetSolutionName().Returns(solutionName);
-        return new Init(fileSystem, inputRequestor, processProvider)
-        {
-            Output = outputDir,
-            SolutionName = null,
-        };
+        return new InitHandler(fileSystem, inputRequestor, processProvider);
     }
 
     private static IProcessProvider GetProcessProvider(Action? action = null, string? errors = null)

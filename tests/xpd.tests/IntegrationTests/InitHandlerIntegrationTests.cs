@@ -11,7 +11,7 @@ using xpd.tests.utilities;
 
 namespace xpd.tests.IntegrationTests;
 
-public class InitIntegrationTests
+public class InitHandlerIntegrationTests
 {
     [Test]
     public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreatedAndToolsAreInstalled()
@@ -19,16 +19,11 @@ public class InitIntegrationTests
         // Arrange
         const string solutionName = "solutionName";
         var outputPath = PrepareOutputDir();
-        var init = GetSubject(
-            solutionName,
-            outputDir: outputPath,
-            new FileSystem(),
-            new ProcessProvider(),
-            new InputRequestor()
-        );
+        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
+        var init = new Init { Output = outputPath, SolutionName = solutionName };
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(init);
 
         // Assert
         var path = Path.Combine(outputPath, solutionName, ".config", "dotnet-tools.json");
@@ -44,16 +39,11 @@ public class InitIntegrationTests
         // Arrange
         const string solutionName = "solutionName";
         var outputPath = PrepareOutputDir();
-        var init = GetSubject(
-            solutionName,
-            outputDir: outputPath,
-            new FileSystem(),
-            new ProcessProvider(),
-            new InputRequestor()
-        );
+        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
+        var init = new Init { Output = outputPath, SolutionName = solutionName };
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(init);
 
         // Assert
         var path = Path.Combine(outputPath, solutionName, ".git");
@@ -66,16 +56,11 @@ public class InitIntegrationTests
         // Arrange
         const string solutionName = "solutionName";
         var outputPath = PrepareOutputDir();
-        var init = GetSubject(
-            solutionName,
-            outputDir: outputPath,
-            new FileSystem(),
-            new ProcessProvider(),
-            new InputRequestor()
-        );
+        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
+        var init = new Init { Output = outputPath, SolutionName = solutionName };
 
         // Act
-        _ = init.Parse(init);
+        _ = initHandler.Parse(init);
 
         // Assert
         var huskyPath = Path.Combine(outputPath, solutionName, ".husky");
@@ -109,18 +94,12 @@ public class InitIntegrationTests
         public Dictionary<string, JsonObject> Tools { get; set; } = null!;
     }
 
-    private Init GetSubject(
-        string solutionName,
-        string outputDir,
+    private InitHandler GetSubject(
         IFileSystem fileSystem,
         IProcessProvider processProvider,
         IInputRequestor inputRequestor
     )
     {
-        return new Init(fileSystem, inputRequestor, processProvider)
-        {
-            Output = outputDir,
-            SolutionName = solutionName,
-        };
+        return new InitHandler(fileSystem, inputRequestor, processProvider);
     }
 }

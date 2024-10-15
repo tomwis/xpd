@@ -10,7 +10,7 @@ public class Program
         var exitCode = result.MapResult(
             (Init opts) =>
             {
-                var initResult = new Init().Parse(opts);
+                var initResult = new InitHandler().Parse(opts);
                 return (int)(initResult.Error ?? 0);
             },
             errs => 0
