@@ -19,6 +19,7 @@ public class CommandService(IProcessProvider processProvider)
             UseShellExecute = false,
             CreateNoWindow = true,
             WorkingDirectory = workingDirectory,
+            EnvironmentVariables = { { "DOTNET_CLI_UI_LANGUAGE", "en" } },
         };
 
         using var process = _processProvider.Start(processInfo);
