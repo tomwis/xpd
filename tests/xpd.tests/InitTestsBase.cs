@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
 using NSubstitute;
+using xpd.Constants;
 using xpd.Interfaces;
 using xpd.Models;
 
@@ -76,7 +77,9 @@ public abstract class InitTestsBase
             }
 
             string testsCsproj = $"{projectName}.Tests.csproj";
-            string testsDir = selectedFolders.Contains("tests") ? "tests" : string.Empty;
+            string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
+                ? OptionalFoldersConstants.TestsDir
+                : string.Empty;
             var csproj = new XDocument(new XElement("Project"));
             var testProjectPath = Path.Combine(
                 currentDir,

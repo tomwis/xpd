@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using xpd.Constants;
 using xpd.Models;
 using xpd.tests.utilities;
 
@@ -94,7 +95,7 @@ public class HuskyTaskRunnerTests
     {
         var csprojPath = Path.Combine(
             rootFolder,
-            "src",
+            OptionalFoldersConstants.SrcDir,
             "xpd.githook.cc-lint",
             "xpd.githook.cc-lint.csproj"
         );

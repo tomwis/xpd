@@ -8,6 +8,7 @@ using xpd.Enums;
 using xpd.Exceptions;
 using xpd.Interfaces;
 using xpd.tests.Extensions;
+using static xpd.Constants.OptionalFoldersConstants;
 
 namespace xpd.tests.UnitTests;
 
@@ -158,12 +159,12 @@ public class InitTests : InitTestsBase
         result.ProjectName.Should().Be(solutionName);
     }
 
-    [TestCase(["src", "tests", "samples", "docs", "build", "config"])]
-    [TestCase(["src", "tests", "samples", "docs", "build"])]
-    [TestCase(["src", "tests", "samples", "docs"])]
-    [TestCase(["src", "tests", "samples"])]
-    [TestCase(["src", "tests"])]
-    [TestCase(["src"])]
+    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir, BuildDir, ConfigDir])]
+    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir, BuildDir])]
+    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir])]
+    [TestCase([SrcDir, TestsDir, SamplesDir])]
+    [TestCase([SrcDir, TestsDir])]
+    [TestCase([SrcDir])]
     [TestCase([])]
     public void WhenFolderIsSelected_ThenCreateItInRootFolder(params string[] selectedFolders)
     {
@@ -184,7 +185,7 @@ public class InitTests : InitTestsBase
         // Arrange
         const string solutionName = "SomeSolution";
         var mockFileSystem = new MockFileSystem();
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: ["src"]);
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: [SrcDir]);
 
         // Act
         var result = init.Parse(init);
@@ -193,7 +194,7 @@ public class InitTests : InitTestsBase
         var expected = mockFileSystem.Path.Combine(
             mockFileSystem.Directory.GetCurrentDirectory(),
             solutionName,
-            "src"
+            SrcDir
         );
         result.SolutionOutputDir.Should().Be(expected);
     }
@@ -367,14 +368,18 @@ public class InitTests : InitTestsBase
         // Arrange
         var mockFileSystem = new MockFileSystem();
         const string solutionName = "SomeSolution";
-        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: ["tests"]);
+        var init = GetSubject(
+            solutionName,
+            fileSystem: mockFileSystem,
+            foldersToCreate: [TestsDir]
+        );
 
         // Act
         var result = init.Parse(init);
 
         // Assert
         var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
-            mockFileSystem.Path.Combine(solutionName, "tests", $"{solutionName}.Tests")
+            mockFileSystem.Path.Combine(solutionName, TestsDir, $"{solutionName}.Tests")
         );
         result.TestProjectPath.Should().Be(expectedTestProjectPath);
     }

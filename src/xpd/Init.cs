@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using CommandLine;
+using xpd.Constants;
 using xpd.Enums;
 using xpd.Interfaces;
 using xpd.Models;
@@ -56,12 +57,12 @@ public class Init(
         var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
         CreateFolders(mainFolder, selectedFolders);
 
-        string solutionOutputDir = selectedFolders.Contains("src")
-            ? _fileSystem.Path.Combine(outputDir, solutionName, "src")
+        string solutionOutputDir = selectedFolders.Contains(OptionalFoldersConstants.SrcDir)
+            ? _fileSystem.Path.Combine(outputDir, solutionName, OptionalFoldersConstants.SrcDir)
             : mainFolder;
 
-        string testsDir = selectedFolders.Contains("tests")
-            ? _fileSystem.Path.Combine(mainFolder, "tests")
+        string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
+            ? _fileSystem.Path.Combine(mainFolder, OptionalFoldersConstants.TestsDir)
             : mainFolder;
 
         var dotnetService = new DotnetService(_commandService, _fileSystem);

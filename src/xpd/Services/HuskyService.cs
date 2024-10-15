@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Text.Json;
+using xpd.Constants;
 using xpd.Enums;
 using xpd.Models;
 using xpd.MsBuildXmlBuilder.Builders;
@@ -70,7 +71,7 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
         var msBuildXmlBuilder = new MsBuildXmlBuilder.Builders.MsBuildXmlBuilder();
         var toolListFileValue =
             CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
-            + Path.Combine("config", "dotnet_tools_installed.txt");
+            + Path.Combine(OptionalFoldersConstants.ConfigDir, "dotnet_tools_installed.txt");
         var messageTagValue =
             $"[Directory.Build.targets][{MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue()}]";
 

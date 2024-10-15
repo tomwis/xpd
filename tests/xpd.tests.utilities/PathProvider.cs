@@ -1,4 +1,6 @@
-﻿namespace xpd.tests.utilities;
+﻿using xpd.Constants;
+
+namespace xpd.tests.utilities;
 
 public static class PathProvider
 {
@@ -21,7 +23,9 @@ public static class PathProvider
         ).Exists;
         var solutionExists = new DirectoryInfo(currentDir).GetFiles("*.sln").Length == 1;
         var solutionExistsInSrc =
-            new DirectoryInfo(Path.Combine(currentDir, "src")).GetFiles("*.sln").Length == 1;
+            new DirectoryInfo(Path.Combine(currentDir, OptionalFoldersConstants.SrcDir))
+                .GetFiles("*.sln")
+                .Length == 1;
 
         if (!packagesPropsExists && !(solutionExists || solutionExistsInSrc))
         {

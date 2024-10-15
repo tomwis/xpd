@@ -1,4 +1,5 @@
 using Sharprompt;
+using xpd.Constants;
 using xpd.Interfaces;
 
 namespace xpd.Services;
@@ -17,7 +18,16 @@ public class InputRequestor : IInputRequestor
 
     public List<string> GetFoldersToCreate()
     {
-        var options = new[] { "src", "tests", "samples", "docs", "build", "config" };
+        var options = new[]
+        {
+            OptionalFoldersConstants.SrcDir,
+            OptionalFoldersConstants.TestsDir,
+            OptionalFoldersConstants.SamplesDir,
+            OptionalFoldersConstants.DocsDir,
+            OptionalFoldersConstants.BuildDir,
+            OptionalFoldersConstants.ConfigDir,
+        };
+
         const int minimum = 0;
         return Prompt
             .MultiSelect("Create folders", options, minimum: minimum, defaultValues: options)
