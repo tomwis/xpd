@@ -17,7 +17,7 @@ public class ProcessWrapper(Process process) : IProcessWrapper
         if (process is null)
         {
             throw new ProcessException(
-                $"Failed to start process. Is'{startInfo.FileName}' installed and in PATH?"
+                $"Failed to start process. Is '{startInfo.FileName}' installed and in PATH?"
             );
         }
 
