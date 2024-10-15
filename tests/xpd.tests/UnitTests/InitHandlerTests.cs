@@ -275,7 +275,7 @@ public class InitHandlerTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreated()
+    public void DotnetToolsManifestIsCreated()
     {
         // Arrange
         var initHandler = GetSubject();
@@ -288,7 +288,7 @@ public class InitHandlerTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenDotnetToolsAreInstalled()
+    public void DotnetToolsAreInstalled()
     {
         // Arrange
         var initHandler = GetSubject();
@@ -303,7 +303,7 @@ public class InitHandlerTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenGitRepositoryIsInitialized()
+    public void GitRepositoryIsInitialized()
     {
         // Arrange
         var initHandler = GetSubject();
@@ -316,7 +316,7 @@ public class InitHandlerTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenDirectoryBuildTargetsIsCorrectlyModified()
+    public void DirectoryBuildTargetsIsCorrectlyModified()
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();

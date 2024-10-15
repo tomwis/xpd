@@ -14,7 +14,7 @@ namespace xpd.tests.IntegrationTests;
 public class InitHandlerIntegrationTests
 {
     [Test]
-    public void WhenInitParseIsCalled_ThenDotnetToolsManifestIsCreatedAndToolsAreInstalled()
+    public void DotnetToolsManifestIsCreatedAndToolsAreInstalled()
     {
         // Arrange
         const string solutionName = "solutionName";
@@ -34,7 +34,7 @@ public class InitHandlerIntegrationTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenGitRepositoryIsInitialized()
+    public void GitRepositoryIsInitialized()
     {
         // Arrange
         const string solutionName = "solutionName";
@@ -51,7 +51,7 @@ public class InitHandlerIntegrationTests
     }
 
     [Test]
-    public void WhenInitParseIsCalled_ThenHuskyHooksAreInstalled()
+    public void HuskyHooksAreInstalled()
     {
         // Arrange
         const string solutionName = "solutionName";
