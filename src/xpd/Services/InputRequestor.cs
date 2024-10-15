@@ -13,7 +13,8 @@ public class InputRequestor : IInputRequestor
 
     public string? GetProjectName(string defaultName)
     {
-        return Prompt.Input<string?>("Enter project name", defaultName);
+        // No input for now to simplify process
+        return defaultName;
     }
 
     public List<string> GetFoldersToCreate()
@@ -28,9 +29,7 @@ public class InputRequestor : IInputRequestor
             OptionalFoldersConstants.ConfigDir,
         };
 
-        const int minimum = 0;
-        return Prompt
-            .MultiSelect("Create folders", options, minimum: minimum, defaultValues: options)
-            .ToList();
+        // No input for now to simplify process
+        return options.ToList();
     }
 }
