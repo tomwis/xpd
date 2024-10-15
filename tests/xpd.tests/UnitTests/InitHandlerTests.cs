@@ -22,7 +22,7 @@ public class InitHandlerTests
 
     [TestCase(null)]
     [TestCase("")]
-    public void WhenSolutionNameArgumentIsEmpty_ThenAskForUserForInput(string solutionNameArg)
+    public void WhenSolutionNameArgumentIsEmpty_ThenAskForUserForInput(string? solutionNameArg)
     {
         // Arrange
         const string expectedSolutionName = "SolutionNameFromUserInput";
