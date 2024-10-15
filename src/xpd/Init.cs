@@ -54,16 +54,18 @@ public class Init(
             return InitResult.WithError(InitError.SolutionNameExists);
         }
 
-        var projectName = _inputRequestor.GetProjectName(solutionName);
-        if (string.IsNullOrEmpty(projectName))
+        var projectName = solutionName;
+        var foldersToCreate = new List<string>
         {
-            Console.WriteLine("Project name will be the same as solution name.");
-            projectName = solutionName;
-        }
-
-        var selectedFolders = _inputRequestor.GetFoldersToCreate();
+            OptionalFoldersConstants.SrcDir,
+            OptionalFoldersConstants.TestsDir,
+            OptionalFoldersConstants.SamplesDir,
+            OptionalFoldersConstants.DocsDir,
+            OptionalFoldersConstants.BuildDir,
+            OptionalFoldersConstants.ConfigDir,
+        };
         var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
-        CreateFolders(mainFolder, selectedFolders);
+        CreateFolders(mainFolder, foldersToCreate);
 
         var dotnetService = new DotnetService(_commandService, _fileSystem);
         string solutionOutputDir = mainFolder;
@@ -78,9 +80,7 @@ public class Init(
             projectName
         );
 
-        string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
-            ? _fileSystem.Path.Combine(mainFolder, OptionalFoldersConstants.TestsDir)
-            : mainFolder;
+        string testsDir = _fileSystem.Path.Combine(mainFolder, OptionalFoldersConstants.TestsDir);
         (string testProjectName, string testProjectPath) = dotnetService.CreateTestProject(
             solutionOutputDir,
             testsDir,
@@ -117,7 +117,7 @@ public class Init(
             solutionName,
             projectName,
             mainFolder,
-            selectedFolders,
+            foldersToCreate,
             solutionOutputDir,
             testProjectPath
         );

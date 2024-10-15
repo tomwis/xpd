@@ -10,7 +10,7 @@ public class InitResult
         string solutionName,
         string projectName,
         string mainFolder,
-        List<string> selectedFolders,
+        List<string> createdFolders,
         string solutionOutputDir,
         string testProjectPath
     )
@@ -18,7 +18,7 @@ public class InitResult
         SolutionName = solutionName;
         ProjectName = projectName;
         MainFolder = mainFolder;
-        SelectedFolders = selectedFolders;
+        CreatedFolders = createdFolders;
         SolutionOutputDir = solutionOutputDir;
         TestProjectPath = testProjectPath;
     }
@@ -31,7 +31,7 @@ public class InitResult
         string solutionName,
         string projectName,
         string mainFolder,
-        List<string> selectedFolders,
+        List<string> createdFolders,
         string solutionOutputDir,
         string testProjectPath
     ) =>
@@ -39,7 +39,7 @@ public class InitResult
             solutionName,
             projectName,
             mainFolder,
-            selectedFolders,
+            createdFolders,
             solutionOutputDir,
             testProjectPath
         );
@@ -49,5 +49,5 @@ public class InitResult
     public string? SolutionOutputDir { get; }
     public string? TestProjectPath { get; }
     public string? MainFolder { get; }
-    public List<string>? SelectedFolders { get; }
+    public List<string>? CreatedFolders { get; }
 }

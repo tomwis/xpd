@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using xpd.Constants;
 using xpd.Enums;
 using xpd.Exceptions;
 using xpd.Interfaces;
@@ -167,27 +166,11 @@ public class InitTests
     }
 
     [Test]
-    public void WhenProjectNameIsProvided_ThenUseIt()
+    public void SolutionNameIsUsedAsProjectName()
     {
         // Arrange
         const string solutionName = "SomeSolution";
-        const string projectName = "SomeProject";
-        var init = GetSubject(solutionName, projectName);
-
-        // Act
-        var result = init.Parse(init);
-
-        // Assert
-        result.ProjectName.Should().Be(projectName);
-    }
-
-    [TestCase(null)]
-    [TestCase("")]
-    public void WhenProjectNameIsNullOrEmpty_ThenUseSolutionNameAsProjectName(string? projectName)
-    {
-        // Arrange
-        const string solutionName = "SomeSolution";
-        var init = GetSubject(solutionName, projectName);
+        var init = GetSubject(solutionName);
 
         // Act
         var result = init.Parse(init);
@@ -196,24 +179,20 @@ public class InitTests
         result.ProjectName.Should().Be(solutionName);
     }
 
-    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir, BuildDir, ConfigDir])]
-    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir, BuildDir])]
-    [TestCase([SrcDir, TestsDir, SamplesDir, DocsDir])]
-    [TestCase([SrcDir, TestsDir, SamplesDir])]
-    [TestCase([SrcDir, TestsDir])]
-    [TestCase([SrcDir])]
-    [TestCase([])]
-    public void WhenFolderIsSelected_ThenCreateItInRootFolder(params string[] selectedFolders)
+    [Test]
+    public void CreateDefaultFoldersInMainFolder()
     {
         // Arrange
-        var init = GetSubject(foldersToCreate: selectedFolders);
+        var init = GetSubject();
 
         // Act
         var result = init.Parse(init);
 
         // Assert
-        result.SelectedFolders.Should().HaveCount(selectedFolders.Length);
-        result.SelectedFolders.Should().BeEquivalentTo(selectedFolders);
+        result.CreatedFolders.Should().HaveCount(6);
+        result
+            .CreatedFolders.Should()
+            .BeEquivalentTo(["src", "tests", "samples", "docs", "build", "config"]);
     }
 
     [Test]
@@ -362,34 +341,12 @@ public class InitTests
     }
 
     [Test]
-    public void WhenTestsDirIsNotCreated_ThenTestProjectIsCreatedInMainFolder()
+    public void TestProjectIsCreatedInTestsDir()
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
         const string solutionName = "SomeSolution";
         var init = GetSubject(solutionName, fileSystem: mockFileSystem);
-
-        // Act
-        var result = init.Parse(init);
-
-        // Assert
-        var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
-            mockFileSystem.Path.Combine(solutionName, $"{solutionName}.Tests")
-        );
-        result.TestProjectPath.Should().Be(expectedTestProjectPath);
-    }
-
-    [Test]
-    public void WhenTestsDirIsCreated_ThenTestProjectIsCreatedInIt()
-    {
-        // Arrange
-        var mockFileSystem = new MockFileSystem();
-        const string solutionName = "SomeSolution";
-        var init = GetSubject(
-            solutionName,
-            fileSystem: mockFileSystem,
-            foldersToCreate: [TestsDir]
-        );
 
         // Act
         var result = init.Parse(init);
@@ -460,22 +417,13 @@ public class InitTests
     {
         var fileSystem = new MockFileSystem();
         var currentDir = fileSystem.Directory.GetCurrentDirectory();
-        string[] foldersToCreate = [];
         var processProvider = GetProcessProvider(() =>
         {
             CreateTaskRunnerJson(fileSystem, currentDir, solutionNameFromArg);
-            CreateTestsCsproj(
-                fileSystem,
-                currentDir,
-                solutionNameFromArg,
-                solutionNameFromArg,
-                foldersToCreate
-            );
+            CreateTestsCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
         });
 
         var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(solutionNameFromArg);
-        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
         return new Init(fileSystem, inputRequestor, processProvider)
         {
             SolutionName = solutionNameFromArg,
@@ -486,7 +434,6 @@ public class InitTests
         string? solutionName = null,
         string? projectName = null,
         IFileSystem? fileSystem = null,
-        string[]? foldersToCreate = null,
         string? outputDir = null,
         IProcessProvider? processProvider = null
     )
@@ -494,7 +441,6 @@ public class InitTests
         solutionName ??= "SomeSolution";
         fileSystem ??= new MockFileSystem();
         var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
-        foldersToCreate ??= [];
         ProcessProvider = processProvider ??= GetProcessProvider(() =>
         {
             CreateTaskRunnerJson(fileSystem, currentDir, solutionName);
@@ -502,15 +448,12 @@ public class InitTests
                 fileSystem,
                 currentDir,
                 solutionName,
-                string.IsNullOrEmpty(projectName) ? solutionName : projectName,
-                foldersToCreate
+                string.IsNullOrEmpty(projectName) ? solutionName : projectName
             );
         });
 
         var inputRequestor = Substitute.For<IInputRequestor>();
         inputRequestor.GetSolutionName().Returns(solutionName);
-        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
-        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
         return new Init(fileSystem, inputRequestor, processProvider)
         {
             Output = outputDir,
@@ -570,8 +513,7 @@ public class InitTests
         IFileSystem fileSystem,
         string currentDir,
         string solutionName,
-        string projectName,
-        string[] selectedFolders
+        string projectName
     )
     {
         if (fileSystem is not MockFileSystem mockFileSystem)
@@ -580,14 +522,11 @@ public class InitTests
         }
 
         string testsCsproj = $"{projectName}.Tests.csproj";
-        string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
-            ? OptionalFoldersConstants.TestsDir
-            : string.Empty;
         var csproj = new XDocument(new XElement("Project"));
         var testProjectPath = Path.Combine(
             currentDir,
             solutionName,
-            testsDir,
+            TestsDir,
             $"{projectName}.Tests",
             testsCsproj
         );
