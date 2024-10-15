@@ -44,53 +44,11 @@ public abstract class InitTestsBase
         inputRequestor.GetSolutionName().Returns(solutionName);
         inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
         inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
-        return new Init(fileSystem, inputRequestor, processProvider) { Output = outputDir };
-
-        static string TaskRunnerJson() => JsonSerializer.Serialize(new TaskRunner { Tasks = [] });
-
-        static void CreateTaskRunnerJson(
-            IFileSystem fileSystem,
-            string currentDir,
-            string solutionName
-        )
+        return new Init(fileSystem, inputRequestor, processProvider)
         {
-            if (fileSystem is MockFileSystem mockFileSystem)
-            {
-                mockFileSystem.AddFile(
-                    fileSystem.Path.Combine(currentDir, solutionName, ".husky", "task-runner.json"),
-                    new MockFileData(TaskRunnerJson())
-                );
-            }
-        }
-
-        static void CreateTestsCsproj(
-            IFileSystem fileSystem,
-            string currentDir,
-            string solutionName,
-            string projectName,
-            string[] selectedFolders
-        )
-        {
-            if (fileSystem is not MockFileSystem mockFileSystem)
-            {
-                return;
-            }
-
-            string testsCsproj = $"{projectName}.Tests.csproj";
-            string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
-                ? OptionalFoldersConstants.TestsDir
-                : string.Empty;
-            var csproj = new XDocument(new XElement("Project"));
-            var testProjectPath = Path.Combine(
-                currentDir,
-                solutionName,
-                testsDir,
-                $"{projectName}.Tests",
-                testsCsproj
-            );
-
-            mockFileSystem.AddFile(testProjectPath, new MockFileData(csproj.ToString()));
-        }
+            Output = outputDir,
+            SolutionName = null,
+        };
     }
 
     protected static IProcessProvider GetProcessProvider(
@@ -124,5 +82,52 @@ public abstract class InitTestsBase
 
             return memoryStream;
         }
+    }
+
+    protected static string GetTaskRunnerJson() =>
+        JsonSerializer.Serialize(new TaskRunner { Tasks = [] });
+
+    protected static void CreateTaskRunnerJson(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName
+    )
+    {
+        if (fileSystem is MockFileSystem mockFileSystem)
+        {
+            mockFileSystem.AddFile(
+                fileSystem.Path.Combine(currentDir, solutionName, ".husky", "task-runner.json"),
+                new MockFileData(GetTaskRunnerJson())
+            );
+        }
+    }
+
+    protected static void CreateTestsCsproj(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName,
+        string projectName,
+        string[] selectedFolders
+    )
+    {
+        if (fileSystem is not MockFileSystem mockFileSystem)
+        {
+            return;
+        }
+
+        string testsCsproj = $"{projectName}.Tests.csproj";
+        string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
+            ? OptionalFoldersConstants.TestsDir
+            : string.Empty;
+        var csproj = new XDocument(new XElement("Project"));
+        var testProjectPath = Path.Combine(
+            currentDir,
+            solutionName,
+            testsDir,
+            $"{projectName}.Tests",
+            testsCsproj
+        );
+
+        mockFileSystem.AddFile(testProjectPath, new MockFileData(csproj.ToString()));
     }
 }

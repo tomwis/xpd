@@ -26,9 +26,17 @@ public class Init(
     [Option('o', "output", Required = false, HelpText = "Parent folder for solution.")]
     public string? Output { get; set; }
 
+    [Value(0, Required = false, HelpText = "Solution name. Use like: init \"MySolutionName\"")]
+    public string? SolutionName { get; set; }
+
     public InitResult Parse(Init args)
     {
-        var solutionName = _inputRequestor.GetSolutionName();
+        var solutionName = args.SolutionName;
+        if (string.IsNullOrEmpty(solutionName))
+        {
+            solutionName = _inputRequestor.GetSolutionName();
+        }
+
         if (string.IsNullOrEmpty(solutionName))
         {
             Console.WriteLine("Solution name is required.");

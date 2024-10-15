@@ -14,6 +14,37 @@ namespace xpd.tests.UnitTests;
 
 public class InitTests : InitTestsBase
 {
+    [TestCase(null)]
+    [TestCase("")]
+    public void WhenSolutionNameArgumentIsEmpty_ThenAskForUserForInput(string solutionNameArg)
+    {
+        // Arrange
+        const string expectedSolutionName = "SolutionNameFromUserInput";
+        var init = GetSubject(expectedSolutionName);
+        init.SolutionName = solutionNameArg;
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        result.SolutionName.Should().Be(expectedSolutionName);
+    }
+
+    [Test]
+    public void WhenSolutionNameArgumentIsNotEmpty_ThenDoNotAskForUserForInput()
+    {
+        // Arrange
+        const string solutionNameFromUserInput = "SolutionNameFromUserInput";
+        const string solutionNameFromArg = "ExpectedSolutionName";
+        var init = GetSubjectForSolutionArgTest(solutionNameFromUserInput, solutionNameFromArg);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        result.SolutionName.Should().Be(solutionNameFromArg);
+    }
+
     [Test]
     public void WhenSolutionNameIsNotEmpty_ThenReturnSuccess()
     {
@@ -437,5 +468,34 @@ public class InitTests : InitTestsBase
             },
             new MockFileSystemOptions { CurrentDirectory = currentDir }
         );
+    }
+
+    private static Init GetSubjectForSolutionArgTest(
+        string solutionNameFromUser,
+        string solutionNameFromArg
+    )
+    {
+        var fileSystem = new MockFileSystem();
+        var currentDir = fileSystem.Directory.GetCurrentDirectory();
+        string[] foldersToCreate = [];
+        var processProvider = GetProcessProvider(() =>
+        {
+            CreateTaskRunnerJson(fileSystem, currentDir, solutionNameFromArg);
+            CreateTestsCsproj(
+                fileSystem,
+                currentDir,
+                solutionNameFromArg,
+                solutionNameFromArg,
+                foldersToCreate
+            );
+        });
+
+        var inputRequestor = Substitute.For<IInputRequestor>();
+        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(solutionNameFromArg);
+        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
+        return new Init(fileSystem, inputRequestor, processProvider)
+        {
+            SolutionName = solutionNameFromArg,
+        };
     }
 }
