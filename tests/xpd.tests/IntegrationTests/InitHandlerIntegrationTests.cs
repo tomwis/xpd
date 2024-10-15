@@ -13,20 +13,30 @@ namespace xpd.tests.IntegrationTests;
 
 public class InitHandlerIntegrationTests
 {
-    [Test]
-    public void DotnetToolsManifestIsCreatedAndToolsAreInstalled()
+    private const string SolutionName = "solutionName";
+    private string _outputPath = null!;
+
+    [OneTimeSetUp]
+    public void Setup()
     {
+        // Doing Arrange and Act in OneTimeSetUp, because these parts are the same for all the test.
+        // I'm only validating different parts of Act results in different tests.
+        // And 1 test can take about 3 seconds, so it's much faster to execute Act only once
+
         // Arrange
-        const string solutionName = "solutionName";
-        var outputPath = PrepareOutputDir();
+        _outputPath = PrepareOutputDir();
         var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
-        var init = new Init { Output = outputPath, SolutionName = solutionName };
+        var init = new Init { Output = _outputPath, SolutionName = SolutionName };
 
         // Act
         _ = initHandler.Parse(init);
+    }
 
+    [Test]
+    public void DotnetToolsManifestIsCreatedAndToolsAreInstalled()
+    {
         // Assert
-        var path = Path.Combine(outputPath, solutionName, ".config", "dotnet-tools.json");
+        var path = Path.Combine(_outputPath, SolutionName, ".config", "dotnet-tools.json");
         File.Exists(path).Should().BeTrue();
         var dotnetToolsManifest = path.Deserialize<DotnetToolsManifest>();
         dotnetToolsManifest.Tools.Should().ContainKey("csharpier");
@@ -36,34 +46,16 @@ public class InitHandlerIntegrationTests
     [Test]
     public void GitRepositoryIsInitialized()
     {
-        // Arrange
-        const string solutionName = "solutionName";
-        var outputPath = PrepareOutputDir();
-        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
-        var init = new Init { Output = outputPath, SolutionName = solutionName };
-
-        // Act
-        _ = initHandler.Parse(init);
-
         // Assert
-        var path = Path.Combine(outputPath, solutionName, ".git");
+        var path = Path.Combine(_outputPath, SolutionName, ".git");
         Directory.Exists(path).Should().BeTrue();
     }
 
     [Test]
     public void HuskyHooksAreInstalled()
     {
-        // Arrange
-        const string solutionName = "solutionName";
-        var outputPath = PrepareOutputDir();
-        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
-        var init = new Init { Output = outputPath, SolutionName = solutionName };
-
-        // Act
-        _ = initHandler.Parse(init);
-
         // Assert
-        var huskyPath = Path.Combine(outputPath, solutionName, ".husky");
+        var huskyPath = Path.Combine(_outputPath, SolutionName, ".husky");
         Path.Combine(huskyPath, "task-runner.json").ToFile().Exists.Should().BeTrue();
         Path.Combine(huskyPath, "pre-commit").ToFile().Exists.Should().BeTrue();
         Path.Combine(huskyPath, "task-runner.json")
@@ -88,12 +80,6 @@ public class InitHandlerIntegrationTests
         return outputPath;
     }
 
-    public class DotnetToolsManifest
-    {
-        [JsonPropertyName("tools")]
-        public Dictionary<string, JsonObject> Tools { get; set; } = null!;
-    }
-
     private InitHandler GetSubject(
         IFileSystem fileSystem,
         IProcessProvider processProvider,
@@ -101,5 +87,11 @@ public class InitHandlerIntegrationTests
     )
     {
         return new InitHandler(fileSystem, inputRequestor, processProvider);
+    }
+
+    private class DotnetToolsManifest
+    {
+        [JsonPropertyName("tools")]
+        public Dictionary<string, JsonObject> Tools { get; set; } = null!;
     }
 }
