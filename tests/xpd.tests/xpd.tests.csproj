@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\xpd\xpd.csproj" />
+      <ProjectReference Include="..\xpd.tests.utilities\xpd.tests.utilities.csproj" />
     </ItemGroup>
 
 </Project>

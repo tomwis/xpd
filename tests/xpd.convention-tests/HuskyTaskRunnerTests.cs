@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Models;
+using xpd.tests.utilities;
 
 namespace xpd.convention_tests;
 
@@ -12,7 +13,7 @@ public class HuskyTaskRunnerTests
     public void ArtifactsDirNameShouldBeTheSameInCcLintProjectAndTaskRunner()
     {
         const string artifactsDirPropertyName = "ArtifactsDir";
-        var rootFolder = GetRootRepoFolder();
+        var rootFolder = PathProvider.GetRootRepoFolder();
         var csprojPath = GetCcLintCsprojPath(rootFolder);
         var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
                 csprojPath,
@@ -36,7 +37,7 @@ public class HuskyTaskRunnerTests
     public void ArtifactsDirPathShouldBeCorrect()
     {
         const string artifactsDirPropertyName = "ArtifactsDir";
-        var rootFolder = GetRootRepoFolder();
+        var rootFolder = PathProvider.GetRootRepoFolder();
         var csprojPath = GetCcLintCsprojPath(rootFolder);
         var csprojDir = new FileInfo(csprojPath).DirectoryName!;
         var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
@@ -52,7 +53,7 @@ public class HuskyTaskRunnerTests
     [Test]
     public void PathToConventionalCommitConfigShouldBeCorrect()
     {
-        var rootFolder = GetRootRepoFolder();
+        var rootFolder = PathProvider.GetRootRepoFolder();
         var taskRunnerPath = Path.Combine(rootFolder, ".husky", "task-runner.json");
         var json = File.ReadAllText(taskRunnerPath);
         var taskRunner = JsonSerializer.Deserialize<TaskRunner>(json);
@@ -98,38 +99,5 @@ public class HuskyTaskRunnerTests
             "xpd.githook.cc-lint.csproj"
         );
         return csprojPath;
-    }
-
-    private static string GetRootRepoFolder()
-    {
-        var currentDir = Directory.GetCurrentDirectory();
-        while (currentDir is not null && !HasGitFolder(currentDir))
-        {
-            currentDir = Directory.GetParent(currentDir)?.FullName;
-        }
-
-        if (currentDir is null)
-        {
-            throw new Exception("Could not find root repo folder.");
-        }
-
-        // Make additional checks for common files to make sure it is root repo folder
-        var packagesPropsExists = new FileInfo(
-            Path.Combine(currentDir, "Directory.Packages.props")
-        ).Exists;
-        var solutionExists = new DirectoryInfo(currentDir).GetFiles("*.sln").Length == 1;
-        var solutionExistsInSrc =
-            new DirectoryInfo(Path.Combine(currentDir, "src")).GetFiles("*.sln").Length == 1;
-
-        if (!packagesPropsExists && !(solutionExists || solutionExistsInSrc))
-        {
-            throw new Exception("Root repo folder doesn't have required files.");
-        }
-
-        Console.WriteLine($"Root repo folder: {currentDir}");
-        return currentDir;
-
-        static bool HasGitFolder(string folder) =>
-            Directory.EnumerateFileSystemEntries(folder).Any(f => f.EndsWith(".git"));
     }
 }
