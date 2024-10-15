@@ -10,15 +10,17 @@ public class InitResult
         string solutionName,
         string projectName,
         string mainFolder,
+        List<string> selectedFolders,
         string solutionOutputDir,
-        List<string> selectedFolders
+        string testProjectPath
     )
     {
         SolutionName = solutionName;
         ProjectName = projectName;
         MainFolder = mainFolder;
-        SolutionOutputDir = solutionOutputDir;
         SelectedFolders = selectedFolders;
+        SolutionOutputDir = solutionOutputDir;
+        TestProjectPath = testProjectPath;
     }
 
     public InitError? Error { get; private init; }
@@ -29,13 +31,23 @@ public class InitResult
         string solutionName,
         string projectName,
         string mainFolder,
+        List<string> selectedFolders,
         string solutionOutputDir,
-        List<string> selectedFolders
-    ) => new(solutionName, projectName, mainFolder, solutionOutputDir, selectedFolders);
+        string testProjectPath
+    ) =>
+        new(
+            solutionName,
+            projectName,
+            mainFolder,
+            selectedFolders,
+            solutionOutputDir,
+            testProjectPath
+        );
 
-    public string? SolutionName { get; private init; }
-    public string? ProjectName { get; private init; }
-    public string? SolutionOutputDir { get; private init; }
-    public string? MainFolder { get; private init; }
-    public List<string>? SelectedFolders { get; private init; }
+    public string? SolutionName { get; }
+    public string? ProjectName { get; }
+    public string? SolutionOutputDir { get; }
+    public string? TestProjectPath { get; }
+    public string? MainFolder { get; }
+    public List<string>? SelectedFolders { get; }
 }

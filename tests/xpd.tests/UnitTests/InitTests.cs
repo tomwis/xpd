@@ -345,6 +345,42 @@ public class InitTests : InitTestsBase
             .And.SaveHuskyInstallToFile();
     }
 
+    [Test]
+    public void WhenTestsDirIsNotCreated_ThenTestProjectIsCreatedInMainFolder()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        const string solutionName = "SomeSolution";
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
+            mockFileSystem.Path.Combine(solutionName, $"{solutionName}.Tests")
+        );
+        result.TestProjectPath.Should().Be(expectedTestProjectPath);
+    }
+
+    [Test]
+    public void WhenTestsDirIsCreated_ThenTestProjectIsCreatedInIt()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        const string solutionName = "SomeSolution";
+        var init = GetSubject(solutionName, fileSystem: mockFileSystem, foldersToCreate: ["tests"]);
+
+        // Act
+        var result = init.Parse(init);
+
+        // Assert
+        var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
+            mockFileSystem.Path.Combine(solutionName, "tests", $"{solutionName}.Tests")
+        );
+        result.TestProjectPath.Should().Be(expectedTestProjectPath);
+    }
+
     private static void AssertDotnetCommandWasCalled(
         IProcessProvider processProvider,
         string command

@@ -61,7 +61,12 @@ public class Init(
             ? _fileSystem.Path.Combine(outputDir, solutionName, "src")
             : mainFolder;
 
+        string testsDir = selectedFolders.Contains("tests")
+            ? _fileSystem.Path.Combine(mainFolder, "tests")
+            : mainFolder;
+
         CreateProjectAndSolution(solutionOutputDir, solutionName, projectName);
+        var testProjectPath = CreateTestProject(solutionOutputDir, testsDir, projectName);
         CreateDirectoryBuildTargets(mainFolder);
         CreateDirectoryPackagesProps(mainFolder);
         InitializeGitRepository(mainFolder);
@@ -80,8 +85,9 @@ public class Init(
             solutionName,
             projectName,
             mainFolder,
+            selectedFolders,
             solutionOutputDir,
-            selectedFolders
+            testProjectPath
         );
     }
 
@@ -109,6 +115,25 @@ public class Init(
             solutionOutputDir
         );
         _commandService.RunCommand("dotnet", $"sln add \"{projectName}\"", solutionOutputDir);
+    }
+
+    private string CreateTestProject(
+        string solutionOutputDir,
+        string testsOutputDir,
+        string projectName
+    )
+    {
+        var testProjectName = $"{projectName}.Tests";
+        var testProjectPath = _fileSystem.Path.Combine(testsOutputDir, testProjectName);
+        testProjectPath = _fileSystem.Path.GetFullPath(testProjectPath);
+        _commandService.RunCommand("dotnet", $"new nunit --name {testProjectName}", testsOutputDir);
+        _commandService.RunCommand(
+            "dotnet",
+            $"sln add \"{testProjectPath}\" --solution-folder Tests",
+            solutionOutputDir
+        );
+
+        return testProjectPath;
     }
 
     private void CreateDirectoryBuildTargets(string mainFolder)
