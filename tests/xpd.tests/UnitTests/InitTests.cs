@@ -1,19 +1,26 @@
 using System.Diagnostics;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Text;
+using System.Text.Json;
 using System.Xml.Linq;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
+using xpd.Constants;
 using xpd.Enums;
 using xpd.Exceptions;
 using xpd.Interfaces;
+using xpd.Models;
 using xpd.tests.Extensions;
 using static xpd.Constants.OptionalFoldersConstants;
 
 namespace xpd.tests.UnitTests;
 
-public class InitTests : InitTestsBase
+public class InitTests
 {
+    private IProcessProvider ProcessProvider { get; set; } = null!;
+
     [TestCase(null)]
     [TestCase("")]
     public void WhenSolutionNameArgumentIsEmpty_ThenAskForUserForInput(string solutionNameArg)
@@ -34,9 +41,8 @@ public class InitTests : InitTestsBase
     public void WhenSolutionNameArgumentIsNotEmpty_ThenDoNotAskForUserForInput()
     {
         // Arrange
-        const string solutionNameFromUserInput = "SolutionNameFromUserInput";
         const string solutionNameFromArg = "ExpectedSolutionName";
-        var init = GetSubjectForSolutionArgTest(solutionNameFromUserInput, solutionNameFromArg);
+        var init = GetSubjectForSolutionArgTest(solutionNameFromArg);
 
         // Act
         var result = init.Parse(init);
@@ -450,10 +456,7 @@ public class InitTests : InitTestsBase
         );
     }
 
-    private static Init GetSubjectForSolutionArgTest(
-        string solutionNameFromUser,
-        string solutionNameFromArg
-    )
+    private static Init GetSubjectForSolutionArgTest(string solutionNameFromArg)
     {
         var fileSystem = new MockFileSystem();
         var currentDir = fileSystem.Directory.GetCurrentDirectory();
@@ -477,5 +480,118 @@ public class InitTests : InitTestsBase
         {
             SolutionName = solutionNameFromArg,
         };
+    }
+
+    private Init GetSubject(
+        string? solutionName = null,
+        string? projectName = null,
+        IFileSystem? fileSystem = null,
+        string[]? foldersToCreate = null,
+        string? outputDir = null,
+        IProcessProvider? processProvider = null
+    )
+    {
+        solutionName ??= "SomeSolution";
+        fileSystem ??= new MockFileSystem();
+        var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
+        foldersToCreate ??= [];
+        ProcessProvider = processProvider ??= GetProcessProvider(() =>
+        {
+            CreateTaskRunnerJson(fileSystem, currentDir, solutionName);
+            CreateTestsCsproj(
+                fileSystem,
+                currentDir,
+                solutionName,
+                string.IsNullOrEmpty(projectName) ? solutionName : projectName,
+                foldersToCreate
+            );
+        });
+
+        var inputRequestor = Substitute.For<IInputRequestor>();
+        inputRequestor.GetSolutionName().Returns(solutionName);
+        inputRequestor.GetProjectName(Arg.Any<string>()).Returns(projectName);
+        inputRequestor.GetFoldersToCreate().Returns(foldersToCreate.ToList());
+        return new Init(fileSystem, inputRequestor, processProvider)
+        {
+            Output = outputDir,
+            SolutionName = null,
+        };
+    }
+
+    private static IProcessProvider GetProcessProvider(Action? action = null, string? errors = null)
+    {
+        var processProvider = Substitute.For<IProcessProvider>();
+        var processWrapper = Substitute.For<IProcessWrapper>();
+        processWrapper.StandardOutput.Returns(new StreamReader(new MemoryStream()));
+        processWrapper.StandardError.Returns(new StreamReader(GetErrorStream(errors)));
+        var configuredCall = processProvider
+            .Start(Arg.Any<ProcessStartInfo>())
+            .Returns(processWrapper);
+
+        if (action is not null)
+        {
+            configuredCall.AndDoes(_ => action());
+        }
+        return processProvider;
+
+        static MemoryStream GetErrorStream(string? errors = null)
+        {
+            var memoryStream = new MemoryStream();
+            if (errors is not null)
+            {
+                var buffer = Encoding.UTF8.GetBytes(errors);
+                memoryStream.Write(buffer, 0, buffer.Length);
+                memoryStream.Position = 0;
+            }
+
+            return memoryStream;
+        }
+    }
+
+    private static string GetTaskRunnerJson() =>
+        JsonSerializer.Serialize(new TaskRunner { Tasks = [] });
+
+    private static void CreateTaskRunnerJson(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName
+    )
+    {
+        if (fileSystem is MockFileSystem mockFileSystem)
+        {
+            mockFileSystem.AddFile(
+                fileSystem.Path.Combine(currentDir, solutionName, ".husky", "task-runner.json"),
+                new MockFileData(GetTaskRunnerJson())
+            );
+        }
+    }
+
+    private static void CreateTestsCsproj(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName,
+        string projectName,
+        string[] selectedFolders
+    )
+    {
+        if (fileSystem is not MockFileSystem mockFileSystem)
+        {
+            return;
+        }
+
+        string testsCsproj = $"{projectName}.Tests.csproj";
+        string testsDir = selectedFolders.Contains(OptionalFoldersConstants.TestsDir)
+            ? OptionalFoldersConstants.TestsDir
+            : string.Empty;
+        var csproj = new XDocument(new XElement("Project"));
+        var testProjectPath = Path.Combine(
+            currentDir,
+            solutionName,
+            testsDir,
+            $"{projectName}.Tests",
+            testsCsproj
+        );
+
+        mockFileSystem.AddFile(testProjectPath, new MockFileData(csproj.ToString()));
     }
 }
