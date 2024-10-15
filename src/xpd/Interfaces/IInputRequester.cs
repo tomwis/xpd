@@ -1,6 +1,6 @@
 namespace xpd.Interfaces;
 
-public interface IInputRequestor
+public interface IInputRequester
 {
     string? GetSolutionName();
 }

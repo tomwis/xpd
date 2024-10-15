@@ -9,24 +9,24 @@ namespace xpd;
 
 public class InitHandler(
     IFileSystem fileSystem,
-    IInputRequestor inputRequestor,
+    IInputRequester inputRequester,
     IProcessProvider processProvider
 )
 {
     private readonly IFileSystem _fileSystem = fileSystem;
-    private readonly IInputRequestor _inputRequestor = inputRequestor;
+    private readonly IInputRequester _inputRequester = inputRequester;
     private readonly CommandService _commandService = new(processProvider);
     private readonly MsBuildService _msBuildService = new(fileSystem);
 
     public InitHandler()
-        : this(new FileSystem(), new InputRequestor(), new ProcessProvider()) { }
+        : this(new FileSystem(), new InputRequester(), new ProcessProvider()) { }
 
     public InitResult Parse(Init args)
     {
         var solutionName = args.SolutionName;
         if (string.IsNullOrEmpty(solutionName))
         {
-            solutionName = _inputRequestor.GetSolutionName();
+            solutionName = _inputRequester.GetSolutionName();
         }
 
         if (string.IsNullOrEmpty(solutionName))

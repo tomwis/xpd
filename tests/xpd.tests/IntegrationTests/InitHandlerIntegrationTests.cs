@@ -25,7 +25,7 @@ public class InitHandlerIntegrationTests
 
         // Arrange
         _outputPath = PrepareOutputDir();
-        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequestor());
+        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequester());
         var init = new Init { Output = _outputPath, SolutionName = SolutionName };
 
         // Act
@@ -83,10 +83,10 @@ public class InitHandlerIntegrationTests
     private InitHandler GetSubject(
         IFileSystem fileSystem,
         IProcessProvider processProvider,
-        IInputRequestor inputRequestor
+        IInputRequester inputRequester
     )
     {
-        return new InitHandler(fileSystem, inputRequestor, processProvider);
+        return new InitHandler(fileSystem, inputRequester, processProvider);
     }
 
     private class DotnetToolsManifest

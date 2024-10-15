@@ -3,7 +3,7 @@ using xpd.Interfaces;
 
 namespace xpd.Services;
 
-public class InputRequestor : IInputRequestor
+public class InputRequester : IInputRequester
 {
     public string? GetSolutionName()
     {

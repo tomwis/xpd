@@ -431,8 +431,8 @@ public class InitHandlerTests
             CreateTestsCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
         });
 
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        return new InitHandler(fileSystem, inputRequestor, processProvider);
+        var inputRequester = Substitute.For<IInputRequester>();
+        return new InitHandler(fileSystem, inputRequester, processProvider);
     }
 
     private InitHandler GetSubject(
@@ -457,9 +457,9 @@ public class InitHandlerTests
             );
         });
 
-        var inputRequestor = Substitute.For<IInputRequestor>();
-        inputRequestor.GetSolutionName().Returns(solutionName);
-        return new InitHandler(fileSystem, inputRequestor, processProvider);
+        var inputRequester = Substitute.For<IInputRequester>();
+        inputRequester.GetSolutionName().Returns(solutionName);
+        return new InitHandler(fileSystem, inputRequester, processProvider);
     }
 
     private static IProcessProvider GetProcessProvider(Action? action = null, string? errors = null)
