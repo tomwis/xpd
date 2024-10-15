@@ -99,6 +99,7 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
         const string outputItemName = "ToolLines";
         const string huskyInstalledTrue = "true";
         var messageTag = CustomProperty.MessageTag.ToUnevaluatedValue();
+        var outputItemIdentity = $"%({outputItemName}.Identity)";
 
         target
             .AddName(TargetName.DotnetToolsRestoreAndInstall)
@@ -110,12 +111,12 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
                 $"{messageTag} ToolListFile: {CustomProperty.ToolListFile.ToUnevaluatedValue()}"
             )
             .AddReadLinesFromFile(CustomProperty.ToolListFile.ToUnevaluatedValue(), outputItemName)
-            .AddMessage($"{messageTag} Tool: %({outputItemName}.Identity)")
+            .AddMessage($"{messageTag} Tool: {outputItemIdentity}")
             .AddPropertyGroup(
                 new PropertyBuilder(
                     CustomProperty.HuskyInstalled,
                     huskyInstalledTrue
-                ).WithCondition(Condition.Equals($"%({outputItemName}.Identity)", "Husky"))
+                ).WithCondition(Condition.Equals(outputItemIdentity, "Husky"))
             )
             .AddMessage(
                 $"{messageTag} HuskyInstalled: {CustomProperty.HuskyInstalled.ToUnevaluatedValue()}"

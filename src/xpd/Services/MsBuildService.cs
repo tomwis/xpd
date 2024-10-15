@@ -47,16 +47,18 @@ public class MsBuildService(IFileSystem fileSystem)
         var csprojXml = XDocument.Parse(csprojContent);
         var xmlRoot = csprojXml.Root!;
 
+        const string includeAttr = "Include";
+        const string versionAttr = "Version";
         var packageReferences = xmlRoot
             .Descendants("PackageReference")
             .Select(pr =>
             {
                 var attributes = new
                 {
-                    Include = pr.Attribute("Include")?.Value,
-                    Version = pr.Attribute("Version")?.Value,
+                    Include = pr.Attribute(includeAttr)?.Value,
+                    Version = pr.Attribute(versionAttr)?.Value,
                 };
-                pr.Attribute("Version")?.Remove();
+                pr.Attribute(versionAttr)?.Remove();
                 return attributes;
             })
             .Where(pr => pr.Include is not null && pr.Version is not null)
@@ -78,8 +80,8 @@ public class MsBuildService(IFileSystem fileSystem)
             itemGroup.Add(
                 new XElement(
                     "PackageVersion",
-                    new XAttribute("Include", pr.Include!),
-                    new XAttribute("Version", pr.Version!)
+                    new XAttribute(includeAttr, pr.Include!),
+                    new XAttribute(versionAttr, pr.Version!)
                 )
             );
         });
