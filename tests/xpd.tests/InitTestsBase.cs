@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Text;
 using System.Text.Json;
 using NSubstitute;
 using xpd.Interfaces;
@@ -51,11 +52,15 @@ public abstract class InitTestsBase
         }
     }
 
-    protected static IProcessProvider GetProcessProvider(Action? action = null)
+    protected static IProcessProvider GetProcessProvider(
+        Action? action = null,
+        string? errors = null
+    )
     {
         var processProvider = Substitute.For<IProcessProvider>();
         var processWrapper = Substitute.For<IProcessWrapper>();
         processWrapper.StandardOutput.Returns(new StreamReader(new MemoryStream()));
+        processWrapper.StandardError.Returns(new StreamReader(GetErrorStream(errors)));
         var configuredCall = processProvider
             .Start(Arg.Any<ProcessStartInfo>())
             .Returns(processWrapper);
@@ -65,5 +70,18 @@ public abstract class InitTestsBase
             configuredCall.AndDoes(_ => action());
         }
         return processProvider;
+
+        static MemoryStream GetErrorStream(string? errors = null)
+        {
+            var memoryStream = new MemoryStream();
+            if (errors is not null)
+            {
+                var buffer = Encoding.UTF8.GetBytes(errors);
+                memoryStream.Write(buffer, 0, buffer.Length);
+                memoryStream.Position = 0;
+            }
+
+            return memoryStream;
+        }
     }
 }

@@ -9,6 +9,7 @@ public class ProcessWrapper(Process process) : IProcessWrapper
     private readonly Process _process = process;
 
     public StreamReader StandardOutput => _process.StandardOutput;
+    public StreamReader StandardError => _process.StandardError;
 
     public static IProcessWrapper Start(ProcessStartInfo startInfo)
     {

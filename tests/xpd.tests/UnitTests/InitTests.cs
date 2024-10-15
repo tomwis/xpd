@@ -5,6 +5,7 @@ using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
 using xpd.Enums;
+using xpd.Exceptions;
 using xpd.Interfaces;
 using xpd.tests.Extensions;
 
@@ -379,6 +380,16 @@ public class InitTests : InitTestsBase
             mockFileSystem.Path.Combine(solutionName, "tests", $"{solutionName}.Tests")
         );
         result.TestProjectPath.Should().Be(expectedTestProjectPath);
+    }
+
+    [Test]
+    public void WhenRunCommandReturnsError_ThenThrowException()
+    {
+        // Arrange
+        var init = GetSubject(processProvider: GetProcessProvider(errors: "any error"));
+
+        // Act && Assert
+        init.Invoking(i => i.Parse(init)).Should().Throw<CommandException>();
     }
 
     private static void AssertDotnetCommandWasCalled(
