@@ -16,7 +16,6 @@ public class Init(
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly IInputRequestor _inputRequestor = inputRequestor;
-    private readonly IProcessProvider _processProvider = processProvider;
     private readonly CommandService _commandService = new(processProvider);
     private readonly MsBuildService _msBuildService = new(fileSystem);
 
