@@ -18,12 +18,10 @@ Xpd is a tool for initializing new dotnet project with convenient defaults. Ther
 # How to use it?
 For now, download the repo and run in src/xpd folder:
 
-`dotnet run init`
-
-You will be asked questions about solution and project names and which folders to create. Solution is created in src/ folder or in root folder if src/ is not created.
+`dotnet run init "MySolutionName"`
 
 You can also run:
 
-`dotnet run init --output "path/to/output/folder"`
+`dotnet run init  "MySolutionName" --output "path/to/output/folder"`
 
-If you'd like to place your solution somewhere else than current directory.
+If you'd like to place your solution somewhere else than current directory (which you should do if you run it from source).
