@@ -16,7 +16,8 @@ public class InitHandler(
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly IInputRequester _inputRequester = inputRequester;
     private readonly CommandService _commandService = new(processProvider);
-    private readonly MsBuildService _msBuildService = new(fileSystem);
+    private MsBuildService _msBuildService;
+    private PathProvider _pathProvider;
 
     public InitHandler()
         : this(new FileSystem(), new InputRequester(), new ProcessProvider()) { }
@@ -35,13 +36,11 @@ public class InitHandler(
             return InitResult.WithError(InitError.SolutionNameRequired);
         }
 
-        var outputDir = args.Output ?? _fileSystem.Directory.GetCurrentDirectory();
-        var solutionPath = _fileSystem.Path.Combine(outputDir, solutionName);
-        var solutionDirectoryInfo = _fileSystem.DirectoryInfo.New(solutionPath);
-        if (solutionDirectoryInfo.Exists)
+        _pathProvider = new PathProvider(_fileSystem, args, solutionName);
+        if (_pathProvider.MainFolder.Exists)
         {
             Console.WriteLine(
-                $"Directory '{solutionName}' already exists in current directory ({outputDir})."
+                $"Directory '{solutionName}' already exists in current directory ({_pathProvider.OutputDir.FullName})."
             );
             return InitResult.WithError(InitError.SolutionNameExists);
         }
@@ -56,15 +55,12 @@ public class InitHandler(
             OptionalFoldersConstants.BuildDir,
             OptionalFoldersConstants.ConfigDir,
         };
-        var mainFolder = _fileSystem.Path.Combine(outputDir, solutionName);
+        var mainFolder = _pathProvider.MainFolder;
         CreateFolders(mainFolder, foldersToCreate);
 
-        var dotnetService = new DotnetService(_commandService, _fileSystem);
-        string solutionOutputDir = mainFolder;
-        string projectOutputDir = _fileSystem.Path.Combine(
-            mainFolder,
-            OptionalFoldersConstants.SrcDir
-        );
+        var dotnetService = new DotnetService(_commandService, _pathProvider);
+        var solutionOutputDir = mainFolder;
+        var projectOutputDir = _pathProvider.SrcDir;
         dotnetService.CreateProjectAndSolution(
             solutionOutputDir,
             solutionName,
@@ -72,59 +68,43 @@ public class InitHandler(
             projectName
         );
 
-        string testsDir = _fileSystem.Path.Combine(mainFolder, OptionalFoldersConstants.TestsDir);
-        (string testProjectName, string testProjectPath) = dotnetService.CreateTestProject(
-            solutionOutputDir,
-            testsDir,
-            projectName
-        );
+        string testProjectName = dotnetService.CreateTestProject(solutionOutputDir, projectName);
 
-        _msBuildService.CreateDirectoryBuildTargets(mainFolder);
-        _msBuildService.CreateDirectoryPackagesProps(mainFolder);
-        string directoryPackagePropsFilePath = _fileSystem.Path.Combine(
-            mainFolder,
-            FileConstants.DirectoryPackagesProps
-        );
-        var testProjectFilePath = _fileSystem.Path.Combine(
-            testProjectPath,
-            $"{testProjectName}.csproj"
-        );
+        _msBuildService = new(_fileSystem, _pathProvider);
+        _msBuildService.CreateDirectoryBuildTargets();
+        _msBuildService.CreateDirectoryPackagesProps();
         _msBuildService.MovePackageVersionsToDirectoryPackagesProps(
-            testProjectFilePath,
-            directoryPackagePropsFilePath
+            _pathProvider.GetTestProjectFile(testProjectName)
         );
         InitializeGitRepository(mainFolder);
         dotnetService.InstallDotnetTools(mainFolder);
 
-        var huskyService = new HuskyService(_fileSystem, _commandService);
+        var huskyService = new HuskyService(_fileSystem, _commandService, _pathProvider);
         var huskyHooksResult = huskyService.InitializeHuskyHooks(mainFolder);
         if (huskyHooksResult is not null)
         {
             return huskyHooksResult;
         }
 
-        huskyService.InitializeHuskyRestoreTarget(mainFolder);
+        huskyService.InitializeHuskyRestoreTarget();
 
         return InitResult.Success(
             solutionName,
             projectName,
-            mainFolder,
+            mainFolder.FullName,
             foldersToCreate,
-            solutionOutputDir,
-            testProjectPath
+            _pathProvider.GetTestProjectDir(testProjectName).FullName
         );
     }
 
-    private void CreateFolders(string mainFolder, List<string> folders)
+    private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
     {
-        _fileSystem.Directory.CreateDirectory(mainFolder);
-        folders.ForEach(folder =>
-            _fileSystem.Directory.CreateDirectory(_fileSystem.Path.Combine(mainFolder, folder))
-        );
+        mainFolder.Create();
+        folders.ForEach(folder => mainFolder.CreateSubdirectory(folder));
     }
 
-    private void InitializeGitRepository(string mainFolder)
+    private void InitializeGitRepository(IDirectoryInfo mainFolder)
     {
-        _commandService.RunCommand("git", "init", mainFolder);
+        _commandService.RunCommand("git", "init", mainFolder.FullName);
     }
 }

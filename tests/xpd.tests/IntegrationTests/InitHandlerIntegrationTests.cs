@@ -7,7 +7,7 @@ using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
 using xpd.tests.Extensions;
-using xpd.tests.utilities;
+using PathProvider = xpd.tests.utilities.PathProvider;
 
 namespace xpd.tests.IntegrationTests;
 

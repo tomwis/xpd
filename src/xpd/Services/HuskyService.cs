@@ -12,21 +12,26 @@ using xpd.MsBuildXmlBuilder.Tasks;
 
 namespace xpd.Services;
 
-public class HuskyService(IFileSystem fileSystem, CommandService commandService)
+internal class HuskyService(
+    IFileSystem fileSystem,
+    CommandService commandService,
+    PathProvider pathProvider
+)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly CommandService _commandService = commandService;
+    private readonly PathProvider _pathProvider = pathProvider;
 
-    public InitResult? InitializeHuskyHooks(string mainFolder)
+    public InitResult? InitializeHuskyHooks(IDirectoryInfo mainFolder)
     {
         _commandService.RunCommand(
             "dotnet",
             "husky add pre-commit -c \"dotnet husky run --group pre-commit\"",
-            mainFolder
+            mainFolder.FullName
         );
 
-        var taskRunnerPath = _fileSystem.Path.Combine(mainFolder, ".husky", "task-runner.json");
-        if (!_fileSystem.File.Exists(taskRunnerPath))
+        var taskRunnerPath = _pathProvider.HuskyTaskRunnerJson;
+        if (!taskRunnerPath.Exists)
         {
             Console.WriteLine(
                 "Warning: .husky/task-runner.json doesn't exist. Git hooks were not added."
@@ -35,7 +40,7 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
             return InitResult.WithError(InitError.HuskyTaskRunnerMissing);
         }
 
-        var taskRunnerJson = _fileSystem.File.ReadAllText(taskRunnerPath);
+        var taskRunnerJson = _fileSystem.File.ReadAllText(taskRunnerPath.FullName);
         var taskRunner = JsonSerializer.Deserialize<TaskRunner>(taskRunnerJson);
 
         if (taskRunner is null)
@@ -61,17 +66,20 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
 
         var options = new JsonSerializerOptions { WriteIndented = true };
         taskRunnerJson = JsonSerializer.Serialize(taskRunner, options);
-        _fileSystem.File.WriteAllText(taskRunnerPath, taskRunnerJson);
+        _fileSystem.File.WriteAllText(taskRunnerPath.FullName, taskRunnerJson);
 
         return null;
     }
 
-    public void InitializeHuskyRestoreTarget(string mainFolder)
+    public void InitializeHuskyRestoreTarget()
     {
         var msBuildXmlBuilder = new MsBuildXmlBuilder.Builders.MsBuildXmlBuilder();
         var toolListFileValue =
             CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()
-            + Path.Combine(OptionalFoldersConstants.ConfigDir, FileConstants.DotnetToolsInstalled);
+            + _fileSystem.Path.GetRelativePath(
+                _pathProvider.MainFolder.FullName,
+                _pathProvider.DotnetToolsInstalledFile.FullName
+            );
         var messageTagValue =
             $"[{FileConstants.DirectoryBuildTargets}][{MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue()}]";
 
@@ -86,12 +94,8 @@ public class HuskyService(IFileSystem fileSystem, CommandService commandService)
             .AddTarget(SetDotnetToolsRestoreAndInstallTarget)
             .AddTarget(SetHuskyRestoreAndInstallTarget);
 
-        var directoryBuildTargetsFile = Path.Combine(
-            mainFolder,
-            FileConstants.DirectoryBuildTargets
-        );
         var contents = msBuildXmlBuilder.ToString();
-        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, contents);
+        _fileSystem.File.WriteAllText(_pathProvider.DirectoryBuildTargetsFile.FullName, contents);
     }
 
     private static void SetDotnetToolsRestoreAndInstallTarget(TargetBuilder target)

@@ -1,29 +1,24 @@
 using System.IO.Abstractions;
 using System.Xml.Linq;
-using xpd.Constants;
 
 namespace xpd.Services;
 
-public class MsBuildService(IFileSystem fileSystem)
+internal sealed class MsBuildService(IFileSystem fileSystem, PathProvider pathProvider)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
+    private readonly PathProvider _pathProvider = pathProvider;
 
-    public void CreateDirectoryBuildTargets(string mainFolder)
+    public void CreateDirectoryBuildTargets()
     {
-        var directoryBuildTargetsFile = _fileSystem.Path.Combine(
-            mainFolder,
-            FileConstants.DirectoryBuildTargets
-        );
         var doc = new XDocument(new XElement("Project"));
-        _fileSystem.File.WriteAllText(directoryBuildTargetsFile, doc.ToString());
+        _fileSystem.File.WriteAllText(
+            _pathProvider.DirectoryBuildTargetsFile.FullName,
+            doc.ToString()
+        );
     }
 
-    public void CreateDirectoryPackagesProps(string mainFolder)
+    public void CreateDirectoryPackagesProps()
     {
-        var directoryPackagesPropsFile = _fileSystem.Path.Combine(
-            mainFolder,
-            FileConstants.DirectoryPackagesProps
-        );
         var doc = new XDocument(
             new XElement(
                 "Project",
@@ -35,15 +30,15 @@ public class MsBuildService(IFileSystem fileSystem)
                 new XElement("ItemGroup", new XAttribute("Label", "Tests"))
             )
         );
-        _fileSystem.File.WriteAllText(directoryPackagesPropsFile, doc.ToString());
+        _fileSystem.File.WriteAllText(
+            _pathProvider.DirectoryPackagesPropsFile.FullName,
+            doc.ToString()
+        );
     }
 
-    public void MovePackageVersionsToDirectoryPackagesProps(
-        string csprojFilePath,
-        string directoryPackagePropsFilePath
-    )
+    public void MovePackageVersionsToDirectoryPackagesProps(IFileInfo csprojFilePath)
     {
-        var csprojContent = _fileSystem.File.ReadAllText(csprojFilePath);
+        var csprojContent = _fileSystem.File.ReadAllText(csprojFilePath.FullName);
         var csprojXml = XDocument.Parse(csprojContent);
         var xmlRoot = csprojXml.Root!;
 
@@ -64,10 +59,10 @@ public class MsBuildService(IFileSystem fileSystem)
             .Where(pr => pr.Include is not null && pr.Version is not null)
             .ToList();
 
-        _fileSystem.File.WriteAllText(csprojFilePath, csprojXml.ToString());
+        _fileSystem.File.WriteAllText(csprojFilePath.FullName, csprojXml.ToString());
 
         var directoryPackagesPropsContent = _fileSystem.File.ReadAllText(
-            directoryPackagePropsFilePath
+            _pathProvider.DirectoryPackagesPropsFile.FullName
         );
         var directoryPackagesPropsXml = XDocument.Parse(directoryPackagesPropsContent);
         var propsRoot = directoryPackagesPropsXml.Root!;
@@ -86,7 +81,7 @@ public class MsBuildService(IFileSystem fileSystem)
             );
         });
         _fileSystem.File.WriteAllText(
-            directoryPackagePropsFilePath,
+            _pathProvider.DirectoryPackagesPropsFile.FullName,
             directoryPackagesPropsXml.ToString()
         );
     }

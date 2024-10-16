@@ -148,7 +148,7 @@ public class InitHandlerTests
 
         // Assert
         var expected = mockFileSystem.Path.Combine(outputDir, solutionName);
-        result.SolutionOutputDir.Should().Be(expected);
+        result.MainFolder.Should().Be(expected);
     }
 
     [Test]
@@ -170,7 +170,7 @@ public class InitHandlerTests
 
         // Assert
         var expected = mockFileSystem.Path.Combine(currentDir, solutionName);
-        result.SolutionOutputDir.Should().Be(expected);
+        result.MainFolder.Should().Be(expected);
     }
 
     [Test]

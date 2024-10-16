@@ -2,60 +2,59 @@ using System.IO.Abstractions;
 
 namespace xpd.Services;
 
-public class DotnetService(CommandService commandService, IFileSystem fileSystem)
+internal class DotnetService(CommandService commandService, PathProvider pathProvider)
 {
     private readonly CommandService _commandService = commandService;
-    private readonly IFileSystem _fileSystem = fileSystem;
+    private readonly PathProvider _pathProvider = pathProvider;
 
     public void CreateProjectAndSolution(
-        string solutionOutputDir,
+        IDirectoryInfo solutionOutputDir,
         string solutionName,
-        string projectOutputDir,
+        IDirectoryInfo projectOutputDir,
         string projectName
     )
     {
         _commandService.RunCommand(
             "dotnet",
-            $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir}\""
+            $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir.FullName}\""
         );
         _commandService.RunCommand(
             "dotnet",
             $"new console --output \"{projectName}\"",
-            projectOutputDir
+            projectOutputDir.FullName
         );
 
-        string projectPath = _fileSystem.Path.Combine(projectOutputDir, projectName);
+        var projectPath = _pathProvider.GetProjectDir(projectName);
         _commandService.RunCommand(
             "dotnet",
-            $"sln add \"{projectPath}\" --in-root",
-            solutionOutputDir
+            $"sln add \"{projectPath.FullName}\" --in-root",
+            solutionOutputDir.FullName
         );
     }
 
-    public (string testProjectName, string testProjectPath) CreateTestProject(
-        string solutionOutputDir,
-        string testsOutputDir,
-        string projectName
-    )
+    public string CreateTestProject(IDirectoryInfo solutionOutputDir, string projectName)
     {
         var testProjectName = $"{projectName}.Tests";
-        var testProjectPath = _fileSystem.Path.Combine(testsOutputDir, testProjectName);
-        testProjectPath = _fileSystem.Path.GetFullPath(testProjectPath);
-        _commandService.RunCommand("dotnet", $"new nunit --name {testProjectName}", testsOutputDir);
+        var testProjectPath = _pathProvider.GetTestProjectDir(testProjectName);
         _commandService.RunCommand(
             "dotnet",
-            $"sln add \"{testProjectPath}\" --solution-folder Tests",
-            solutionOutputDir
+            $"new nunit --name {testProjectName}",
+            testProjectPath.Parent!.FullName
+        );
+        _commandService.RunCommand(
+            "dotnet",
+            $"sln add \"{testProjectPath.FullName}\" --solution-folder Tests",
+            solutionOutputDir.FullName
         );
 
-        return (testProjectName, testProjectPath);
+        return testProjectName;
     }
 
-    public void InstallDotnetTools(string mainFolder)
+    public void InstallDotnetTools(IDirectoryInfo mainFolder)
     {
-        _commandService.RunCommand("dotnet", "new tool-manifest", mainFolder);
-        _commandService.RunCommand("dotnet", "tool install csharpier", mainFolder);
-        _commandService.RunCommand("dotnet", "tool install husky", mainFolder);
-        _commandService.RunCommand("dotnet", "husky install", mainFolder);
+        _commandService.RunCommand("dotnet", "new tool-manifest", mainFolder.FullName);
+        _commandService.RunCommand("dotnet", "tool install csharpier", mainFolder.FullName);
+        _commandService.RunCommand("dotnet", "tool install husky", mainFolder.FullName);
+        _commandService.RunCommand("dotnet", "husky install", mainFolder.FullName);
     }
 }
