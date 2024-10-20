@@ -22,6 +22,10 @@ This project has been initialized with the following features:
     ├── Directory.Build.targets
     └── Directory.Packages.props
 ```
+- Solution contains solution folder "SolutionSettings" with files:
+  - Directory.Build.targets
+  - Directory.Packages.props
+  - .husky/task-runner.json
 - Nuget packages added to test project:
     - AutoFixture
     - AutoFixture.AutoNSubstitute
