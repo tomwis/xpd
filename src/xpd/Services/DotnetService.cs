@@ -50,6 +50,18 @@ internal class DotnetService(CommandService commandService, PathProvider pathPro
         return testProjectName;
     }
 
+    public void AddNugetsToTestProject(IFileInfo testProjectFile, params string[] nugetPackages)
+    {
+        foreach (var package in nugetPackages)
+        {
+            _commandService.RunCommand(
+                "dotnet",
+                $"add package {package}",
+                testProjectFile.Directory!.FullName
+            );
+        }
+    }
+
     public void InstallDotnetTools(IDirectoryInfo mainFolder)
     {
         _commandService.RunCommand("dotnet", "new tool-manifest", mainFolder.FullName);

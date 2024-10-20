@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Interfaces;
@@ -65,6 +66,34 @@ public class InitHandlerIntegrationTests
             .NotBeNull();
 
         bool IsCsharpierTask(TaskRunnerTask task) => task.Arguments.Contains("csharpier");
+    }
+
+    [Test]
+    public void TestProjectHasAllNugetsInstalled()
+    {
+        // Arrange
+        const string testProjectName = $"{SolutionName}.Tests";
+        var csprojPath = Path.Combine(
+            _outputPath,
+            SolutionName,
+            "tests",
+            testProjectName,
+            $"{testProjectName}.csproj"
+        );
+        var project = XDocument.Load(csprojPath);
+
+        // Assert
+        project
+            .Root!.Descendants("PackageReference")
+            .Select(e => e.Attribute("Include")!.Value)
+            .Should()
+            .Contain(
+                "FluentAssertions",
+                "NSubstitute",
+                "NSubstitute.Analyzers.CSharp",
+                "AutoFixture",
+                "AutoFixture.AutoNSubstitute"
+            );
     }
 
     private static string PrepareOutputDir()

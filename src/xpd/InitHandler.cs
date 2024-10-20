@@ -69,6 +69,18 @@ public class InitHandler(
         );
 
         string testProjectName = dotnetService.CreateTestProject(solutionOutputDir, projectName);
+        var nugetPackagesForTestProject = new[]
+        {
+            "FluentAssertions",
+            "NSubstitute",
+            "NSubstitute.Analyzers.CSharp",
+            "AutoFixture",
+            "AutoFixture.AutoNSubstitute",
+        };
+        dotnetService.AddNugetsToTestProject(
+            _pathProvider.GetTestProjectFile(testProjectName),
+            nugetPackagesForTestProject
+        );
 
         _msBuildService = new(_fileSystem, _pathProvider);
         _msBuildService.CreateDirectoryBuildTargets();
