@@ -96,6 +96,18 @@ public class InitHandlerIntegrationTests
             );
     }
 
+    [Test]
+    public void ReadmeIsCreatedInMainFolder()
+    {
+        // Arrange
+        string readmePath = Path.Combine(_outputPath, SolutionName, "README.md");
+
+        // Assert
+        readmePath.ToFile().Exists.Should().BeTrue();
+        var readmeContent = File.ReadAllText(readmePath);
+        readmeContent.Should().Contain("## Project Initialization");
+    }
+
     private static string PrepareOutputDir()
     {
         const string outputDir = "XpdIntegrationTestsOutputDir";
