@@ -19,10 +19,12 @@ This project has been initialized with the following features:
     ├── samples/
     ├── {solutionName}.sln
     ├── README.md
+    ├── .gitignore  # Default .gitignore from dotnet CLI wit hsome additions
     ├── Directory.Build.targets
     └── Directory.Packages.props
 ```
 - Solution contains solution folder "SolutionSettings" with files:
+  - .gitignore
   - Directory.Build.targets
   - Directory.Packages.props
   - .husky/task-runner.json
