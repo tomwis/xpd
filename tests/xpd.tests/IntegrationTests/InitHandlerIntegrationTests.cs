@@ -126,7 +126,8 @@ public class InitHandlerIntegrationTests
             .Which.Should()
             .HaveItem("Directory.Build.targets", "Directory.Build.targets")
             .And.HaveItem("Directory.Packages.props", "Directory.Packages.props")
-            .And.HaveItem("task-runner.json", ".husky/task-runner.json");
+            .And.HaveItem("task-runner.json", ".husky/task-runner.json")
+            .And.HaveItem(".gitignore", ".gitignore");
     }
 
     private static string PrepareOutputDir()

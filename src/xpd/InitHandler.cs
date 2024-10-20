@@ -170,12 +170,13 @@ public class InitHandler(
     {
         var solutionItems = new Dictionary<string, string>
         {
+            { FileConstants.GitIgnore, FileConstants.GitIgnore },
             { FileConstants.DirectoryBuildTargets, FileConstants.DirectoryBuildTargets },
             { FileConstants.DirectoryPackagesProps, FileConstants.DirectoryPackagesProps },
             {
                 FileConstants.TaskRunnerJson,
                 _fileSystem.Path.GetRelativePath(
-                    _pathProvider.MainFolder.FullName,
+                    _pathProvider!.MainFolder.FullName,
                     _pathProvider.HuskyTaskRunnerJson.FullName
                 )
             },
