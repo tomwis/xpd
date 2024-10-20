@@ -36,7 +36,9 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
         );
 
     internal IFileInfo HuskyTaskRunnerJson =>
-        AsFile(_fileSystem.Path.Combine(MainFolder.FullName, ".husky", "task-runner.json"));
+        AsFile(
+            _fileSystem.Path.Combine(MainFolder.FullName, ".husky", FileConstants.TaskRunnerJson)
+        );
 
     internal IDirectoryInfo GetTestProjectDir(string testProjectName) =>
         AsDir(_fileSystem.Path.Combine(TestsDir.FullName, testProjectName));
@@ -52,6 +54,9 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
                 FileConstants.DotnetToolsInstalled
             )
         );
+
+    internal IFileInfo GetSolutionFile(string solutionName) =>
+        AsFile(_fileSystem.Path.Combine(MainFolder.FullName, $"{solutionName}.sln"));
 
     private IFileInfo AsFile(string path)
     {

@@ -4,6 +4,7 @@ using xpd.Enums;
 using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
+using xpd.SolutionModifier;
 
 namespace xpd;
 
@@ -102,6 +103,8 @@ public class InitHandler(
 
         AddReadme(mainFolder, solutionName, projectName, testProjectName);
 
+        AddSolutionSettingsFolderWithItems(solutionName);
+
         return InitResult.Success(
             solutionName,
             projectName,
@@ -143,5 +146,33 @@ public class InitHandler(
     private void InitializeGitRepository(IDirectoryInfo mainFolder)
     {
         _commandService.RunCommand("git", "init", mainFolder.FullName);
+    }
+
+    private void AddSolutionSettingsFolderWithItems(string solutionName)
+    {
+        var solutionItems = new Dictionary<string, string>
+        {
+            { FileConstants.DirectoryBuildTargets, FileConstants.DirectoryBuildTargets },
+            { FileConstants.DirectoryPackagesProps, FileConstants.DirectoryPackagesProps },
+            {
+                FileConstants.TaskRunnerJson,
+                _fileSystem.Path.GetRelativePath(
+                    _pathProvider.MainFolder.FullName,
+                    _pathProvider.HuskyTaskRunnerJson.FullName
+                )
+            },
+        };
+
+        var solutionFolder = new SolutionFolder("SolutionSettings");
+        foreach (var (name, value) in solutionItems)
+        {
+            solutionFolder.AddItem(new SolutionItem(name, value));
+        }
+
+        var solutionFileInfo = _pathProvider.GetSolutionFile(solutionName);
+        var slnContent = _fileSystem.File.ReadAllText(solutionFileInfo.FullName);
+        var solutionFile = new SolutionFile(slnContent);
+        solutionFile.AddSolutionFolder(solutionFolder);
+        _fileSystem.File.WriteAllText(solutionFileInfo.FullName, solutionFile.ToString());
     }
 }

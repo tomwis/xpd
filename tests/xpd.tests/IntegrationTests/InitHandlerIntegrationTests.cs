@@ -7,6 +7,8 @@ using NUnit.Framework;
 using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
+using xpd.tests.Assertions.Extensions;
+using xpd.tests.Assertions.Models;
 using xpd.tests.Extensions;
 using PathProvider = xpd.tests.utilities.PathProvider;
 
@@ -106,6 +108,25 @@ public class InitHandlerIntegrationTests
         readmePath.ToFile().Exists.Should().BeTrue();
         var readmeContent = File.ReadAllText(readmePath);
         readmeContent.Should().Contain("## Project Initialization");
+    }
+
+    [Test]
+    public void SolutionFolderIsAddedToSlnFile()
+    {
+        // Arrange
+        string slnPath = Path.Combine(_outputPath, SolutionName, $"{SolutionName}.sln");
+
+        // Assert
+
+        // Act & Assert
+        var slnContent = File.ReadAllText(slnPath);
+        new SolutionFileForTest(slnContent)
+            .Should()
+            .HaveSolutionFolder("SolutionSettings")
+            .Which.Should()
+            .HaveItem("Directory.Build.targets", "Directory.Build.targets")
+            .And.HaveItem("Directory.Packages.props", "Directory.Packages.props")
+            .And.HaveItem("task-runner.json", ".husky/task-runner.json");
     }
 
     private static string PrepareOutputDir()

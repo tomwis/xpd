@@ -427,6 +427,7 @@ public class InitHandlerTests
         var currentDir = fileSystem.Directory.GetCurrentDirectory();
         var processProvider = GetProcessProvider(() =>
         {
+            CreateSolution(fileSystem, currentDir, solutionNameFromArg);
             CreateTaskRunnerJson(fileSystem, currentDir, solutionNameFromArg);
             CreateTestsCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
         });
@@ -448,6 +449,7 @@ public class InitHandlerTests
         var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
         ProcessProvider = processProvider ??= GetProcessProvider(() =>
         {
+            CreateSolution(fileSystem, currentDir, solutionName);
             CreateTaskRunnerJson(fileSystem, currentDir, solutionName);
             CreateTestsCsproj(
                 fileSystem,
@@ -506,6 +508,21 @@ public class InitHandlerTests
             mockFileSystem.AddFile(
                 fileSystem.Path.Combine(currentDir, solutionName, ".husky", "task-runner.json"),
                 new MockFileData(GetTaskRunnerJson())
+            );
+        }
+    }
+
+    private static void CreateSolution(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName
+    )
+    {
+        if (fileSystem is MockFileSystem mockFileSystem)
+        {
+            mockFileSystem.AddFile(
+                fileSystem.Path.Combine(currentDir, solutionName, $"{solutionName}.sln"),
+                new MockFileData("Microsoft Visual Studio Solution File, Format Version 12.00")
             );
         }
     }
