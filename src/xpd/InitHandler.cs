@@ -17,8 +17,9 @@ public class InitHandler(
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly IInputRequester _inputRequester = inputRequester;
     private readonly CommandService _commandService = new(processProvider);
-    private MsBuildService _msBuildService;
-    private PathProvider _pathProvider;
+    private MsBuildService? _msBuildService;
+    private PathProvider? _pathProvider;
+    private DotnetService? _dotnetService;
 
     public InitHandler()
         : this(new FileSystem(), new InputRequester(), new ProcessProvider()) { }
@@ -59,17 +60,17 @@ public class InitHandler(
         var mainFolder = _pathProvider.MainFolder;
         CreateFolders(mainFolder, foldersToCreate);
 
-        var dotnetService = new DotnetService(_commandService, _pathProvider);
+        _dotnetService = new DotnetService(_commandService, _pathProvider);
         var solutionOutputDir = mainFolder;
         var projectOutputDir = _pathProvider.SrcDir;
-        dotnetService.CreateProjectAndSolution(
+        _dotnetService.CreateProjectAndSolution(
             solutionOutputDir,
             solutionName,
             projectOutputDir,
             projectName
         );
 
-        string testProjectName = dotnetService.CreateTestProject(solutionOutputDir, projectName);
+        string testProjectName = _dotnetService.CreateTestProject(solutionOutputDir, projectName);
         var nugetPackagesForTestProject = new[]
         {
             "FluentAssertions",
@@ -78,7 +79,7 @@ public class InitHandler(
             "AutoFixture",
             "AutoFixture.AutoNSubstitute",
         };
-        dotnetService.AddNugetsToTestProject(
+        _dotnetService.AddNugetsToTestProject(
             _pathProvider.GetTestProjectFile(testProjectName),
             nugetPackagesForTestProject
         );
@@ -90,7 +91,8 @@ public class InitHandler(
             _pathProvider.GetTestProjectFile(testProjectName)
         );
         InitializeGitRepository(mainFolder);
-        dotnetService.InstallDotnetTools(mainFolder);
+        CreateGitIgnore(mainFolder);
+        _dotnetService.InstallDotnetTools(mainFolder);
 
         var huskyService = new HuskyService(_fileSystem, _commandService, _pathProvider);
         var huskyHooksResult = huskyService.InitializeHuskyHooks(mainFolder);
@@ -111,6 +113,22 @@ public class InitHandler(
             mainFolder.FullName,
             foldersToCreate,
             _pathProvider.GetTestProjectDir(testProjectName).FullName
+        );
+    }
+
+    private void CreateGitIgnore(IDirectoryInfo mainFolder)
+    {
+        _dotnetService!.CreateGitIgnore(mainFolder);
+        string[] gitIgnoreAdditionalContent =
+        [
+            Environment.NewLine,
+            "# Added by xpd init",
+            "/config/dotnet_tools_installed.txt",
+        ];
+
+        _fileSystem.File.AppendAllLines(
+            _pathProvider!.GitIgnoreFile.FullName,
+            gitIgnoreAdditionalContent
         );
     }
 

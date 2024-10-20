@@ -55,6 +55,9 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
             )
         );
 
+    public IFileInfo GitIgnoreFile =>
+        AsFile(_fileSystem.Path.Combine(MainFolder.FullName, ".gitignore"));
+
     internal IFileInfo GetSolutionFile(string solutionName) =>
         AsFile(_fileSystem.Path.Combine(MainFolder.FullName, $"{solutionName}.sln"));
 

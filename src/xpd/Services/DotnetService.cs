@@ -69,4 +69,9 @@ internal class DotnetService(CommandService commandService, PathProvider pathPro
         _commandService.RunCommand("dotnet", "tool install husky", mainFolder.FullName);
         _commandService.RunCommand("dotnet", "husky install", mainFolder.FullName);
     }
+
+    public void CreateGitIgnore(IDirectoryInfo mainFolder)
+    {
+        _commandService.RunCommand("dotnet", "new gitignore", mainFolder.FullName);
+    }
 }
