@@ -13,4 +13,11 @@
       <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\README.md" />
+      <EmbeddedResource Include="Resources\README.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
