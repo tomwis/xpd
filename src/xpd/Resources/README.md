@@ -25,22 +25,22 @@ This project has been initialized with the following features:
 ```
 - Solution contains solution folder "SolutionSettings" with files:
   - .gitignore
-  - Directory.Build.targets
-  - Directory.Packages.props
+  - [Directory.Build.targets](https://learn.microsoft.com/en-us/visualstudio/msbuild/customize-by-directory)
+  - [Directory.Packages.props](https://devblogs.microsoft.com/nuget/introducing-central-package-management/)
   - .husky/task-runner.json
 - Nuget packages added to test project:
-    - AutoFixture
-    - AutoFixture.AutoNSubstitute
-    - FluentAssertions
+    - [AutoFixture](https://autofixture.github.io)
+    - [AutoFixture.AutoNSubstitute](https://github.com/AutoFixture/AutoFixture?tab=readme-ov-file#mocking-libraries)
+    - [FluentAssertions](https://fluentassertions.com)
     - Microsoft.NET.Test.Sdk
-    - NSubstitute
-    - NSubstitute.Analyzers.CSharp
-    - NUnit
-    - NUnit3TestAdapter
-    - NUnit.Analyzers
-    - coverlet.collector
+    - [NSubstitute](https://nsubstitute.github.io)
+    - [NSubstitute.Analyzers.CSharp](https://nsubstitute.github.io/help/nsubstitute-analysers/)
+    - [NUnit](https://nunit.org)
+    - [NUnit3TestAdapter](https://docs.nunit.org/articles/vs-test-adapter/Index.html)
+    - [NUnit.Analyzers](https://docs.nunit.org/articles/nunit-analyzers/NUnit-Analyzers.html)
+    - [coverlet.collector](https://github.com/coverlet-coverage/coverlet)
 - Dotnet tools:
-    - `Husky.Net` is installed and pre-commit hook is initialized
-    - `Csharpier` is installed and added to pre-commit hook
+    - [`Husky.Net`](https://alirezanet.github.io/Husky.Net/) is installed and pre-commit hook is initialized
+    - [`Csharpier`](https://csharpier.com) is installed and added to pre-commit hook
 - `Directory.Build.targets` file is created with husky restore (so that developers don't have to do that manually after cloning repo)
 - `Directory.Packages.props` file is created and set to manage nuget packages versions
