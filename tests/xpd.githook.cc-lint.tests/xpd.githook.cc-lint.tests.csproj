@@ -23,9 +23,9 @@
 
     <ItemGroup>
       <None Update="TestFiles\commit.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="TestFiles\conventionalcommit.json">
+      <None Update="TestFiles\commit-message-config.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

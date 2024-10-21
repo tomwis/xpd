@@ -14,9 +14,9 @@ public class Options
 
     [Option(
         'o',
-        "cc-options-file",
+        "commit-message-config-file",
         Required = true,
-        HelpText = "Provide file name of conventional commit options in json format."
+        HelpText = "Provide file name of commit message config in json format."
     )]
-    public string ConventionalCommitOptionsFileName { get; set; } = null!;
+    public string CommitMessageConfigFileName { get; set; } = null!;
 }

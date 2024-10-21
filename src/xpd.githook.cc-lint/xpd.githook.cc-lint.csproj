@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <PackageReference Include="CommandLineParser" />
+      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
     </ItemGroup>
     
     <Target Name="CopyOutputToArtifactsDir" AfterTargets="Build">
