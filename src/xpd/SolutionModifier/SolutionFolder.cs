@@ -10,4 +10,9 @@ internal sealed class SolutionFolder(string name)
     {
         Items.Add(item);
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(SolutionFolder)}({nameof(Name)}: {Name})";
+    }
 }

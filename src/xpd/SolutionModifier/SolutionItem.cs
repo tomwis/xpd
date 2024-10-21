@@ -11,6 +11,6 @@ internal sealed class SolutionItem(string name, string path)
             .GetProperties()
             .Select(prop => $"{prop.Name}: {prop.GetValue(this)}");
 
-        return $"{GetType().Name}({string.Join(Environment.NewLine, properties)})";
+        return $"{GetType().Name}({string.Join(", ", properties)})";
     }
 }

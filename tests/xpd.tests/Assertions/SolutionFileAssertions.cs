@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using FluentAssertions.Execution;
 using xpd.SolutionModifier;
 using xpd.tests.Assertions.Models;
 
@@ -12,12 +12,23 @@ internal class SolutionFileAssertions(SolutionFileForTest solutionFile)
 {
     protected override string Identifier => nameof(SolutionFileForTest);
 
+    [CustomAssertion]
     public AndWhichConstraint<SolutionFileAssertions, SolutionFolder> HaveSolutionFolder(
         string name
     )
     {
-        var folder = Subject.SolutionFolders.FirstOrDefault(f => f.Name == name);
-        Assert.That(folder, Is.Not.Null);
-        return new AndWhichConstraint<SolutionFileAssertions, SolutionFolder>(this, folder);
+        var solutionFolder = Subject.SolutionFolders.FirstOrDefault(item => item.Name == name);
+        var failureMessage = FailureMessage.ForEnumerable(
+            () => Subject.SolutionFolders,
+            item => item.ToString(),
+            new SolutionFolder(name).ToString()
+        );
+
+        Execute.Assertion.ForCondition(solutionFolder is not null).FailWith(failureMessage);
+
+        return new AndWhichConstraint<SolutionFileAssertions, SolutionFolder>(
+            this,
+            solutionFolder!
+        );
     }
 }
