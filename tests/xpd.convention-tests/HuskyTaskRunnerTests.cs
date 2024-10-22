@@ -20,6 +20,7 @@ public class HuskyTaskRunnerTests
                 csprojPath,
                 artifactsDirPropertyName
             )
+            .TrimEnd('/')
             .Split(Path.DirectorySeparatorChar)
             .Last();
 
@@ -47,7 +48,7 @@ public class HuskyTaskRunnerTests
         );
 
         var artifactsDirPath = Path.GetFullPath(Path.Combine(csprojDir, artifactsDirFromCsproj));
-        var artifactsParentDir = Path.GetDirectoryName(artifactsDirPath);
+        var artifactsParentDir = new DirectoryInfo(artifactsDirPath).Parent!.FullName;
         artifactsParentDir.Should().Be(rootFolder);
     }
 

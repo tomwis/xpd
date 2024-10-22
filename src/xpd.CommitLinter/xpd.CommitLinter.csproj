@@ -15,13 +15,19 @@
     
     <Target Name="CopyOutputToArtifactsDir" AfterTargets="Build">
         <PropertyGroup>
-            <ArtifactsDir>../../artifacts</ArtifactsDir>            
+            <ArtifactsDir>../../artifacts/</ArtifactsDir>            
         </PropertyGroup>
         <ItemGroup>
             <OutputFiles Include="$(OutputPath)*.*" />
+            <ArtifactFiles Include="$(ArtifactsDir)*.*" />
         </ItemGroup>
         <Message Text="Current Output Directory: $(OutputPath)" Importance="high" />
         <Message Text="ArtifactsDir: $(ArtifactsDir)" Importance="high" />
+        <Message Text="ArtifactFiles: @(ArtifactFiles)" Importance="high" />
+        <Delete Files="@(ArtifactFiles)">
+            <Output TaskParameter="DeletedFiles" ItemName="DeletedList" />
+        </Delete>
+        <Message Text="Deleted artifacts: @(DeletedList)" Importance="high" />
         <Message Text="OutputFiles: @(OutputFiles)" Importance="high" />
         <Copy SourceFiles="@(OutputFiles)" DestinationFolder="$(ArtifactsDir)" />
     </Target>
