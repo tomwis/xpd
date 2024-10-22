@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using NUnit.Framework;
 
-namespace xpd.githook.cc_lint.tests;
+namespace xpd.CommitLinter.Tests;
 
 public class LinterTests
 {

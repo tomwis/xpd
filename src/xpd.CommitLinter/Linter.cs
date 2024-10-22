@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.Json;
-using xpd.githook.cc_lint.Models;
+using xpd.CommitLinter.Models;
 
-namespace xpd.githook.cc_lint;
+namespace xpd.CommitLinter;
 
 public class Linter
 {

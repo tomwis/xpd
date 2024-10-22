@@ -86,7 +86,7 @@ public class HuskyTaskRunnerTests
         var dllPath = commitMessageLinterTask.Arguments.First();
         var dllName = dllPath.Split(Path.DirectorySeparatorChar)[1];
 
-        dllName.Should().Be("xpd.githook.cc-lint.dll");
+        dllName.Should().Be("xpd.CommitLinter.dll");
     }
 
     private static TaskRunner? GetTaskRunner(string rootFolder)
@@ -112,8 +112,8 @@ public class HuskyTaskRunnerTests
         var csprojPath = Path.Combine(
             rootFolder,
             OptionalFoldersConstants.SrcDir,
-            "xpd.githook.cc-lint",
-            "xpd.githook.cc-lint.csproj"
+            "xpd.CommitLinter",
+            "xpd.CommitLinter.csproj"
         );
         return csprojPath;
     }

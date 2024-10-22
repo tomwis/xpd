@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace xpd.githook.cc_lint.Models;
+namespace xpd.CommitLinter.Models;
 
 internal sealed class CommitMessageConfigRoot
 {

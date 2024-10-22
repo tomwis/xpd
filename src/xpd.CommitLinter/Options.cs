@@ -1,6 +1,6 @@
 using CommandLine;
 
-namespace xpd.githook.cc_lint;
+namespace xpd.CommitLinter;
 
 public class Options
 {

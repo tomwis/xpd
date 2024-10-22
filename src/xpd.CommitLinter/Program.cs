@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using CommandLine;
 
-namespace xpd.githook.cc_lint;
+namespace xpd.CommitLinter;
 
 public class Program
 {

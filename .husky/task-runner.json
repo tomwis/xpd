@@ -24,7 +24,7 @@
          "group": "commit-msg",
          "command": "dotnet",
          "args": [
-            "artifacts/xpd.githook.cc-lint.dll",
+            "artifacts/xpd.CommitLinter.dll",
             "--commit-file",
             "${args}",
             "--commit-message-config-file",

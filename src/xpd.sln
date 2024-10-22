@@ -2,9 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd", "xpd\xpd.csproj", "{1D552893-6590-4531-B27E-7B630F93D2DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.githook.cc-lint", "xpd.githook.cc-lint\xpd.githook.cc-lint.csproj", "{7904904F-5E39-493F-BFB9-43B5263C775F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter", "xpd.CommitLinter\xpd.CommitLinter.csproj", "{7904904F-5E39-493F-BFB9-43B5263C775F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.githook.cc-lint.tests", "..\tests\xpd.githook.cc-lint.tests\xpd.githook.cc-lint.tests.csproj", "{9546EA7F-CE6E-4813-A4F6-63021D2A4884}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter.Tests", "..\tests\xpd.CommitLinter.Tests\xpd.CommitLinter.Tests.csproj", "{9546EA7F-CE6E-4813-A4F6-63021D2A4884}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E47-E562-4E1B-A5C6-999BCCE9C3EC}"
 	ProjectSection(SolutionItems) = preProject
