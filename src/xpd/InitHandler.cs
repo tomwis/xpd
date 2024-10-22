@@ -26,16 +26,9 @@ public class InitHandler(
 
     public InitResult Parse(Init args)
     {
-        var solutionName = args.SolutionName;
-        if (string.IsNullOrEmpty(solutionName))
+        if (!TryGetSolutionName(args, out var solutionName, out var withError))
         {
-            solutionName = _inputRequester.GetSolutionName();
-        }
-
-        if (string.IsNullOrEmpty(solutionName))
-        {
-            Console.WriteLine("Solution name is required.");
-            return InitResult.WithError(InitError.SolutionNameRequired);
+            return withError!;
         }
 
         _pathProvider = new PathProvider(_fileSystem, args, solutionName);
@@ -114,6 +107,25 @@ public class InitHandler(
             foldersToCreate,
             _pathProvider.GetTestProjectDir(testProjectName).FullName
         );
+    }
+
+    private bool TryGetSolutionName(Init args, out string? solutionName, out InitResult? withError)
+    {
+        withError = null;
+        solutionName = args.SolutionName;
+        if (string.IsNullOrEmpty(solutionName))
+        {
+            solutionName = _inputRequester.GetSolutionName();
+        }
+
+        if (string.IsNullOrEmpty(solutionName))
+        {
+            Console.WriteLine("Solution name is required.");
+            withError = InitResult.WithError(InitError.SolutionNameRequired);
+            return false;
+        }
+
+        return true;
     }
 
     private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
