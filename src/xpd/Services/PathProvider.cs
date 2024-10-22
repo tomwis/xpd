@@ -61,6 +61,9 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     internal IFileInfo GetSolutionFile(string solutionName) =>
         AsFile(_fileSystem.Path.Combine(MainFolder.FullName, $"{solutionName}.sln"));
 
+    internal IFileInfo EditorConfigFile =>
+        AsFile(_fileSystem.Path.Combine(MainFolder.FullName, FileConstants.EditorConfig));
+
     private IFileInfo AsFile(string path)
     {
         return _fileSystem.FileInfo.New(path);

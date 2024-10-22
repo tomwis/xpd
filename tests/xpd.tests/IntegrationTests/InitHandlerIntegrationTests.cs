@@ -111,6 +111,18 @@ public class InitHandlerIntegrationTests
     }
 
     [Test]
+    public void EditorconfigIsCreatedInMainFolder()
+    {
+        // Arrange
+        string filePath = Path.Combine(_outputPath, SolutionName, ".editorconfig");
+
+        // Assert
+        filePath.ToFile().Exists.Should().BeTrue();
+        var readmeContent = File.ReadAllText(filePath);
+        readmeContent.Should().Contain("root = true");
+    }
+
+    [Test]
     public void SolutionFolderIsAddedToSlnFile()
     {
         // Arrange
@@ -127,7 +139,8 @@ public class InitHandlerIntegrationTests
             .HaveItem("Directory.Build.targets", "Directory.Build.targets")
             .And.HaveItem("Directory.Packages.props", "Directory.Packages.props")
             .And.HaveItem("task-runner.json", ".husky/task-runner.json")
-            .And.HaveItem(".gitignore", ".gitignore");
+            .And.HaveItem(".gitignore", ".gitignore")
+            .And.HaveItem(".editorconfig", ".editorconfig");
     }
 
     private static string PrepareOutputDir()

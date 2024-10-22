@@ -7,4 +7,5 @@ public static class FileConstants
     public const string DotnetToolsInstalled = "dotnet_tools_installed.txt";
     public const string TaskRunnerJson = "task-runner.json";
     public const string GitIgnore = ".gitignore";
+    public const string EditorConfig = ".editorconfig";
 }

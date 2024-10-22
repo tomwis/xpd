@@ -14,10 +14,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resources\README.md" />
       <EmbeddedResource Include="Resources\README.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
+      <EmbeddedResource Include="Resources\.editorconfig" />
     </ItemGroup>
 
 </Project>

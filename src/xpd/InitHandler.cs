@@ -104,7 +104,7 @@ public class InitHandler(
         huskyService.InitializeHuskyRestoreTarget();
 
         AddReadme(mainFolder, solutionName, projectName, testProjectName);
-
+        AddEditorConfig(_pathProvider.EditorConfigFile);
         AddSolutionSettingsFolderWithItems(solutionName);
 
         return InitResult.Success(
@@ -114,6 +114,12 @@ public class InitHandler(
             foldersToCreate,
             _pathProvider.GetTestProjectDir(testProjectName).FullName
         );
+    }
+
+    private void AddEditorConfig(IFileInfo editorConfigFile)
+    {
+        var content = GetResource(editorConfigFile.Name);
+        _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
     }
 
     private void CreateGitIgnore(IDirectoryInfo mainFolder)
@@ -140,12 +146,7 @@ public class InitHandler(
     )
     {
         const string readmeName = "README.md";
-        var assembly = typeof(InitHandler).Assembly;
-        var readmeResourceName = assembly
-            .GetManifestResourceNames()
-            .First(name => name.EndsWith(readmeName));
-        using var stream = assembly.GetManifestResourceStream(readmeResourceName)!;
-        var content = new StreamReader(stream).ReadToEnd();
+        var content = GetResource(readmeName);
         content = content
             .Replace("{solutionName}", solutionName)
             .Replace("{projectName}", projectName)
@@ -153,6 +154,17 @@ public class InitHandler(
 
         var readmePath = _fileSystem.Path.Combine(mainFolder.FullName, "README.md");
         _fileSystem.File.WriteAllText(readmePath, content);
+    }
+
+    private static string GetResource(string readmeName)
+    {
+        var assembly = typeof(InitHandler).Assembly;
+        var readmeResourceName = assembly
+            .GetManifestResourceNames()
+            .First(name => name.EndsWith(readmeName));
+        using var stream = assembly.GetManifestResourceStream(readmeResourceName)!;
+        var content = new StreamReader(stream).ReadToEnd();
+        return content;
     }
 
     private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
@@ -170,6 +182,7 @@ public class InitHandler(
     {
         var solutionItems = new Dictionary<string, string>
         {
+            { FileConstants.EditorConfig, FileConstants.EditorConfig },
             { FileConstants.GitIgnore, FileConstants.GitIgnore },
             { FileConstants.DirectoryBuildTargets, FileConstants.DirectoryBuildTargets },
             { FileConstants.DirectoryPackagesProps, FileConstants.DirectoryPackagesProps },
