@@ -27,7 +27,9 @@ public class InitHandlerIntegrationTests
         // And 1 test can take about 3 seconds, so it's much faster to execute Act only once
 
         // Arrange
-        _outputPath = PrepareOutputDir();
+        _outputPath = PathProvider.PrepareOutputDirForIntegrationTests(
+            "InitHandlerIntegrationTests"
+        );
         var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequester());
         var init = new Init { Output = _outputPath, SolutionName = SolutionName };
 
@@ -141,19 +143,6 @@ public class InitHandlerIntegrationTests
             .And.HaveItem("task-runner.json", ".husky/task-runner.json")
             .And.HaveItem(".gitignore", ".gitignore")
             .And.HaveItem(".editorconfig", ".editorconfig");
-    }
-
-    private static string PrepareOutputDir()
-    {
-        const string outputDir = "XpdIntegrationTestsOutputDir";
-        var rootRepoFolder = PathProvider.GetRootRepoFolder();
-        var outputPath = Path.Combine(rootRepoFolder, "..", outputDir);
-        if (Directory.Exists(outputPath))
-        {
-            Directory.Delete(outputPath, true);
-        }
-
-        return outputPath;
     }
 
     private InitHandler GetSubject(

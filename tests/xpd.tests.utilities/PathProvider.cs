@@ -38,4 +38,17 @@ public static class PathProvider
         static bool HasGitFolder(string folder) =>
             Directory.EnumerateFileSystemEntries(folder).Any(f => f.EndsWith(".git"));
     }
+
+    public static string PrepareOutputDirForIntegrationTests(string suffix)
+    {
+        const string outputDir = "XpdIntegrationTestsOutputDir";
+        var rootRepoFolder = GetRootRepoFolder();
+        var outputPath = Path.Combine(rootRepoFolder, "..", outputDir, $"Test-{suffix}");
+        if (Directory.Exists(outputPath))
+        {
+            Directory.Delete(outputPath, true);
+        }
+
+        return outputPath;
+    }
 }
