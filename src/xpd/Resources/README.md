@@ -20,6 +20,7 @@ This project has been initialized with the following features:
     ├── {solutionName}.sln
     ├── README.md
     ├── .gitignore  # Default .gitignore from dotnet CLI wit hsome additions
+    ├── .editorconfig
     ├── Directory.Build.targets
     └── Directory.Packages.props
 ```
