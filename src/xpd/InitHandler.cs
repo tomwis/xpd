@@ -26,12 +26,14 @@ public class InitHandler(
 
     public InitResult Parse(Init args)
     {
-        if (!TryGetSolutionName(args, out var solutionName, out var withError))
+        if (!TryGetSolutionName(args, out var solutionName, out var initError))
         {
-            return withError!;
+            return initError!;
         }
 
-        _pathProvider = new PathProvider(_fileSystem, args, solutionName);
+        var selectedProjectType = args.ProjectType ?? ProjectTypes.ConsoleApp;
+
+        _pathProvider = new PathProvider(_fileSystem, args, solutionName!);
         if (_pathProvider.MainFolder.Exists)
         {
             Console.WriteLine(
@@ -58,9 +60,10 @@ public class InitHandler(
         var projectOutputDir = _pathProvider.SrcDir;
         _dotnetService.CreateProjectAndSolution(
             solutionOutputDir,
-            solutionName,
+            solutionName!,
             projectOutputDir,
-            projectName
+            projectName!,
+            selectedProjectType
         );
 
         string testProjectName = _dotnetService.CreateTestProject(solutionOutputDir, projectName);
@@ -109,9 +112,9 @@ public class InitHandler(
         );
     }
 
-    private bool TryGetSolutionName(Init args, out string? solutionName, out InitResult? withError)
+    private bool TryGetSolutionName(Init args, out string? solutionName, out InitResult? initError)
     {
-        withError = null;
+        initError = null;
         solutionName = args.SolutionName;
         if (string.IsNullOrEmpty(solutionName))
         {
@@ -121,7 +124,7 @@ public class InitHandler(
         if (string.IsNullOrEmpty(solutionName))
         {
             Console.WriteLine("Solution name is required.");
-            withError = InitResult.WithError(InitError.SolutionNameRequired);
+            initError = InitResult.WithError(InitError.SolutionNameRequired);
             return false;
         }
 
@@ -163,7 +166,7 @@ public class InitHandler(
     )
     {
         const string readmeName = "README.md";
-        var content = GetResource(readmeName);
+        var content = ResourceProvider.GetResource(readmeName);
         content = content
             .Replace("{solutionName}", solutionName)
             .Replace("{projectName}", projectName)
@@ -175,19 +178,8 @@ public class InitHandler(
 
     private void AddEditorConfig(IFileInfo editorConfigFile)
     {
-        var content = GetResource(editorConfigFile.Name);
+        var content = ResourceProvider.GetResource(editorConfigFile.Name);
         _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
-    }
-
-    private static string GetResource(string readmeName)
-    {
-        var assembly = typeof(InitHandler).Assembly;
-        var readmeResourceName = assembly
-            .GetManifestResourceNames()
-            .First(name => name.EndsWith(readmeName));
-        using var stream = assembly.GetManifestResourceStream(readmeResourceName)!;
-        var content = new StreamReader(stream).ReadToEnd();
-        return content;
     }
 
     private void AddSolutionSettingsFolderWithItems(string solutionName)

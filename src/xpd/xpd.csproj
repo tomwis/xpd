@@ -18,6 +18,7 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </EmbeddedResource>
       <EmbeddedResource Include="Resources\.editorconfig" />
+      <EmbeddedResource Include="Config\project_types.json" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using xpd.Models;
 
 namespace xpd.Services;
 
@@ -11,7 +12,8 @@ internal class DotnetService(CommandService commandService, PathProvider pathPro
         IDirectoryInfo solutionOutputDir,
         string solutionName,
         IDirectoryInfo projectOutputDir,
-        string projectName
+        string projectName,
+        ProjectType projectType
     )
     {
         _commandService.RunCommand(
@@ -20,7 +22,7 @@ internal class DotnetService(CommandService commandService, PathProvider pathPro
         );
         _commandService.RunCommand(
             "dotnet",
-            $"new console --output \"{projectName}\"",
+            $"new {projectType} --output \"{projectName}\"",
             projectOutputDir.FullName
         );
 

@@ -420,6 +420,40 @@ public class InitHandlerTests
         gitIgnoreContent.Should().Contain("/config/dotnet_tools_installed.txt");
     }
 
+    [TestCase("console")]
+    [TestCase("maui")]
+    public void WhenProjectTypeParameterIsProvided_ThenProjectOfSelectedTypeIsCreated(
+        string projectType
+    )
+    {
+        // Arrange
+        const string solutionName = "solutionName";
+        var initHandler = GetSubject(solutionName);
+
+        // Act
+        _ = initHandler.Parse(new Init { ProjectType = projectType });
+
+        // Assert
+        AssertDotnetCommandWasCalled(
+            ProcessProvider,
+            $"new {projectType} --output \"{solutionName}\""
+        );
+    }
+
+    [Test]
+    public void WhenProjectTypeParameterIsNotProvided_ThenConsoleProjectTypeIsCreated()
+    {
+        // Arrange
+        const string solutionName = "solutionName";
+        var initHandler = GetSubject(solutionName);
+
+        // Act
+        _ = initHandler.Parse(new Init());
+
+        // Assert
+        AssertDotnetCommandWasCalled(ProcessProvider, $"new console --output \"{solutionName}\"");
+    }
+
     private static void AssertDotnetCommandWasCalled(
         IProcessProvider processProvider,
         string command

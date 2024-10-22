@@ -10,4 +10,12 @@ public class Init
 
     [Value(0, Required = false, HelpText = "Solution name. Use like: init \"MySolutionName\"")]
     public string? SolutionName { get; set; }
+
+    [Option(
+        'p',
+        "project-type",
+        Required = false,
+        HelpText = "Project type to be created. Supported values: console, maui"
+    )]
+    public string? ProjectType { get; set; }
 }
