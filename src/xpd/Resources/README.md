@@ -9,7 +9,7 @@ This project has been initialized with the following features:
     ├── .git/       # New git repo is initialized
     ├── .husky/
     ├── src/
-    │   └── Console Project '{projectName}'
+    │   └── Project '{projectName}'
     ├── tests/
     │   └── Test Project '{testProjectName}'
     ├── config/
@@ -43,5 +43,8 @@ This project has been initialized with the following features:
 - Dotnet tools:
     - [`Husky.Net`](https://alirezanet.github.io/Husky.Net/) is installed and pre-commit hook is initialized
     - [`Csharpier`](https://csharpier.com) is installed and added to pre-commit hook
+- Git hooks:
+  - [pre-commit] Code formatting of staged files with [Csharpier](https://csharpier.com)
+  - [pre-commit] Run solution build
 - `Directory.Build.targets` file is created with husky restore (so that developers don't have to do that manually after cloning repo)
 - `Directory.Packages.props` file is created and set to manage nuget packages versions
