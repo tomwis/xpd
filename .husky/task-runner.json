@@ -27,8 +27,8 @@
             "artifacts/xpd.githook.cc-lint.dll",
             "--commit-file",
             "${args}",
-            "--cc-options-file",
-            "config/conventionalcommit.json"
+            "--commit-message-config-file",
+            "config/commit-message-config.json"
          ]
       },
       {

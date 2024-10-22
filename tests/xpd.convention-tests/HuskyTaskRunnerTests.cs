@@ -11,11 +11,11 @@ namespace xpd.convention_tests;
 public class HuskyTaskRunnerTests
 {
     [Test]
-    public void ArtifactsDirNameShouldBeTheSameInCcLintProjectAndTaskRunner()
+    public void ArtifactsDirNameShouldBeTheSameInCommitLinterProjectAndTaskRunner()
     {
         const string artifactsDirPropertyName = "ArtifactsDir";
         var rootFolder = PathProvider.GetRootRepoFolder();
-        var csprojPath = GetCcLintCsprojPath(rootFolder);
+        var csprojPath = GetCommitLinterCsprojPath(rootFolder);
         var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
                 csprojPath,
                 artifactsDirPropertyName
@@ -35,11 +35,11 @@ public class HuskyTaskRunnerTests
     }
 
     [Test]
-    public void ArtifactsDirPathShouldBeCorrect()
+    public void ArtifactsDirPathInCommitLinterCsprojShouldPointToArtifactsDirMainFolder()
     {
         const string artifactsDirPropertyName = "ArtifactsDir";
         var rootFolder = PathProvider.GetRootRepoFolder();
-        var csprojPath = GetCcLintCsprojPath(rootFolder);
+        var csprojPath = GetCommitLinterCsprojPath(rootFolder);
         var csprojDir = new FileInfo(csprojPath).DirectoryName!;
         var artifactsDirFromCsproj = GetPropertyValueFromCsproj(
             csprojPath,
@@ -52,25 +52,41 @@ public class HuskyTaskRunnerTests
     }
 
     [Test]
-    public void PathToConventionalCommitConfigShouldBeCorrect()
+    public void PathToCommitConfigShouldBeCorrect()
     {
+        const string commitMessageLinterTaskName = "commit-message-linter";
+        const string commitMessageConfigJson = "commit-message-config.json";
         var rootFolder = PathProvider.GetRootRepoFolder();
         var taskRunnerPath = Path.Combine(rootFolder, ".husky", "task-runner.json");
         var json = File.ReadAllText(taskRunnerPath);
         var taskRunner = JsonSerializer.Deserialize<TaskRunner>(json);
         var commitMessageLinterTask = taskRunner!.Tasks.Single(t =>
-            t.Name == "commit-message-linter"
+            t.Name == commitMessageLinterTaskName
         );
-        var conventionalCommitConfigPath = commitMessageLinterTask.Arguments.Single(arg =>
-            arg.Contains("conventionalcommit.json")
+        var commitConfigPath = commitMessageLinterTask.Arguments.Single(arg =>
+            arg.Contains(commitMessageConfigJson)
         );
 
-        var expectedPath = Path.Combine(rootFolder, conventionalCommitConfigPath);
+        var expectedPath = Path.Combine(rootFolder, commitConfigPath);
         File.Exists(expectedPath)
             .Should()
             .BeTrue(
-                $"Path to conventionalcommit.json ({conventionalCommitConfigPath}) in commit-message-linter task in .husky/task-runner.json is incorrect."
+                $"Path to {commitMessageConfigJson} ({commitConfigPath}) in {commitMessageLinterTaskName} task in .husky/task-runner.json is incorrect."
             );
+    }
+
+    [Test]
+    public void CommitLinterDllNameInTaskRunnerMustBeCorrect()
+    {
+        var rootFolder = PathProvider.GetRootRepoFolder();
+        var taskRunner = GetTaskRunner(rootFolder);
+        var commitMessageLinterTask = taskRunner!.Tasks.Single(t =>
+            t.Name == "commit-message-linter"
+        );
+        var dllPath = commitMessageLinterTask.Arguments.First();
+        var dllName = dllPath.Split(Path.DirectorySeparatorChar)[1];
+
+        dllName.Should().Be("xpd.githook.cc-lint.dll");
     }
 
     private static TaskRunner? GetTaskRunner(string rootFolder)
@@ -91,7 +107,7 @@ public class HuskyTaskRunnerTests
         return artifactsDirProperty.Value;
     }
 
-    private static string GetCcLintCsprojPath(string rootFolder)
+    private static string GetCommitLinterCsprojPath(string rootFolder)
     {
         var csprojPath = Path.Combine(
             rootFolder,
