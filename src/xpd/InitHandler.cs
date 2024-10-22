@@ -91,7 +91,7 @@ public class InitHandler(
             _pathProvider.GetTestProjectFile(testProjectName)
         );
         InitializeGitRepository(mainFolder);
-        CreateGitIgnore(mainFolder);
+        AddGitIgnore(mainFolder);
         _dotnetService.InstallDotnetTools(mainFolder);
 
         var huskyService = new HuskyService(_fileSystem, _commandService, _pathProvider);
@@ -116,13 +116,18 @@ public class InitHandler(
         );
     }
 
-    private void AddEditorConfig(IFileInfo editorConfigFile)
+    private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
     {
-        var content = GetResource(editorConfigFile.Name);
-        _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
+        mainFolder.Create();
+        folders.ForEach(folder => mainFolder.CreateSubdirectory(folder));
     }
 
-    private void CreateGitIgnore(IDirectoryInfo mainFolder)
+    private void InitializeGitRepository(IDirectoryInfo mainFolder)
+    {
+        _commandService.RunCommand("git", "init", mainFolder.FullName);
+    }
+
+    private void AddGitIgnore(IDirectoryInfo mainFolder)
     {
         _dotnetService!.CreateGitIgnore(mainFolder);
         string[] gitIgnoreAdditionalContent =
@@ -156,6 +161,12 @@ public class InitHandler(
         _fileSystem.File.WriteAllText(readmePath, content);
     }
 
+    private void AddEditorConfig(IFileInfo editorConfigFile)
+    {
+        var content = GetResource(editorConfigFile.Name);
+        _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
+    }
+
     private static string GetResource(string readmeName)
     {
         var assembly = typeof(InitHandler).Assembly;
@@ -165,17 +176,6 @@ public class InitHandler(
         using var stream = assembly.GetManifestResourceStream(readmeResourceName)!;
         var content = new StreamReader(stream).ReadToEnd();
         return content;
-    }
-
-    private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
-    {
-        mainFolder.Create();
-        folders.ForEach(folder => mainFolder.CreateSubdirectory(folder));
-    }
-
-    private void InitializeGitRepository(IDirectoryInfo mainFolder)
-    {
-        _commandService.RunCommand("git", "init", mainFolder.FullName);
     }
 
     private void AddSolutionSettingsFolderWithItems(string solutionName)
