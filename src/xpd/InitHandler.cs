@@ -26,14 +26,15 @@ public class InitHandler(
 
     public InitResult Parse(Init args)
     {
-        if (!TryGetSolutionName(args, out var solutionName, out var initError))
+        if (!TryGetSolutionName(args, out var slnName, out var initError))
         {
             return initError!;
         }
 
+        var solutionName = slnName!;
         var selectedProjectType = args.ProjectType ?? ProjectTypes.ConsoleApp;
 
-        _pathProvider = new PathProvider(_fileSystem, args, solutionName!);
+        _pathProvider = new PathProvider(_fileSystem, args, solutionName);
         if (_pathProvider.MainFolder.Exists)
         {
             Console.WriteLine(
@@ -60,9 +61,9 @@ public class InitHandler(
         var projectOutputDir = _pathProvider.SrcDir;
         _dotnetService.CreateProjectAndSolution(
             solutionOutputDir,
-            solutionName!,
+            solutionName,
             projectOutputDir,
-            projectName!,
+            projectName,
             selectedProjectType
         );
 
