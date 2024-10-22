@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using xpd.Constants;
 using xpd.Enums;
 using xpd.Models;
@@ -53,23 +54,38 @@ internal class HuskyService(
         }
 
         taskRunner.Tasks.Clear();
-        taskRunner.Tasks.Add(
-            new TaskRunnerTask
-            {
-                Name = "format-staged-files-with-csharpier",
-                Group = "pre-commit",
-                Command = "dotnet",
-                Arguments = ["csharpier", "${staged}"],
-                Include = ["**/*.cs"],
-            }
-        );
+        taskRunner.Tasks.Add(GetCsharpierTask());
+        taskRunner.Tasks.Add(GetBuildTask());
 
-        var options = new JsonSerializerOptions { WriteIndented = true };
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        };
         taskRunnerJson = JsonSerializer.Serialize(taskRunner, options);
         _fileSystem.File.WriteAllText(taskRunnerPath.FullName, taskRunnerJson);
 
         return null;
     }
+
+    private static TaskRunnerTask GetCsharpierTask() =>
+        new()
+        {
+            Name = "format-staged-files-with-csharpier",
+            Group = "pre-commit",
+            Command = "dotnet",
+            Arguments = ["csharpier", "${staged}"],
+            Include = ["**/*.cs"],
+        };
+
+    private static TaskRunnerTask GetBuildTask() =>
+        new()
+        {
+            Name = "build",
+            Group = "pre-commit",
+            Command = "dotnet",
+            Arguments = ["build"],
+        };
 
     public void InitializeHuskyRestoreTarget()
     {

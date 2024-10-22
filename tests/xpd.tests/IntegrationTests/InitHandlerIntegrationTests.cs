@@ -63,14 +63,22 @@ public class InitHandlerIntegrationTests
         var huskyPath = Path.Combine(_outputPath, SolutionName, ".husky");
         Path.Combine(huskyPath, "task-runner.json").ToFile().Exists.Should().BeTrue();
         Path.Combine(huskyPath, "pre-commit").ToFile().Exists.Should().BeTrue();
-        Path.Combine(huskyPath, "task-runner.json")
-            .Deserialize<TaskRunner>()
-            .Tasks.SingleOrDefault(IsCsharpierTask)
-            .Should()
-            .NotBeNull();
-
-        bool IsCsharpierTask(TaskRunnerTask task) => task.Arguments.Contains("csharpier");
+        var tasks = Path.Combine(huskyPath, "task-runner.json").Deserialize<TaskRunner>().Tasks;
+        tasks.Should().ContainSingle(task => IsCsharpierTask(task));
+        tasks.Should().ContainSingle(task => IsBuildTask(task));
     }
+
+    private static bool IsCsharpierTask(TaskRunnerTask task) =>
+        IsPreCommitTask(task)
+        && IsDotnetCommand(task)
+        && task.Arguments.First().Equals("csharpier");
+
+    private static bool IsBuildTask(TaskRunnerTask task) =>
+        IsPreCommitTask(task) && IsDotnetCommand(task) && task.Arguments.First().Equals("build");
+
+    private static bool IsDotnetCommand(TaskRunnerTask task) => task.Command.Equals("dotnet");
+
+    private static bool IsPreCommitTask(TaskRunnerTask task) => task.Group.Equals("pre-commit");
 
     [Test]
     public void TestProjectHasAllNugetsInstalled()
