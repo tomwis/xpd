@@ -1,4 +1,3 @@
-using System.IO.Abstractions;
 using CommandLine;
 
 namespace xpd.CommitLinter;
@@ -11,11 +10,11 @@ public class Program
             .Default.ParseArguments<Options>(args)
             .WithParsed(o =>
             {
-                var fileSystem = new FileSystem();
-                new Linter().Run(
-                    fileSystem.FileInfo.New(o.CommitMessageFileName),
-                    fileSystem.FileInfo.New(o.CommitMessageConfigFileName)
+                var linterConfig = new LinterConfig(
+                    o.CommitMessageFileName,
+                    o.CommitMessageConfigFileName
                 );
+                new Linter().Run(linterConfig);
             })
             .WithNotParsed(errors => { });
     }

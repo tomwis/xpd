@@ -1,4 +1,3 @@
-using System.IO.Abstractions;
 using NUnit.Framework;
 
 namespace xpd.CommitLinter.Tests;
@@ -10,12 +9,13 @@ public class LinterTests
     {
         // Arrange
         var subject = GetSubject();
-        var fileSystem = new FileSystem();
-        var commitFile = fileSystem.FileInfo.New("TestFiles/commit.txt");
-        var commitConfigFile = fileSystem.FileInfo.New("TestFiles/commit-message-config.json");
+        var linterConfig = new LinterConfig(
+            "TestFiles/commit.txt",
+            "TestFiles/commit-message-config.json"
+        );
 
         // Act
-        subject.Run(commitFile, commitConfigFile);
+        subject.Run(linterConfig);
     }
 
     private static Linter GetSubject()

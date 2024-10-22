@@ -1,38 +1,30 @@
 using System.Diagnostics.CodeAnalysis;
-using System.IO.Abstractions;
-using System.Text.Json;
 using xpd.CommitLinter.Models;
 
 namespace xpd.CommitLinter;
 
-public class Linter
+public sealed class Linter
 {
     private const char Checkmark = '\u2714';
     private const string SubjectSeparator = ": ";
 
-    public void Run(IFileInfo commitMessageFile, IFileInfo commitMessageConfigFile)
+    public void Run(LinterConfig config)
     {
-        var commitMessage = File.ReadAllLines(commitMessageFile.FullName);
-        var commitMessageConfigContent = File.ReadAllText(commitMessageConfigFile.FullName);
-        var commitMessageConfig = JsonSerializer.Deserialize<CommitMessageConfigRoot>(
-            commitMessageConfigContent,
-            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.KebabCaseLower }
-        );
-        var commitSubject = commitMessage[0];
-        PrintCommit(commitMessage);
-        SubjectLengthValidation(commitSubject, commitMessageConfig?.Config?.MaxSubjectLength);
-        TypeValidation(commitSubject, commitMessageConfig?.Config?.ConventionalCommit);
+        var commitSubject = config.CommitMessageLines[0];
+        PrintCommit(config.CommitMessageLines);
+        SubjectLengthValidation(commitSubject, config.CommitMessageConfig?.MaxSubjectLength);
+        TypeValidation(commitSubject, config.CommitMessageConfig?.ConventionalCommit);
         DescriptionNotEmptyValidation(commitSubject);
 
-        var lines = commitMessage.Length;
+        var lines = config.CommitMessageLines.Length;
         if (lines == 1)
         {
             Console.WriteLine("1 line commit. Checks finished.");
             return;
         }
 
-        BlankLineBetweenSubjectAndBodyValidation(commitMessage);
-        BodyNotEmptyValidation(lines, commitMessage);
+        BlankLineBetweenSubjectAndBodyValidation(config.CommitMessageLines);
+        BodyNotEmptyValidation(lines, config.CommitMessageLines);
     }
 
     private static void PrintCommit(string[] commitMessage)
