@@ -12,6 +12,8 @@ This project has been initialized with the following features:
     │   └── Project '{projectName}'
     ├── tests/
     │   └── Test Project '{testProjectName}'
+    │       └── UnitTests
+    │       └── IntegrationTests
     ├── config/
     │   └── Cache of Husky restore
     ├── build/
@@ -46,5 +48,6 @@ This project has been initialized with the following features:
 - Git hooks:
   - [pre-commit] Code formatting of staged files with [Csharpier](https://csharpier.com)
   - [pre-commit] Run solution build
+  - [pre-commit] Run unit tests from solution
 - `Directory.Build.targets` file is created with husky restore (so that developers don't have to do that manually after cloning repo)
 - `Directory.Packages.props` file is created and set to manage nuget packages versions
