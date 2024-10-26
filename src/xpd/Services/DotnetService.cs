@@ -1,12 +1,18 @@
 using System.IO.Abstractions;
+using System.Xml.Linq;
 using xpd.Models;
 
 namespace xpd.Services;
 
-internal class DotnetService(CommandService commandService, PathProvider pathProvider)
+internal class DotnetService(
+    CommandService commandService,
+    PathProvider pathProvider,
+    IFileSystem fileSystem
+)
 {
     private readonly CommandService _commandService = commandService;
     private readonly PathProvider _pathProvider = pathProvider;
+    private readonly IFileSystem _fileSystem = fileSystem;
 
     public void CreateProjectAndSolution(
         IDirectoryInfo solutionOutputDir,
@@ -49,7 +55,33 @@ internal class DotnetService(CommandService commandService, PathProvider pathPro
             solutionOutputDir.FullName
         );
 
+        AddDefaultFoldersToTestProject(testProjectName);
+
         return testProjectName;
+    }
+
+    private void AddDefaultFoldersToTestProject(string testProjectName)
+    {
+        var testProjectDir = _pathProvider.GetTestProjectDir(testProjectName);
+        CreateFolder("UnitTests");
+        CreateFolder("IntegrationTests");
+
+        var testProjectFile = _pathProvider.GetTestProjectFile(testProjectName);
+        var testProjectContent = _fileSystem.File.ReadAllText(testProjectFile.FullName);
+        var xml = XDocument.Parse(testProjectContent);
+        xml.Root!.Add(
+            new XElement("ItemGroup", AddFolder("UnitTests"), AddFolder("IntegrationTests"))
+        );
+        _fileSystem.File.WriteAllText(testProjectFile.FullName, xml.ToString());
+        return;
+
+        void CreateFolder(string name) =>
+            _fileSystem.Directory.CreateDirectory(
+                _fileSystem.Path.Combine(testProjectDir.FullName, name)
+            );
+
+        static XElement AddFolder(string name) =>
+            new("Folder", new XAttribute("Include", $"{name}\\"));
     }
 
     public void AddNugetsToTestProject(IFileInfo testProjectFile, params string[] nugetPackages)

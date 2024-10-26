@@ -1,5 +1,6 @@
 using System.Xml.Linq;
 using FluentAssertions;
+using FluentAssertions.Collections;
 using FluentAssertions.Xml;
 
 namespace xpd.tests.Extensions;
@@ -93,5 +94,20 @@ public static class XDocumentAssertionsExtensions
             .And.HaveAttribute("Condition", "'$(HUSKY)' != '0' AND '$(HuskyInstalled)' != 'true'");
 
         return andWhichConstraint;
+    }
+
+    public static AndWhichConstraint<
+        GenericCollectionAssertions<XElement>,
+        XElement
+    > HaveElementWithFolder(this XDocumentAssertions xDocumentAssertions, string expectedFolder)
+    {
+        return xDocumentAssertions
+            .HaveElement("ItemGroup", AtLeast.Once())
+            .Which.Should()
+            .Contain(element => element.Element("Folder") != null)
+            .Which.Should()
+            .HaveElement("Folder", AtLeast.Once())
+            .Which.Should()
+            .ContainSingle(x => x.Attribute("Include")!.Value == expectedFolder);
     }
 }

@@ -56,7 +56,7 @@ public class InitHandler(
         var mainFolder = _pathProvider.MainFolder;
         CreateFolders(mainFolder, foldersToCreate);
 
-        _dotnetService = new DotnetService(_commandService, _pathProvider);
+        _dotnetService = new DotnetService(_commandService, _pathProvider, _fileSystem);
         var solutionOutputDir = mainFolder;
         var projectOutputDir = _pathProvider.SrcDir;
         _dotnetService.CreateProjectAndSolution(

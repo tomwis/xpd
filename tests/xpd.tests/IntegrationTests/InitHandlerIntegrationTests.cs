@@ -144,8 +144,6 @@ public class InitHandlerIntegrationTests
         // Arrange
         string slnPath = Path.Combine(_outputPath, SolutionName, $"{SolutionName}.sln");
 
-        // Assert
-
         // Act & Assert
         var slnContent = File.ReadAllText(slnPath);
         new SolutionFileForTest(slnContent)
@@ -157,6 +155,25 @@ public class InitHandlerIntegrationTests
             .And.HaveItem("task-runner.json", ".husky/task-runner.json")
             .And.HaveItem(".gitignore", ".gitignore")
             .And.HaveItem(".editorconfig", ".editorconfig");
+    }
+
+    [TestCase("UnitTests\\")]
+    [TestCase("IntegrationTests\\")]
+    public void DefaultFoldersAreAddedToTestsCsproj(string expectedFolder)
+    {
+        // Arrange
+        var path = Path.Combine(
+            _outputPath,
+            SolutionName,
+            "tests",
+            $"{SolutionName}.Tests",
+            $"{SolutionName}.Tests.csproj"
+        );
+
+        var xml = XDocument.Load(path);
+
+        // Assert
+        xml.Should().HaveElementWithFolder(expectedFolder);
     }
 
     private InitHandler GetSubject(

@@ -454,6 +454,25 @@ public class InitHandlerTests
         AssertDotnetCommandWasCalled(ProcessProvider, $"new console --output \"{solutionName}\"");
     }
 
+    [TestCase("UnitTests")]
+    [TestCase("IntegrationTests")]
+    public void DefaultFoldersAreCreatedInTestsProject(string expectedFolder)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var expectedFolderPath = mockFileSystem.Path.Combine(
+            result.TestProjectPath!,
+            expectedFolder
+        );
+        mockFileSystem.Directory.Exists(expectedFolderPath).Should().BeTrue();
+    }
+
     private static void AssertDotnetCommandWasCalled(
         IProcessProvider processProvider,
         string command
