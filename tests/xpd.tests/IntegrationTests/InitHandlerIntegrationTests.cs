@@ -66,6 +66,7 @@ public class InitHandlerIntegrationTests
         var tasks = Path.Combine(huskyPath, "task-runner.json").Deserialize<TaskRunner>().Tasks;
         tasks.Should().ContainSingle(task => IsCsharpierTask(task));
         tasks.Should().ContainSingle(task => IsBuildTask(task));
+        tasks.Should().ContainSingle(task => IsUnitTestsTask(task));
     }
 
     private static bool IsCsharpierTask(TaskRunnerTask task) =>
@@ -75,6 +76,11 @@ public class InitHandlerIntegrationTests
 
     private static bool IsBuildTask(TaskRunnerTask task) =>
         IsPreCommitTask(task) && IsDotnetCommand(task) && task.Arguments.First().Equals("build");
+
+    private static bool IsUnitTestsTask(TaskRunnerTask task) =>
+        IsPreCommitTask(task)
+        && IsDotnetCommand(task)
+        && task.Arguments.SequenceEqual(["test", "--filter", "FullyQualifiedName~UnitTests"]);
 
     private static bool IsDotnetCommand(TaskRunnerTask task) => task.Command.Equals("dotnet");
 

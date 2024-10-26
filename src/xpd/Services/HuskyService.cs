@@ -56,6 +56,7 @@ internal class HuskyService(
         taskRunner.Tasks.Clear();
         taskRunner.Tasks.Add(GetCsharpierTask());
         taskRunner.Tasks.Add(GetBuildTask());
+        taskRunner.Tasks.Add(GetUnitTestsTask());
 
         var options = new JsonSerializerOptions
         {
@@ -85,6 +86,15 @@ internal class HuskyService(
             Group = "pre-commit",
             Command = "dotnet",
             Arguments = ["build"],
+        };
+
+    private TaskRunnerTask GetUnitTestsTask() =>
+        new()
+        {
+            Name = "run-unit-tests",
+            Group = "pre-commit",
+            Command = "dotnet",
+            Arguments = ["test", "--filter", "FullyQualifiedName~UnitTests"],
         };
 
     public void InitializeHuskyRestoreTarget()
