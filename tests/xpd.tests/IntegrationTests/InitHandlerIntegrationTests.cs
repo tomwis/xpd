@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
@@ -64,9 +65,14 @@ public class InitHandlerIntegrationTests
         Path.Combine(huskyPath, "task-runner.json").ToFile().Exists.Should().BeTrue();
         Path.Combine(huskyPath, "pre-commit").ToFile().Exists.Should().BeTrue();
         var tasks = Path.Combine(huskyPath, "task-runner.json").Deserialize<TaskRunner>().Tasks;
-        tasks.Should().ContainSingle(task => IsCsharpierTask(task));
-        tasks.Should().ContainSingle(task => IsBuildTask(task));
-        tasks.Should().ContainSingle(task => IsUnitTestsTask(task));
+        var tasksJson = JsonSerializer.Serialize(
+            tasks,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
+        var errorMessage = $"actual tasks list is as following: {tasksJson}";
+        tasks.Should().ContainSingle(task => IsCsharpierTask(task), errorMessage);
+        tasks.Should().ContainSingle(task => IsBuildTask(task), errorMessage);
+        tasks.Should().ContainSingle(task => IsUnitTestsTask(task), errorMessage);
     }
 
     private static bool IsCsharpierTask(TaskRunnerTask task) =>
@@ -80,7 +86,9 @@ public class InitHandlerIntegrationTests
     private static bool IsUnitTestsTask(TaskRunnerTask task) =>
         IsPreCommitTask(task)
         && IsDotnetCommand(task)
-        && task.Arguments.SequenceEqual(["test", "--filter", "FullyQualifiedName~UnitTests"]);
+        && task.Arguments.SequenceEqual(
+            ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests"]
+        );
 
     private static bool IsDotnetCommand(TaskRunnerTask task) => task.Command.Equals("dotnet");
 
