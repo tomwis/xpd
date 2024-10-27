@@ -5,7 +5,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using xpd.Services;
 
-namespace xpd.convention_tests;
+namespace xpd.ConventionTests;
 
 public class ProjectTypesTests
 {

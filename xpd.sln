@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CFADD125
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests", "tests\xpd.tests\xpd.tests.csproj", "{8B55C578-0E54-4429-995A-06A1E6017D2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.convention-tests", "tests\xpd.convention-tests\xpd.convention-tests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.ConventionTests", "tests\xpd.ConventionTests\xpd.ConventionTests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests.utilities", "tests\xpd.tests.utilities\xpd.tests.utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
 EndProject

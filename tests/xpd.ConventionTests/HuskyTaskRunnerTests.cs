@@ -6,7 +6,7 @@ using xpd.Constants;
 using xpd.Models;
 using xpd.tests.utilities;
 
-namespace xpd.convention_tests;
+namespace xpd.ConventionTests;
 
 public class HuskyTaskRunnerTests
 {

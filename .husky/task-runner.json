@@ -11,7 +11,7 @@
          "name": "run-convention-tests",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "test", "tests/xpd.convention-tests" ]
+         "args": [ "test", "tests/xpd.ConventionTests" ]
       },
       {
          "name": "run-unit-tests",
