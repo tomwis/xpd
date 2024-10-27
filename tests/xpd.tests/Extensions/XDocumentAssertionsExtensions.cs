@@ -3,7 +3,7 @@ using FluentAssertions;
 using FluentAssertions.Collections;
 using FluentAssertions.Xml;
 
-namespace xpd.tests.Extensions;
+namespace xpd.Tests.Extensions;
 
 public static class XDocumentAssertionsExtensions
 {

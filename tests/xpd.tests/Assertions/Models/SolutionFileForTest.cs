@@ -1,6 +1,6 @@
 using xpd.SolutionModifier;
 
-namespace xpd.tests.Assertions.Models;
+namespace xpd.Tests.Assertions.Models;
 
 internal class SolutionFileForTest : SolutionFile
 {

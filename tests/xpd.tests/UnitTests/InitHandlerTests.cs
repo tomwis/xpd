@@ -11,10 +11,10 @@ using xpd.Enums;
 using xpd.Exceptions;
 using xpd.Interfaces;
 using xpd.Models;
-using xpd.tests.Extensions;
+using xpd.Tests.Extensions;
 using static xpd.Constants.OptionalFoldersConstants;
 
-namespace xpd.tests.UnitTests;
+namespace xpd.Tests.UnitTests;
 
 public class InitHandlerTests
 {

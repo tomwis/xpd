@@ -2,7 +2,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using xpd.Models;
 
-namespace xpd.tests.UnitTests;
+namespace xpd.Tests.UnitTests;
 
 public class ProjectTypeTests
 {

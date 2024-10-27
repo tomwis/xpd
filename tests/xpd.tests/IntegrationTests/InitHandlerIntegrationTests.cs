@@ -7,12 +7,12 @@ using NUnit.Framework;
 using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
-using xpd.tests.Assertions.Extensions;
-using xpd.tests.Assertions.Models;
-using xpd.tests.Extensions;
+using xpd.Tests.Assertions.Extensions;
+using xpd.Tests.Assertions.Models;
+using xpd.Tests.Extensions;
 using PathProvider = xpd.tests.utilities.PathProvider;
 
-namespace xpd.tests.IntegrationTests;
+namespace xpd.Tests.IntegrationTests;
 
 public class InitHandlerIntegrationTests
 {

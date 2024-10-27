@@ -7,7 +7,7 @@ using xpd.Models;
 using xpd.Services;
 using PathProvider = xpd.tests.utilities.PathProvider;
 
-namespace xpd.tests.IntegrationTests;
+namespace xpd.Tests.IntegrationTests;
 
 public class AllProjectTypesIntegrationTests
 {

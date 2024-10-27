@@ -1,8 +1,8 @@
 using FluentAssertions.Execution;
 using xpd.SolutionModifier;
-using xpd.tests.Assertions.Models;
+using xpd.Tests.Assertions.Models;
 
-namespace xpd.tests.Assertions;
+namespace xpd.Tests.Assertions;
 
 using FluentAssertions;
 using FluentAssertions.Primitives;

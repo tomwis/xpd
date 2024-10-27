@@ -2,9 +2,9 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
 using xpd.SolutionModifier;
-using xpd.tests.Assertions.Models;
+using xpd.Tests.Assertions.Models;
 
-namespace xpd.tests.Assertions;
+namespace xpd.Tests.Assertions;
 
 internal class SolutionFolderAssertions(SolutionFolder folder)
     : ReferenceTypeAssertions<SolutionFolder, SolutionFolderAssertions>(folder)

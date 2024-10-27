@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace xpd.tests.Extensions;
+namespace xpd.Tests.Extensions;
 
 public static class StringExtensions
 {

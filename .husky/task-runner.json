@@ -17,7 +17,7 @@
          "name": "run-unit-tests",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "test", "tests/xpd.tests", "--filter", "FullyQualifiedName~UnitTests" ]
+         "args": [ "test", "tests/xpd.Tests", "--filter", "FullyQualifiedName~UnitTests" ]
       },
       {
          "name": "commit-message-linter",

@@ -1,6 +1,6 @@
-using xpd.tests.Assertions.Models;
+using xpd.Tests.Assertions.Models;
 
-namespace xpd.tests.Assertions.Extensions;
+namespace xpd.Tests.Assertions.Extensions;
 
 internal static class SolutionFileAssertionsExtensions
 {

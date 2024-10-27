@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using System.Text;
-using xpd.tests.Assertions.Extensions;
+using xpd.Tests.Assertions.Extensions;
 
-namespace xpd.tests.Assertions.Models;
+namespace xpd.Tests.Assertions.Models;
 
 public static class FailureMessage
 {

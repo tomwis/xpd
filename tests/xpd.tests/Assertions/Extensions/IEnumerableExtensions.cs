@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace xpd.tests.Assertions.Extensions;
+namespace xpd.Tests.Assertions.Extensions;
 
 // ReSharper disable once InconsistentNaming
 public static class IEnumerableExtensions
