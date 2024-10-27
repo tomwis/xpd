@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.Tests", "tests\xpd.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.ConventionTests", "tests\xpd.ConventionTests\xpd.ConventionTests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests.utilities", "tests\xpd.tests.utilities\xpd.tests.utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.Tests.Utilities", "tests\xpd.Tests.Utilities\xpd.Tests.Utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,7 +10,7 @@ using xpd.Services;
 using xpd.Tests.Assertions.Extensions;
 using xpd.Tests.Assertions.Models;
 using xpd.Tests.Extensions;
-using PathProvider = xpd.tests.utilities.PathProvider;
+using PathProvider = xpd.Tests.Utilities.PathProvider;
 
 namespace xpd.Tests.IntegrationTests;
 

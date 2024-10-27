@@ -5,7 +5,7 @@ using NUnit.Framework;
 using xpd.Interfaces;
 using xpd.Models;
 using xpd.Services;
-using PathProvider = xpd.tests.utilities.PathProvider;
+using PathProvider = xpd.Tests.Utilities.PathProvider;
 
 namespace xpd.Tests.IntegrationTests;
 

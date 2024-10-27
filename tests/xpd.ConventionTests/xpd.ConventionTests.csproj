@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\xpd\xpd.csproj" />
-      <ProjectReference Include="..\xpd.tests.utilities\xpd.tests.utilities.csproj" />
+      <ProjectReference Include="..\xpd.Tests.Utilities\xpd.Tests.Utilities.csproj" />
     </ItemGroup>
 
 </Project>

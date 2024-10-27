@@ -1,6 +1,6 @@
 ﻿using xpd.Constants;
 
-namespace xpd.tests.utilities;
+namespace xpd.Tests.Utilities;
 
 public static class PathProvider
 {

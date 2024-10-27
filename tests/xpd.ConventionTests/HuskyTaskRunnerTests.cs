@@ -4,7 +4,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using xpd.Constants;
 using xpd.Models;
-using xpd.tests.utilities;
+using xpd.Tests.Utilities;
 
 namespace xpd.ConventionTests;
 
