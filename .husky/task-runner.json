@@ -11,13 +11,13 @@
          "name": "run-convention-tests",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "test", "tests/xpd.ConventionTests" ]
+         "args": [ "test", "tests/xpd.ConventionTests", "--no-build" ]
       },
       {
          "name": "run-unit-tests",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "test", "tests/xpd.Tests", "--filter", "FullyQualifiedName~.Tests.UnitTests" ]
+         "args": [ "test", "tests/xpd.Tests", "--filter", "FullyQualifiedName~.Tests.UnitTests", "--no-build" ]
       },
       {
          "name": "commit-message-linter",
