@@ -17,7 +17,7 @@ public class ProjectTypeTests
     }
 
     [Test]
-    public void WhenCreatingProjectTypeWIthUnsupportedValue_ThenThrowInvalidOperationException()
+    public void WhenCreatingProjectTypeWithUnsupportedValue_ThenThrowInvalidOperationException()
     {
         //Arrange & Act
         Func<ProjectType> projectTypeFunc = () => "unsupported";
