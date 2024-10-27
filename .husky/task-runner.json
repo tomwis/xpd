@@ -5,7 +5,7 @@
           "name": "build",
           "group": "pre-commit",
           "command": "dotnet",
-          "args": [ "build", "src/xpd.sln" ]
+          "args": [ "build", "xpd.sln" ]
       },
       {
          "name": "run-convention-tests",
@@ -42,14 +42,14 @@
          "name": "format-staged-files-with-dotnet-format-style",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "format", "style", "src/", "--include", "${staged}" ],
+         "args": [ "format", "style", "--include", "${staged}" ],
          "include": [ "**/*.cs" ]
       },
       {
          "name": "format-staged-files-with-dotnet-format-analyzers",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "format", "analyzers", "src/", "--include", "${staged}" ],
+         "args": [ "format", "analyzers", "--include", "${staged}" ],
          "include": [ "**/*.cs" ]
       }
    ]

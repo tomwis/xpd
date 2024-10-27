@@ -1,28 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd", "xpd\xpd.csproj", "{1D552893-6590-4531-B27E-7B630F93D2DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd", "src\xpd\xpd.csproj", "{1D552893-6590-4531-B27E-7B630F93D2DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter", "xpd.CommitLinter\xpd.CommitLinter.csproj", "{7904904F-5E39-493F-BFB9-43B5263C775F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter", "src\xpd.CommitLinter\xpd.CommitLinter.csproj", "{7904904F-5E39-493F-BFB9-43B5263C775F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter.Tests", "..\tests\xpd.CommitLinter.Tests\xpd.CommitLinter.Tests.csproj", "{9546EA7F-CE6E-4813-A4F6-63021D2A4884}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.CommitLinter.Tests", "tests\xpd.CommitLinter.Tests\xpd.CommitLinter.Tests.csproj", "{9546EA7F-CE6E-4813-A4F6-63021D2A4884}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E47-E562-4E1B-A5C6-999BCCE9C3EC}"
 	ProjectSection(SolutionItems) = preProject
-		.gitignore = ..\.gitignore
-		Directory.Packages.props = ..\Directory.Packages.props
-		.husky\task-runner.json = ..\.husky\task-runner.json
-		..\Directory.Build.targets = ..\Directory.Build.targets
-		..\.editorconfig = ..\.editorconfig
-		..\config\commit-message-config.json = ..\config\commit-message-config.json
+		.gitignore = .gitignore
+		Directory.Packages.props = Directory.Packages.props
+		.husky\task-runner.json = .husky\task-runner.json
+		Directory.Build.targets = Directory.Build.targets
+		.editorconfig = .editorconfig
+		config\commit-message-config.json = config\commit-message-config.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CFADD125-BADB-4967-B4B0-239EB248B9B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests", "..\tests\xpd.tests\xpd.tests.csproj", "{8B55C578-0E54-4429-995A-06A1E6017D2A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests", "tests\xpd.tests\xpd.tests.csproj", "{8B55C578-0E54-4429-995A-06A1E6017D2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.convention-tests", "..\tests\xpd.convention-tests\xpd.convention-tests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.convention-tests", "tests\xpd.convention-tests\xpd.convention-tests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests.utilities", "..\tests\xpd.tests.utilities\xpd.tests.utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.tests.utilities", "tests\xpd.tests.utilities\xpd.tests.utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
