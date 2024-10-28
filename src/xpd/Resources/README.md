@@ -14,6 +14,7 @@ This project has been initialized with the following features:
     │   └── Test Project '{testProjectName}'
     │       └── UnitTests
     │       └── IntegrationTests
+    │           └── SetupFixture.cs
     ├── config/
     │   └── Cache of Husky restore
     ├── build/
@@ -49,5 +50,7 @@ This project has been initialized with the following features:
   - [pre-commit] Code formatting of staged files with [Csharpier](https://csharpier.com)
   - [pre-commit] Run solution build
   - [pre-commit] Run unit tests from solution
+  - Environment variable `GIT_HOOK_EXECUTION` is set to `true` for git hooks, so that we can detect if code is executing in a git hook
+    - There is a check for this var in `tests/{testProjectName}/IntegrationTests/SetupFixture.cs` to make sure integration tests don't run in a git hook. The reason for this is following. `dotnet test` with  `--filter FullyQualifiedName~.Tests.UnitTests` is used to run tests. Parameter values from parametrized tests  are included in FQN. If any integration test includes a parameter with value `.Tests.UnitTests`, then it will be run within this filter. Additional check for env var prevents this.
 - `Directory.Build.targets` file is created with husky restore (so that developers don't have to do that manually after cloning repo)
 - `Directory.Packages.props` file is created and set to manage nuget packages versions
