@@ -45,7 +45,7 @@ This project has been initialized with the following features:
     - [coverlet.collector](https://github.com/coverlet-coverage/coverlet)
 - Dotnet tools:
     - [`Husky.Net`](https://alirezanet.github.io/Husky.Net/) is installed and pre-commit hook is initialized
-    - [`Csharpier`](https://csharpier.com) is installed and added to pre-commit hook
+    - [`Csharpier`](https://csharpier.com) is installed and added to pre-commit hook. Check plugins for different IDEs [here](https://csharpier.com/docs/Editors) to run CSharpier on file save.
 - Git hooks:
   - [pre-commit] Code formatting of staged files with [Csharpier](https://csharpier.com)
   - [pre-commit] Run solution build
