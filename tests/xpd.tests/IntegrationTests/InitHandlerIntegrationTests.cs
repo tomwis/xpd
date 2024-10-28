@@ -140,7 +140,7 @@ public class InitHandlerIntegrationTests
     private static bool IsPreCommitTask(TaskRunnerTask task) => task.Group.Equals("pre-commit");
 
     [Test]
-    public void TestProjectHasAllNugetsInstalled()
+    public void TestProjectHasAllNugetPackagesInstalled()
     {
         // Arrange
         const string testProjectName = $"{SolutionName}.Tests";
@@ -160,11 +160,34 @@ public class InitHandlerIntegrationTests
             .Should()
             .Contain(
                 "FluentAssertions",
+                "FluentAssertions.Analyzers",
                 "NSubstitute",
                 "NSubstitute.Analyzers.CSharp",
                 "AutoFixture",
                 "AutoFixture.AutoNSubstitute"
             );
+    }
+
+    [Test]
+    public void ConventionTestProjectHasAllNugetPackagesInstalled()
+    {
+        // Arrange
+        const string testProjectName = $"{SolutionName}.ConventionTests";
+        var csprojPath = Path.Combine(
+            _outputPath,
+            SolutionName,
+            "tests",
+            testProjectName,
+            $"{testProjectName}.csproj"
+        );
+        var project = XDocument.Load(csprojPath);
+
+        // Assert
+        project
+            .Root!.Descendants("PackageReference")
+            .Select(e => e.Attribute("Include")!.Value)
+            .Should()
+            .Contain("FluentAssertions", "FluentAssertions.Analyzers");
     }
 
     [Test]

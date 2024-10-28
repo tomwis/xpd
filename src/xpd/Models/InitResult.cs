@@ -11,7 +11,8 @@ public class InitResult
         string projectName,
         string mainFolder,
         List<string> createdFolders,
-        string testProjectPath
+        string testProjectPath,
+        string conventionTestProjectPath
     )
     {
         SolutionName = solutionName;
@@ -19,6 +20,7 @@ public class InitResult
         MainFolder = mainFolder;
         CreatedFolders = createdFolders;
         TestProjectPath = testProjectPath;
+        ConventionTestProjectPath = conventionTestProjectPath;
     }
 
     public InitError? Error { get; private init; }
@@ -30,12 +32,22 @@ public class InitResult
         string projectName,
         string mainFolder,
         List<string> createdFolders,
-        string testProjectPath
-    ) => new(solutionName, projectName, mainFolder, createdFolders, testProjectPath);
+        string testProjectPath,
+        string conventionTestProjectPath
+    ) =>
+        new(
+            solutionName,
+            projectName,
+            mainFolder,
+            createdFolders,
+            testProjectPath,
+            conventionTestProjectPath
+        );
 
     public string? SolutionName { get; }
     public string? ProjectName { get; }
     public string? TestProjectPath { get; }
+    public string? ConventionTestProjectPath { get; }
     public string? MainFolder { get; }
     public List<string>? CreatedFolders { get; }
 }

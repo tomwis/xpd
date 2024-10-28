@@ -28,6 +28,24 @@ public class InitHandlerTestProjectTests : InitHandlerTestsBase
         result.TestProjectPath.Should().Be(expectedTestProjectPath);
     }
 
+    [Test]
+    public void ConventionTestProjectIsCreatedInTestsDir()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        const string solutionName = "SomeSolution";
+        var initHandler = GetSubject(solutionName, fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var expectedTestProjectPath = mockFileSystem.Path.GetFullPath(
+            mockFileSystem.Path.Combine(solutionName, TestsDir, $"{solutionName}.ConventionTests")
+        );
+        result.ConventionTestProjectPath.Should().Be(expectedTestProjectPath);
+    }
+
     [TestCase("UnitTests")]
     [TestCase("IntegrationTests")]
     public void DefaultFoldersAreCreatedInTestsProject(string expectedFolder)

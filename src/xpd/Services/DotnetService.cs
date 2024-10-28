@@ -44,22 +44,51 @@ internal class DotnetService(
     public string CreateTestProject(IDirectoryInfo solutionOutputDir, string projectName)
     {
         var testProjectName = $"{projectName}.Tests";
-        var testProjectPath = _pathProvider.GetTestProjectDir(testProjectName);
+        var testProjectDir = _pathProvider.GetTestProjectDir(testProjectName);
+        CreateTestProjectAndAddToSolution(solutionOutputDir, testProjectName, testProjectDir);
+        AddDefaultFoldersToTestProject(testProjectName);
+        AddSetupFixtureWithGitHookCheckForIntegrationTests(testProjectName);
+        AddNugetPackagesToTestProject(
+            _pathProvider.GetTestProjectFile(testProjectName),
+            "FluentAssertions",
+            "FluentAssertions.Analyzers",
+            "NSubstitute",
+            "NSubstitute.Analyzers.CSharp",
+            "AutoFixture",
+            "AutoFixture.AutoNSubstitute"
+        );
+        return testProjectName;
+    }
+
+    public string CreateConventionTestProject(IDirectoryInfo solutionOutputDir, string projectName)
+    {
+        var testProjectName = $"{projectName}.ConventionTests";
+        var testProjectDir = _pathProvider.GetTestProjectDir(testProjectName);
+        CreateTestProjectAndAddToSolution(solutionOutputDir, testProjectName, testProjectDir);
+        AddNugetPackagesToTestProject(
+            _pathProvider.GetTestProjectFile(testProjectName),
+            "FluentAssertions",
+            "FluentAssertions.Analyzers"
+        );
+        return testProjectName;
+    }
+
+    private void CreateTestProjectAndAddToSolution(
+        IDirectoryInfo solutionOutputDir,
+        string testProjectName,
+        IDirectoryInfo testProjectDir
+    )
+    {
         _commandService.RunCommand(
             "dotnet",
             $"new nunit --name {testProjectName}",
-            testProjectPath.Parent!.FullName
+            testProjectDir.Parent!.FullName
         );
         _commandService.RunCommand(
             "dotnet",
-            $"sln add \"{testProjectPath.FullName}\" --solution-folder Tests",
+            $"sln add \"{testProjectDir.FullName}\" --solution-folder Tests",
             solutionOutputDir.FullName
         );
-
-        AddDefaultFoldersToTestProject(testProjectName);
-        AddSetupFixtureWithGitHookCheckForIntegrationTests(testProjectName);
-
-        return testProjectName;
     }
 
     private void AddDefaultFoldersToTestProject(string testProjectName)
@@ -90,7 +119,10 @@ internal class DotnetService(
             new("Folder", new XAttribute("Include", $"{name}\\"));
     }
 
-    public void AddNugetsToTestProject(IFileInfo testProjectFile, params string[] nugetPackages)
+    private void AddNugetPackagesToTestProject(
+        IFileInfo testProjectFile,
+        params string[] nugetPackages
+    )
     {
         foreach (var package in nugetPackages)
         {
