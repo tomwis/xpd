@@ -214,6 +214,23 @@ public class InitHandlerIntegrationTests
     }
 
     [Test]
+    public void TokensInReadmeAreReplaced()
+    {
+        // Arrange
+        string readmePath = Path.Combine(_outputPath, SolutionName, "README.md");
+        string[] tokens =
+        [
+            "{solutionName}",
+            "{projectName}",
+            "{testProjectName}",
+            "{conventionTestProjectName}",
+        ];
+
+        // Assert
+        readmePath.ToFile().ReadAllText().Should().NotContainAny(tokens);
+    }
+
+    [Test]
     public void EditorconfigIsCreatedInMainFolder()
     {
         // Arrange
