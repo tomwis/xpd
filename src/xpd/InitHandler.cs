@@ -84,7 +84,7 @@ public class InitHandler(
         _dotnetService.InstallDotnetTools(mainFolder);
 
         var huskyService = new HuskyService(_fileSystem, _commandService, _pathProvider);
-        var huskyHooksResult = huskyService.InitializeHuskyHooks(mainFolder);
+        var huskyHooksResult = huskyService.InitializeHuskyHooks(mainFolder, projectName);
         if (huskyHooksResult is not null)
         {
             return huskyHooksResult;

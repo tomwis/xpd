@@ -23,7 +23,7 @@ internal class HuskyService(
     private readonly CommandService _commandService = commandService;
     private readonly PathProvider _pathProvider = pathProvider;
 
-    public InitResult? InitializeHuskyHooks(IDirectoryInfo mainFolder)
+    public InitResult? InitializeHuskyHooks(IDirectoryInfo mainFolder, string projectName)
     {
         string[] commands =
         [
@@ -62,6 +62,7 @@ internal class HuskyService(
         taskRunner.Tasks.Add(GetCsharpierTask());
         taskRunner.Tasks.Add(GetBuildTask());
         taskRunner.Tasks.Add(GetUnitTestsTask());
+        taskRunner.Tasks.Add(GetConventionTestsTask(projectName));
 
         var options = new JsonSerializerOptions
         {
@@ -100,6 +101,23 @@ internal class HuskyService(
             Group = "pre-commit",
             Command = "dotnet",
             Arguments = ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests", "--no-build"],
+        };
+
+    private TaskRunnerTask GetConventionTestsTask(string projectName) =>
+        new()
+        {
+            Name = "run-convention-tests",
+            Group = "pre-commit",
+            Command = "dotnet",
+            Arguments =
+            [
+                "test",
+                _fileSystem.Path.Combine(
+                    OptionalFoldersConstants.TestsDir,
+                    $"{projectName}.ConventionTests"
+                ),
+                "--no-build",
+            ],
         };
 
     public void InitializeHuskyRestoreTarget()

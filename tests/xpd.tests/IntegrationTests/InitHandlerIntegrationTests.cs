@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
@@ -74,6 +76,7 @@ public class InitHandlerIntegrationTests
         tasks.Should().ContainSingle(task => IsCsharpierTask(task), errorMessage);
         tasks.Should().ContainSingle(task => IsBuildTask(task), errorMessage);
         tasks.Should().ContainSingle(task => IsUnitTestsTask(task), errorMessage);
+        tasks.Should().ContainSingle(task => IsConventionTestsTask(task), errorMessage);
     }
 
     [Test]
@@ -134,6 +137,14 @@ public class InitHandlerIntegrationTests
         && task.Arguments.SequenceEqual(
             ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests", "--no-build"]
         );
+
+    [SuppressMessage("Performance", "SYSLIB1045:Konwertuj na atrybut „GeneratedRegexAttribute”.")]
+    private static bool IsConventionTestsTask(TaskRunnerTask task) =>
+        IsPreCommitTask(task)
+        && IsDotnetCommand(task)
+        && task.Arguments.First().Equals("test")
+        && Regex.IsMatch(task.Arguments.Skip(1).First(), "tests/.*\\.ConventionTests")
+        && task.Arguments.Last().Equals("--no-build");
 
     private static bool IsDotnetCommand(TaskRunnerTask task) => task.Command.Equals("dotnet");
 
