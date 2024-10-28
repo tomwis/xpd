@@ -19,6 +19,7 @@
       </EmbeddedResource>
       <EmbeddedResource Include="Resources\.editorconfig" />
       <EmbeddedResource Include="Config\project_types.json" />
+      <EmbeddedResource Include="Resources\SetupFixture.template" />
     </ItemGroup>
 
 </Project>

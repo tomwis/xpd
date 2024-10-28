@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Xml.Linq;
+using xpd.Constants;
 using xpd.Models;
 
 namespace xpd.Services;
@@ -56,6 +57,7 @@ internal class DotnetService(
         );
 
         AddDefaultFoldersToTestProject(testProjectName);
+        AddSetupFixtureWithGitHookCheckForIntegrationTests(testProjectName);
 
         return testProjectName;
     }
@@ -63,14 +65,18 @@ internal class DotnetService(
     private void AddDefaultFoldersToTestProject(string testProjectName)
     {
         var testProjectDir = _pathProvider.GetTestProjectDir(testProjectName);
-        CreateFolder("UnitTests");
-        CreateFolder("IntegrationTests");
+        CreateFolder(DirectoryConstants.UnitTestsDirName);
+        CreateFolder(DirectoryConstants.IntegrationTestsDirName);
 
         var testProjectFile = _pathProvider.GetTestProjectFile(testProjectName);
         var testProjectContent = _fileSystem.File.ReadAllText(testProjectFile.FullName);
         var xml = XDocument.Parse(testProjectContent);
         xml.Root!.Add(
-            new XElement("ItemGroup", AddFolder("UnitTests"), AddFolder("IntegrationTests"))
+            new XElement(
+                "ItemGroup",
+                AddFolder(DirectoryConstants.UnitTestsDirName),
+                AddFolder(DirectoryConstants.IntegrationTestsDirName)
+            )
         );
         _fileSystem.File.WriteAllText(testProjectFile.FullName, xml.ToString());
         return;
@@ -94,6 +100,21 @@ internal class DotnetService(
                 testProjectFile.Directory!.FullName
             );
         }
+    }
+
+    private void AddSetupFixtureWithGitHookCheckForIntegrationTests(string testProjectName)
+    {
+        const string setupFixtureFileName = "SetupFixture.cs";
+        const string setupFixtureTemplateFileName = "SetupFixture.template";
+        var integrationTestsDir = _pathProvider.GetTestProjectIntegrationTestsDir(testProjectName);
+        var content = ResourceProvider
+            .GetResource(setupFixtureTemplateFileName)
+            .Replace("{ProjectName}", testProjectName);
+        var setupFixtureFilePath = _fileSystem.Path.Combine(
+            integrationTestsDir.FullName,
+            setupFixtureFileName
+        );
+        _fileSystem.File.WriteAllText(setupFixtureFilePath, content);
     }
 
     public void InstallDotnetTools(IDirectoryInfo mainFolder)

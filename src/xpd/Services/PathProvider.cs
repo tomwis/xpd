@@ -64,6 +64,14 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     internal IFileInfo EditorConfigFile =>
         AsFile(_fileSystem.Path.Combine(MainFolder.FullName, FileConstants.EditorConfig));
 
+    internal IDirectoryInfo GetTestProjectIntegrationTestsDir(string testProjectName) =>
+        AsDir(
+            _fileSystem.Path.Combine(
+                GetTestProjectDir(testProjectName).FullName,
+                DirectoryConstants.IntegrationTestsDirName
+            )
+        );
+
     private IFileInfo AsFile(string path)
     {
         return _fileSystem.FileInfo.New(path);

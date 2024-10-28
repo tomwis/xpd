@@ -25,9 +25,14 @@ internal class HuskyService(
 
     public InitResult? InitializeHuskyHooks(IDirectoryInfo mainFolder)
     {
+        string[] commands =
+        [
+            "export GIT_HOOK_EXECUTION=true",
+            "dotnet husky run --group pre-commit",
+        ];
         _commandService.RunCommand(
             "dotnet",
-            "husky add pre-commit -c \"dotnet husky run --group pre-commit\"",
+            $"husky add pre-commit -c \"{string.Join(Environment.NewLine, commands)}\"",
             mainFolder.FullName
         );
 

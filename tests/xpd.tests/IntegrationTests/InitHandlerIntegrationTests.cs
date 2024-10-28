@@ -75,6 +75,30 @@ public class InitHandlerIntegrationTests
         tasks.Should().ContainSingle(task => IsUnitTestsTask(task), errorMessage);
     }
 
+    [Test]
+    public void PreCommitGitHookIsRunningHuskyPreCommitGroup()
+    {
+        // Assert
+        var preCommitHook = Path.Combine(_outputPath, SolutionName, ".husky", "pre-commit")
+            .ToFile()
+            .ReadAllLines();
+        preCommitHook
+            .Should()
+            .ContainSingle(line => line.StartsWith("dotnet husky run --group pre-commit"));
+    }
+
+    [Test]
+    public void PreCommitGitHookHasFlagSet()
+    {
+        // Assert
+        var preCommitHook = Path.Combine(_outputPath, SolutionName, ".husky", "pre-commit")
+            .ToFile()
+            .ReadAllLines();
+        preCommitHook
+            .Should()
+            .ContainSingle(line => line.StartsWith("export GIT_HOOK_EXECUTION=true"));
+    }
+
     private static bool IsCsharpierTask(TaskRunnerTask task) =>
         IsPreCommitTask(task)
         && IsDotnetCommand(task)
