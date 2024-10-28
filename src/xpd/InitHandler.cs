@@ -92,7 +92,13 @@ public class InitHandler(
 
         huskyService.InitializeHuskyRestoreTarget();
 
-        AddReadme(mainFolder, solutionName, projectName, testProjectName);
+        AddReadme(
+            mainFolder,
+            solutionName,
+            projectName,
+            testProjectName,
+            conventionTestProjectName
+        );
         AddEditorConfig(_pathProvider.EditorConfigFile);
         AddSolutionSettingsFolderWithItems(solutionName);
 
@@ -156,7 +162,8 @@ public class InitHandler(
         IDirectoryInfo mainFolder,
         string solutionName,
         string projectName,
-        string testProjectName
+        string testProjectName,
+        string conventionTestProjectName
     )
     {
         const string readmeName = "README.md";
@@ -164,7 +171,8 @@ public class InitHandler(
         content = content
             .Replace("{solutionName}", solutionName)
             .Replace("{projectName}", projectName)
-            .Replace("{testProjectName}", testProjectName);
+            .Replace("{testProjectName}", testProjectName)
+            .Replace("{conventionTestProjectName}", conventionTestProjectName);
 
         var readmePath = _fileSystem.Path.Combine(mainFolder.FullName, "README.md");
         _fileSystem.File.WriteAllText(readmePath, content);
