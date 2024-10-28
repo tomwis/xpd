@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -97,6 +98,26 @@ public class InitHandlerIntegrationTests
         preCommitHook
             .Should()
             .ContainSingle(line => line.StartsWith("export GIT_HOOK_EXECUTION=true"));
+    }
+
+    [Test]
+    public void SolutionIsBuildingSuccessfully()
+    {
+        // Assert
+        var slnDir = Path.Combine(_outputPath, SolutionName);
+        var process = Process.Start(
+            new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "build",
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                WorkingDirectory = slnDir,
+            }
+        );
+        process!.WaitForExit();
+        process.StandardOutput.ReadToEnd().Should().NotBeEmpty();
+        process.StandardError.ReadToEnd().Should().BeEmpty();
     }
 
     private static bool IsCsharpierTask(TaskRunnerTask task) =>
