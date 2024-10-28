@@ -99,7 +99,7 @@ internal class HuskyService(
             Name = "run-unit-tests",
             Group = "pre-commit",
             Command = "dotnet",
-            Arguments = ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests"],
+            Arguments = ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests", "--no-build"],
         };
 
     public void InitializeHuskyRestoreTarget()

@@ -132,7 +132,7 @@ public class InitHandlerIntegrationTests
         IsPreCommitTask(task)
         && IsDotnetCommand(task)
         && task.Arguments.SequenceEqual(
-            ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests"]
+            ["test", "--filter", "FullyQualifiedName~.Tests.UnitTests", "--no-build"]
         );
 
     private static bool IsDotnetCommand(TaskRunnerTask task) => task.Command.Equals("dotnet");
