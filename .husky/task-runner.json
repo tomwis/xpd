@@ -30,20 +30,6 @@
             "--commit-message-config-file",
             "config/commit-message-config.json"
          ]
-      },
-      {
-         "name": "format-staged-files-with-csharpier",
-         "group": "pre-commit",
-         "command": "dotnet",
-         "args": [ "csharpier", "${staged}" ],
-         "include": [ "**/*.cs" ]
-      },
-      {
-         "name": "format-staged-files-with-dotnet-format-analyzers",
-         "group": "pre-commit",
-         "command": "dotnet",
-         "args": [ "format", "analyzers", "--include", "${staged}" ],
-         "include": [ "**/*.cs" ]
       }
    ]
 }

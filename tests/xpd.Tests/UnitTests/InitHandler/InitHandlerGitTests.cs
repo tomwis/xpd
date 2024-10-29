@@ -45,7 +45,8 @@ public class InitHandlerGitTests : InitHandlerTestsBase
 
         // Assert
         var expectedGitIgnorePath = mockFileSystem.Path.Combine(result.MainFolder!, ".gitignore");
-        mockFileSystem.File.Exists(expectedGitIgnorePath).Should().BeTrue();
+        mockFileSystem.File.Exists(expectedGitIgnorePath).Should()
+            .BeTrue();
     }
 
     [Test]
