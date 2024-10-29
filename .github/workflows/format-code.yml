@@ -1,6 +1,7 @@
 name: Format Code
 
 on:
+    pull_request:
     workflow_run:
         workflows: ["Build and Test"]
         types:
