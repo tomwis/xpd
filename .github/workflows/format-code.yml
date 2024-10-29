@@ -12,6 +12,7 @@ on:
 
 permissions:
     contents: write
+    pull-requests: write
 
 jobs:
     format:
@@ -54,5 +55,5 @@ jobs:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                 echo "SOURCE_BRANCH: $SOURCE_BRANCH"
-                echo "Target_Branch: Target_Branch"
+                echo "Target_Branch: $Target_Branch"
                 gh pr create --title "Auto code formatting" --body "This PR applies automated code formatting done in GitHub workflow." --base $Target_Branch --head $SOURCE_BRANCH
