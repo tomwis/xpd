@@ -10,6 +10,7 @@ public class ProcessWrapper(Process process) : IProcessWrapper
 
     public StreamReader StandardOutput => _process.StandardOutput;
     public StreamReader StandardError => _process.StandardError;
+    public int ExitCode => _process.ExitCode;
 
     public static IProcessWrapper Start(ProcessStartInfo startInfo)
     {

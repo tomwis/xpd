@@ -23,17 +23,26 @@ public class CommandService(IProcessProvider processProvider)
         };
 
         using var process = _processProvider.Start(processInfo);
-        var result = process.StandardOutput.ReadToEnd();
-        var errors = process.StandardError.ReadToEnd();
+        var stdOut = process.StandardOutput.ReadToEnd();
+        var stdErr = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
-        if (!string.IsNullOrEmpty(errors))
+        if (!string.IsNullOrEmpty(stdOut))
         {
-            var message = $"Command '{command} {arguments}' failed with errors: {errors}";
-            Console.WriteLine(message);
-            throw new CommandException(message);
+            Console.WriteLine($"Stdout of command '{command} {arguments}': {stdOut}");
         }
 
-        Console.WriteLine($"Output of command '{command} {arguments}': {result}");
+        if (!string.IsNullOrEmpty(stdErr))
+        {
+            var message = $"Stderr of command '{command} {arguments}': {stdErr}";
+            Console.WriteLine(message);
+        }
+
+        if (process.ExitCode != 0)
+        {
+            throw new CommandException(
+                $"Command {command} {arguments} exited with code {process.ExitCode}"
+            );
+        }
     }
 }

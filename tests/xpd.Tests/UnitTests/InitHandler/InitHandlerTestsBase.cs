@@ -79,13 +79,20 @@ public abstract class InitHandlerTestsBase
 
     protected static IProcessProvider GetProcessProvider(
         Action? action = null,
-        string? errors = null
+        string? errors = null,
+        int? exitCode = null
     )
     {
         var processProvider = Substitute.For<IProcessProvider>();
         var processWrapper = Substitute.For<IProcessWrapper>();
         processWrapper.StandardOutput.Returns(new StreamReader(new MemoryStream()));
         processWrapper.StandardError.Returns(new StreamReader(GetErrorStream(errors)));
+
+        if (exitCode is not null)
+        {
+            processWrapper.ExitCode.Returns(exitCode.Value);
+        }
+
         var configuredCall = processProvider
             .Start(Arg.Any<ProcessStartInfo>())
             .Returns(processWrapper);
