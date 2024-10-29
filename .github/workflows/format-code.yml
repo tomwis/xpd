@@ -45,9 +45,9 @@ jobs:
               env:
                   Target_Branch: ${{ github.ref_name }}
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: >
-                gh pr create
-                  --title "Auto code formatting"
-                  --body "This PR applies automated code formatting done in GitHub workflow."
-                  --base $Target_Branch
+              run: |
+                gh pr create `
+                  --title "Auto code formatting" `
+                  --body "This PR applies automated code formatting done in GitHub workflow." `
+                  --base $Target_Branch `
                   --head $SOURCE_BRANCH
