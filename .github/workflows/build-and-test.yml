@@ -4,8 +4,8 @@
 name: Build and Test
 
 on:
-    push:
-        branches: [ "main", "format-test" ]
+#    push:
+#        branches: [ "main", "format-test" ]
     pull_request:
         branches: [ "main", "format-test" ]
 
