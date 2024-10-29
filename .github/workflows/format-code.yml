@@ -40,7 +40,7 @@ jobs:
               run: |
                 git config --global user.name "github-actions[bot]"
                 git config --global user.email "github-actions[bot]@users.noreply.github.com"
-                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
+                CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')
                 echo "auto/reformat-$Date_Time"
                 echo "auto/reformat-$CURRENT_DATETIME"
                 git add .
