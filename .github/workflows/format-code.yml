@@ -1,7 +1,10 @@
 name: Format Code
 
 on:
+    push:
+        branches: [ "main", "format-test" ]
     pull_request:
+        branches: [ "main", "format-test" ]
     workflow_run:
         workflows: ["Build and Test"]
         types:
