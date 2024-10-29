@@ -1,5 +1,6 @@
 using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace xpd.Tests.UnitTests.InitHandler;
@@ -16,7 +17,8 @@ public class InitHandlerGitTests : InitHandlerTestsBase
         _ = initHandler.Parse(new Init());
 
         // Assert
-        AssertCommandWasCalled(ProcessProvider, "git", "init");
+        AssertCommandWasCalled(ProcessProvider,
+            "git", "init");
     }
 
     [Test]
