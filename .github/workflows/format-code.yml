@@ -10,6 +10,9 @@ on:
         types:
             - completed
 
+permissions:
+    contents: write
+
 jobs:
     format:
         # if: github.event.workflow_run.conclusion == 'success'
@@ -41,7 +44,7 @@ jobs:
                 BRANCH_NAME="auto/reformat-$CURRENT_DATETIME"
                 git add .
                 git diff --cached --quiet && echo "No formatting changes found. Exiting." && exit 0
-                git commit -m "style: automatic code formatting by GitHub workflow"
+                git commit --no-verify -m "style: automatic code formatting by GitHub workflow"
                 echo "Pushing change to branch $BRANCH_NAME"
                 git push origin HEAD:$BRANCH_NAME
             - name: Create Pull Request
