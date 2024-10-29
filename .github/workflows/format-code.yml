@@ -34,11 +34,13 @@ jobs:
                 git status
                 git diff
             - name: Push changes
+              env:
+                  Date_Time: $(date +'%Y-%m-%d-%H-%M-%S')
               run: |
                 git config --global user.name "github-actions[bot]"
                 git config --global user.email "github-actions[bot]@users.noreply.github.com"
-                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
-                echo "auto/reformat-${{ env.CURRENT_DATETIME }}"
+#                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
+                echo "auto/reformat-$Date_Time"
                 git add .
                 git diff --cached --quiet && echo "No formatting changes found. Exiting." && exit 0
 #                git commit -m "style: automatic code formatting by GitHub workflow"
