@@ -27,8 +27,8 @@ jobs:
               run: dotnet csharpier .
             - name: Format with dotnet format
               run: |
-                dotnet format style --verify-no-changes
-                dotnet format analyzers --verify-no-changes
+                dotnet format style
+                dotnet format analyzers
             - name: Check changes
               run: |
                 git status
