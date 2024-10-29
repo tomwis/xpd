@@ -6,3 +6,4 @@ riderModule.iml
 /Artifacts/
 *.sln.DotSettings.user
 /config/dotnet_tools_installed.txt
+**/TestResults/**
