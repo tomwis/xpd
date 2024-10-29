@@ -50,10 +50,10 @@ jobs:
                 git push origin HEAD:$BRANCH_NAME
             - name: Create Pull Request
               env:
-                Branch_Name: ${{ github.ref_name }}
+                Target_Branch: ${{ github.ref_name }}
               run: |
-                  echo "SOURCE_BRANCH: $SOURCE_BRANCH"
-                  echo "Branch_Name: $Branch_Name"
-#                gh pr create --title "Auto code formatting" --body "This PR applies automated code formatting done in GitHub workflow." --base $Branch_Name --head $SOURCE_BRANCH
+                echo "SOURCE_BRANCH: $SOURCE_BRANCH"
+                echo "Target_Branch: Target_Branch"
+                gh pr create --title "Auto code formatting" --body "This PR applies automated code formatting done in GitHub workflow." --base $Target_Branch --head $SOURCE_BRANCH
 #              env:
 #                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
