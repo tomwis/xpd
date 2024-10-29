@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E
 		Directory.Build.targets = Directory.Build.targets
 		.editorconfig = .editorconfig
 		config\commit-message-config.json = config\commit-message-config.json
-		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CFADD125-BADB-4967-B4B0-239EB248B9B1}"
@@ -24,6 +23,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.ConventionTests", "tests\xpd.ConventionTests\xpd.ConventionTests.csproj", "{414537EE-FB3F-4406-8731-BDB70B5846F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.Tests.Utilities", "tests\xpd.Tests.Utilities\xpd.Tests.Utilities.csproj", "{DF094887-B7E1-427B-B0DF-E6BA81D185CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{99E240B2-86CF-4EB5-97C7-869333A0B638}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
+		.github\workflows\format-code.yml = .github\workflows\format-code.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,5 +66,6 @@ Global
 		{8B55C578-0E54-4429-995A-06A1E6017D2A} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
 		{414537EE-FB3F-4406-8731-BDB70B5846F1} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
 		{DF094887-B7E1-427B-B0DF-E6BA81D185CA} = {CFADD125-BADB-4967-B4B0-239EB248B9B1}
+		{99E240B2-86CF-4EB5-97C7-869333A0B638} = {BDF74E47-E562-4E1B-A5C6-999BCCE9C3EC}
 	EndGlobalSection
 EndGlobal

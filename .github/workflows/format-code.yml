@@ -1,0 +1,30 @@
+name: Format Code
+
+on:
+    workflow_run:
+        workflows: ["Build and Test"]
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+jobs:
+    build:
+
+        runs-on: macos-14
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: 8.0.x
+            - name: Install CSharpier
+              run: dotnet tool install csharpier
+            - name: Format with CSharpier
+              run: dotnet csharpier . --check
+            - name: Format with dotnet format
+              run: |
+                dotnet format style --verify-no-changes
+                dotnet format analyzers --verify-no-changes
+            - name: Restore
+              run: dotnet restore
+            - name: Build
+              run: dotnet build --no-restore
