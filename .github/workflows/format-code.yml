@@ -36,13 +36,14 @@ jobs:
             - name: Push changes
               env:
                   Date_Time: $(date +'%Y-%m-%d-%H-%M-%S')
+                  First_Name: Mona
               run: |
                 git config --global user.name "github-actions[bot]"
                 git config --global user.email "github-actions[bot]@users.noreply.github.com"
-#                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
                 echo "auto/reformat-$Date_Time"
                 git add .
                 git diff --cached --quiet && echo "No formatting changes found. Exiting." && exit 0
+#                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
 #                git commit -m "style: automatic code formatting by GitHub workflow"
 #                git push origin HEAD:auto/reformat-${{ env.CURRENT_DATETIME }}
             - name: Create Pull Request
