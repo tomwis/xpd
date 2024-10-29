@@ -33,7 +33,11 @@ jobs:
               run: |
                 git status
                 git diff
-            - name: Restore
-              run: dotnet restore
-            - name: Build
-              run: dotnet build --no-restore
+            - name: Check branch name
+              run: echo ${{ github.ref_name }}
+#            - name: Build
+#              run: git checkout auto/reformat-
+#            - name: Create Pull Request
+#              run: gh pr
+#              env:
+#                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
