@@ -3,11 +3,12 @@ name: Format Code
 on:
     workflow_run:
         workflows: ["Build and Test"]
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        types:
+            - completed
 
 jobs:
-    build:
-
+    format:
+        if: github.event.workflow_run.conclusion == 'success'
         runs-on: macos-14
 
         steps:
