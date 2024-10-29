@@ -51,9 +51,8 @@ jobs:
             - name: Create Pull Request
               env:
                 Target_Branch: ${{ github.ref_name }}
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                 echo "SOURCE_BRANCH: $SOURCE_BRANCH"
                 echo "Target_Branch: Target_Branch"
                 gh pr create --title "Auto code formatting" --body "This PR applies automated code formatting done in GitHub workflow." --base $Target_Branch --head $SOURCE_BRANCH
-#              env:
-#                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
