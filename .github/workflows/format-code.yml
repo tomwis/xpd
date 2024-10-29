@@ -33,11 +33,17 @@ jobs:
               run: |
                 git status
                 git diff
-            - name: Check branch name
-              run: echo ${{ github.ref_name }}
-#            - name: Build
-#              run: git checkout auto/reformat-
-#            - name: Create Pull Request
-#              run: gh pr
+            - name: Push changes
+              run: |
+                git config --global user.name "github-actions[bot]"
+                git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                echo "CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
+                echo "auto/reformat-${{ env.CURRENT_DATETIME }}"
+                git add .
+                git diff --cached --quiet && echo "No formatting changes found. Exiting." && exit 0
+#                git commit -m "style: automatic code formatting by GitHub workflow"
+#                git push origin HEAD:auto/reformat-${{ env.CURRENT_DATETIME }}
+            - name: Create Pull Request
+              run: echo "Create PR step runs"
 #              env:
 #                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
