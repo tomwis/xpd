@@ -12,10 +12,9 @@ permissions:
     checks: write
 
 jobs:
-    build:
-
+    build-and-test:
+        name: Build and Test
         runs-on: macos-14
-
         steps:
             - uses: actions/checkout@v4
             - name: Setup .NET
