@@ -26,8 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xpd.Tests.Utilities", "test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{99E240B2-86CF-4EB5-97C7-869333A0B638}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
-		.github\workflows\format-code.yml = .github\workflows\format-code.yml
+		.github\workflows\build-test-lint.yml = .github\workflows\build-test-lint.yml
 	EndProjectSection
 EndProject
 Global
