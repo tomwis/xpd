@@ -13,6 +13,12 @@
       "commands": [
         "dotnet-csharpier"
       ]
+    },
+    "versionize": {
+      "version": "2.2.0",
+      "commands": [
+        "versionize"
+      ]
     }
   }
 }
