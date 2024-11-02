@@ -42,14 +42,14 @@
          "name": "format-staged-files-with-dotnet-format-style",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "format", "style", "--include", "${staged}" ],
+         "args": [ "format", "style", "--include", "${staged}", "--no-restore" ],
          "include": [ "**/*.cs" ]
       },
       {
          "name": "format-staged-files-with-dotnet-format-analyzers",
          "group": "pre-commit",
          "command": "dotnet",
-         "args": [ "format", "analyzers", "--include", "${staged}" ],
+         "args": [ "format", "analyzers", "--include", "${staged}", "--no-restore" ],
          "include": [ "**/*.cs" ]
       }
    ]
