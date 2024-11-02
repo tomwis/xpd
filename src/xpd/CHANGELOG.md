@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file. See [versio
 <a name="0.1.0"></a>
 ## [0.1.0](https://www.github.com/tomwis/xpd/releases/tag/v0.1.0) (2024-11-02)
 
+<a name="0.1.0"></a>
+## [0.1.0](https://www.github.com/tomwis/xpd/releases/tag/v0.1.0) (2024-11-02)
+
 ### Features
 
 * added argument for init command to provide solution name ([9efa8d1](https://www.github.com/tomwis/xpd/commit/9efa8d12ba2798d7f0d499ccdac30b22ce172b41))
