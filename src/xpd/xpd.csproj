@@ -7,6 +7,14 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>xpd</ToolCommandName>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <Version>0.1.0</Version>
+        <PackageId>xpd</PackageId>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="CommandLineParser" />
       <PackageReference Include="Sharprompt" />
