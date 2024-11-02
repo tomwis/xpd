@@ -16,7 +16,7 @@ jobs:
     prepare-release:
         name: Increment version and add changelog
         runs-on: ubuntu-latest
-        if: !contains(github.event.head_commit.tags, 'v.*') # Commit with v.* tag is a release commit created by this job, no need to create a new release from it
+        if: ${{ !contains(github.event.head_commit.tags, 'v.*') }} # Commit with v.* tag is a release commit created by this job, no need to create a new release from it
         steps:
             - uses: actions/checkout@v4
             - name: Setup .NET
