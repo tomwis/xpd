@@ -82,3 +82,29 @@ jobs:
                   --body "This PR applies automated code formatting done in GitHub workflow."
                   --base $Target_Branch
                   --head $SOURCE_BRANCH
+
+    deploy:
+        name: Deploy to nuget.org
+        runs-on: macos-14
+        needs: build-and-test
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: 8.0.x
+            - name: Increment version
+              run: |
+                dotnet tool install versionize
+                dotnet versionize
+            - name: Push version & changelog
+              run: |
+                  CURRENT_DATETIME=$(date +'%Y-%m-%d-%H-%M-%S')
+                  BRANCH_NAME="auto/release-$CURRENT_DATETIME"
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  git push --follow-tags origin HEAD:$BRANCH_NAME
+            - name: Pack as tool
+              run: dotnet pack --configuration Release
+#            - name: Deploy to NuGet
+#              run: dotnet nuget push src/xpd/nukpg/xpd.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
