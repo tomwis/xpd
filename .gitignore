@@ -8,3 +8,4 @@ riderModule.iml
 /config/dotnet_tools_installed.txt
 **/TestResults/**
 **/nupkg/**
+.env

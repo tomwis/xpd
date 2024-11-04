@@ -3,9 +3,9 @@
 # Usage: ./release.sh <command>
 # Commands: prepare, publish
 
+. config/.env
 WORKING_DIR="src/xpd"
 CS_PROJ_FILE="$WORKING_DIR/xpd.csproj"
-NUGET_API_KEY="your-nuget-api-key"
 NUGET_SOURCE="https://api.nuget.org/v3/index.json"
 
 get_version() {
@@ -75,6 +75,10 @@ Version tag will be added to the last commit. [y/$(underline "n")] "
     dotnet pack "$WORKING_DIR" --configuration Release --verbosity quiet
 
     echo "Publishing to NuGet..."
+    if [ -z "$NUGET_API_KEY" ]; then
+        print_error "NUGET_API_KEY is empty. Set it in config/.env file."
+        exit 1
+    fi
     dotnet nuget push "$WORKING_DIR"/nupkg/*.nupkg --api-key "$NUGET_API_KEY" --source "$NUGET_SOURCE"
 
     PACKAGE_NAME=$(get_package_name)

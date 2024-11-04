@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{BDF74E
 		Directory.Build.targets = Directory.Build.targets
 		.editorconfig = .editorconfig
 		config\commit-message-config.json = config\commit-message-config.json
+		config\.env = config\.env
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{CFADD125-BADB-4967-B4B0-239EB248B9B1}"
