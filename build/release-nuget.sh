@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Usage: ./release.sh <command>
-# Commands: prepare, publish
-
 . config/.env
 WORKING_DIR="src/xpd"
 CS_PROJ_FILE="$WORKING_DIR/xpd.csproj"
@@ -94,7 +91,25 @@ case "$1" in
         publish
         ;;
     *)
-        echo "Usage: $0 {prepare|publish}"
+
+        description="
+Usage: $0 {prepare|publish}
+
+Subcommands:
+    prepare     Prepares changelog and new version number.
+                   - Increments the version in the .csproj file. <Version> tag is required.
+                   - Generates a changelog for given version in CHANGELOG.md
+                      - File is located in the project's directory.
+                      - Changes are taken from commit messages since the previous version tag. Requires conventional commits.
+                      - Changelog is generated only if there are feat or fix commits since the last release (Otherwise changelog is empty).
+
+    publish     Publishes to NuGet, saves changes from ""prepare"" and adds tag.
+                   - Commits current working directory
+                   - Adds version tag
+                   - Packs the project in Release mode
+                   - Publishes to NuGet (Nuget API key is required in config/.env file)
+"
+        echo "$description"
         exit 1
         ;;
 esac
