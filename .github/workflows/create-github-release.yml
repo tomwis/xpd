@@ -28,7 +28,7 @@ jobs:
                   set -e
                   version="${{ env.version }}"
                   changelog_file="src/xpd/CHANGELOG.md"
-                  release_notes=$(./build/create-github-release.sh "$version" "$changelog_file")
+                  release_notes=$(./build/parse-changelog.sh "$version" "$changelog_file")
 
                   echo "release_notes<<EOF" >> $GITHUB_ENV
                   echo "$release_notes" >> $GITHUB_ENV
