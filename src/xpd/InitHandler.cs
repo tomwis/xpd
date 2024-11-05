@@ -35,6 +35,9 @@ public class InitHandler(
         var selectedProjectType = args.ProjectType ?? ProjectTypes.ConsoleApp;
 
         _pathProvider = new PathProvider(_fileSystem, args, solutionName);
+        _dotnetService = new DotnetService(_commandService, _pathProvider, _fileSystem);
+        var fileSystemService = new FileSystemService(_fileSystem, _dotnetService, _pathProvider);
+
         if (_pathProvider.MainFolder.Exists)
         {
             Console.WriteLine(
@@ -54,9 +57,8 @@ public class InitHandler(
             OptionalFoldersConstants.ConfigDir,
         };
         var mainFolder = _pathProvider.MainFolder;
-        CreateFolders(mainFolder, foldersToCreate);
+        fileSystemService.CreateFolders(mainFolder, foldersToCreate);
 
-        _dotnetService = new DotnetService(_commandService, _pathProvider, _fileSystem);
         var solutionOutputDir = mainFolder;
         var projectOutputDir = _pathProvider.SrcDir;
         _dotnetService.CreateProjectAndSolution(
@@ -80,7 +82,7 @@ public class InitHandler(
             _pathProvider.GetTestProjectFile(testProjectName)
         );
         InitializeGitRepository(mainFolder);
-        AddGitIgnore(mainFolder);
+        fileSystemService.AddGitIgnore(mainFolder);
         _dotnetService.InstallDotnetTools(mainFolder);
 
         var huskyService = new HuskyService(_fileSystem, _commandService, _pathProvider);
@@ -92,14 +94,14 @@ public class InitHandler(
 
         huskyService.InitializeHuskyRestoreTarget();
 
-        AddReadme(
+        fileSystemService.AddReadme(
             mainFolder,
             solutionName,
             projectName,
             testProjectName,
             conventionTestProjectName
         );
-        AddEditorConfig(_pathProvider.EditorConfigFile);
+        fileSystemService.AddEditorConfig(_pathProvider.EditorConfigFile);
         AddSolutionSettingsFolderWithItems(solutionName);
 
         return InitResult.Success(
@@ -131,57 +133,9 @@ public class InitHandler(
         return true;
     }
 
-    private void CreateFolders(IDirectoryInfo mainFolder, List<string> folders)
-    {
-        mainFolder.Create();
-        folders.ForEach(folder => mainFolder.CreateSubdirectory(folder));
-    }
-
     private void InitializeGitRepository(IDirectoryInfo mainFolder)
     {
         _commandService.RunCommand("git", "init", mainFolder.FullName);
-    }
-
-    private void AddGitIgnore(IDirectoryInfo mainFolder)
-    {
-        _dotnetService!.CreateGitIgnore(mainFolder);
-        string[] gitIgnoreAdditionalContent =
-        [
-            Environment.NewLine,
-            "# Added by xpd init",
-            "/config/dotnet_tools_installed.txt",
-        ];
-
-        _fileSystem.File.AppendAllLines(
-            _pathProvider!.GitIgnoreFile.FullName,
-            gitIgnoreAdditionalContent
-        );
-    }
-
-    private void AddReadme(
-        IDirectoryInfo mainFolder,
-        string solutionName,
-        string projectName,
-        string testProjectName,
-        string conventionTestProjectName
-    )
-    {
-        const string readmeName = "README.md";
-        var content = ResourceProvider.GetResource(readmeName);
-        content = content
-            .Replace("{solutionName}", solutionName)
-            .Replace("{projectName}", projectName)
-            .Replace("{testProjectName}", testProjectName)
-            .Replace("{conventionTestProjectName}", conventionTestProjectName);
-
-        var readmePath = _fileSystem.Path.Combine(mainFolder.FullName, "README.md");
-        _fileSystem.File.WriteAllText(readmePath, content);
-    }
-
-    private void AddEditorConfig(IFileInfo editorConfigFile)
-    {
-        var content = ResourceProvider.GetResource(editorConfigFile.Name);
-        _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
     }
 
     private void AddSolutionSettingsFolderWithItems(string solutionName)
