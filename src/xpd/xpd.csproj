@@ -28,6 +28,9 @@
       <EmbeddedResource Include="Resources\.editorconfig" />
       <EmbeddedResource Include="Config\project_types.json" />
       <EmbeddedResource Include="Resources\SetupFixture.template" />
+      <EmbeddedResource Include="Resources\build-test-lint.yml.template">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

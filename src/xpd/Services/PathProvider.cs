@@ -64,6 +64,15 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     internal IFileInfo EditorConfigFile =>
         AsFile(_fileSystem.Path.Combine(MainFolder.FullName, FileConstants.EditorConfig));
 
+    public IDirectoryInfo GitHubWorkflowsDir =>
+        AsDir(
+            _fileSystem.Path.Combine(
+                MainFolder.FullName,
+                DirectoryConstants.GitHubDirName,
+                DirectoryConstants.GitHubWorkflowsDirName
+            )
+        );
+
     internal IDirectoryInfo GetTestProjectIntegrationTestsDir(string testProjectName) =>
         AsDir(
             _fileSystem.Path.Combine(

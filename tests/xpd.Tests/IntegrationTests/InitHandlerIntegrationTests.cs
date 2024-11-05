@@ -31,10 +31,13 @@ public class InitHandlerIntegrationTests
         // And 1 test can take about 3 seconds, so it's much faster to execute Act only once
 
         // Arrange
+        var fileSystem = new FileSystem();
+        StringExtensions.Set(fileSystem);
+        FileInfoExtensions.Set(fileSystem);
         _outputPath = PathProvider.PrepareOutputDirForIntegrationTests(
             "InitHandlerIntegrationTests"
         );
-        var initHandler = GetSubject(new FileSystem(), new ProcessProvider(), new InputRequester());
+        var initHandler = GetSubject(fileSystem, new ProcessProvider(), new InputRequester());
         var init = new Init { Output = _outputPath, SolutionName = SolutionName };
 
         // Act

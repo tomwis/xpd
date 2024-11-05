@@ -1,14 +1,20 @@
+using System.IO.Abstractions;
+
 namespace xpd.Tests.Extensions;
 
 public static class FileInfoExtensions
 {
-    public static string ReadAllText(this FileInfo fileInfo)
+    private static IFileSystem _fileSystem = null!;
+
+    public static void Set(IFileSystem fileSystem) => _fileSystem = fileSystem;
+
+    public static string ReadAllText(this IFileInfo fileInfo)
     {
-        return File.ReadAllText(fileInfo.FullName);
+        return _fileSystem.File.ReadAllText(fileInfo.FullName);
     }
 
-    public static string[] ReadAllLines(this FileInfo fileInfo)
+    public static string[] ReadAllLines(this IFileInfo fileInfo)
     {
-        return File.ReadAllLines(fileInfo.FullName);
+        return _fileSystem.File.ReadAllLines(fileInfo.FullName);
     }
 }

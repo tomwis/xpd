@@ -3,7 +3,7 @@ using xpd.Services;
 
 namespace xpd.Models;
 
-public class ProjectType
+public record ProjectType
 {
     private readonly string _type;
 

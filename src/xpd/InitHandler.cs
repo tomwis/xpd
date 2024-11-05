@@ -37,6 +37,7 @@ public class InitHandler(
         _pathProvider = new PathProvider(_fileSystem, args, solutionName);
         _dotnetService = new DotnetService(_commandService, _pathProvider, _fileSystem);
         var fileSystemService = new FileSystemService(_fileSystem, _dotnetService, _pathProvider);
+        var gitHubActionsService = new GitHubActionsService(_pathProvider, _fileSystem);
 
         if (_pathProvider.MainFolder.Exists)
         {
@@ -103,6 +104,7 @@ public class InitHandler(
         );
         fileSystemService.AddEditorConfig(_pathProvider.EditorConfigFile);
         AddSolutionSettingsFolderWithItems(solutionName);
+        gitHubActionsService.AddBuildTestLintAction(selectedProjectType);
 
         return InitResult.Success(
             solutionName,
