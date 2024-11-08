@@ -17,6 +17,11 @@ public static class StringExtensions
 
     public static IFileInfo ToFile(this string fileName)
     {
+        if (_fileSystem is null)
+            throw new NullReferenceException(
+                $"Field {nameof(_fileSystem)} must be set with {nameof(Set)} method before using this extension."
+            );
+
         return _fileSystem.FileInfo.New(fileName);
     }
 }
