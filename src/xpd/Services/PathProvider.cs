@@ -10,7 +10,7 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     private readonly string _solutionName = solutionName;
 
     internal IDirectoryInfo OutputDir =>
-        AsDir(_init.Output ?? _fileSystem.Directory.GetCurrentDirectory());
+        AsDir(ExpandPath(_init.Output) ?? _fileSystem.Directory.GetCurrentDirectory());
 
     internal IDirectoryInfo MainFolder =>
         AsDir(_fileSystem.Path.Combine(OutputDir.FullName, _solutionName));
@@ -143,5 +143,22 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     private IDirectoryInfo AsDir(string path)
     {
         return _fileSystem.DirectoryInfo.New(path);
+    }
+
+    private string? ExpandPath(string? path)
+    {
+        if (path is null)
+            return null;
+
+        if (path.StartsWith('~'))
+        {
+            var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            path = Path.Combine(
+                homeDirectory,
+                path.Substring(1).TrimStart(Path.DirectorySeparatorChar)
+            );
+        }
+
+        return _fileSystem.Path.GetFullPath(path);
     }
 }

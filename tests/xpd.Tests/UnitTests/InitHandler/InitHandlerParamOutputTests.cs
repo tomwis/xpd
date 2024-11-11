@@ -55,4 +55,34 @@ public class InitHandlerParamOutputTests : InitHandlerTestsBase
         var expected = mockFileSystem.Path.Combine(currentDir, solutionName);
         result.MainFolder.Should().Be(expected);
     }
+
+    [Test]
+    public void WhenOutputDirStartsWithTildeSign_ThenExpandPath()
+    {
+        // Arrange
+        const string solutionName = "SomeSolution";
+        const string outputDirName = "OutputDir";
+        const string outputDirPath = $"~/{outputDirName}";
+        const string currentDir = "/CurrentDir";
+
+        var mockFileSystem = new MockFileSystem(
+            new Dictionary<string, MockFileData>(),
+            new MockFileSystemOptions { CurrentDirectory = currentDir }
+        );
+
+        var initHandler = GetSubject(
+            solutionName,
+            fileSystem: mockFileSystem,
+            outputDir: outputDirPath
+        );
+        var init = new Init { Output = outputDirPath };
+
+        // Act
+        var result = initHandler.Parse(init);
+
+        // Assert
+        var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var expected = mockFileSystem.Path.Combine(homeDirectory, outputDirName, solutionName);
+        result.MainFolder.Should().Be(expected);
+    }
 }

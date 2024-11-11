@@ -59,7 +59,7 @@ public abstract class InitHandlerTestsBase
     {
         solutionName ??= "SomeSolution";
         fileSystem ??= new MockFileSystem();
-        var currentDir = outputDir ?? fileSystem.Directory.GetCurrentDirectory();
+        var currentDir = ExpandPath(outputDir) ?? fileSystem.Directory.GetCurrentDirectory();
         ProcessProvider = processProvider ??= GetProcessProvider(() =>
         {
             CreateSolution(fileSystem, currentDir, solutionName);
@@ -121,6 +121,23 @@ public abstract class InitHandlerTestsBase
 
             return memoryStream;
         }
+    }
+
+    private static string? ExpandPath(string? path)
+    {
+        if (path is null)
+            return null;
+
+        if (path.StartsWith('~'))
+        {
+            var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            path = Path.Combine(
+                homeDirectory,
+                path.Substring(1).TrimStart(Path.DirectorySeparatorChar)
+            );
+        }
+
+        return path;
     }
 
     private static string GetTaskRunnerJson() =>
