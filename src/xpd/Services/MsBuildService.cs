@@ -72,6 +72,15 @@ internal sealed class MsBuildService(IFileSystem fileSystem, PathProvider pathPr
 
         packageReferences.ForEach(pr =>
         {
+            if (
+                itemGroup
+                    .Elements("PackageVersion")
+                    .Any(element => ElementHasName(element, pr.Include!))
+            )
+            {
+                return;
+            }
+
             itemGroup.Add(
                 new XElement(
                     "PackageVersion",
@@ -84,5 +93,7 @@ internal sealed class MsBuildService(IFileSystem fileSystem, PathProvider pathPr
             _pathProvider.DirectoryPackagesPropsFile.FullName,
             directoryPackagesPropsXml.ToString()
         );
+
+        bool ElementHasName(XElement e, string name) => e.Attribute(includeAttr)!.Value == name;
     }
 }
