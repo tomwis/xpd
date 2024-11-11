@@ -48,6 +48,7 @@ public class InitHandlerTests : InitHandlerTestsBase
         AssertDotnetCommandWasCalled(ProcessProvider, "tool install csharpier");
         AssertDotnetCommandWasCalled(ProcessProvider, "tool install husky");
         AssertDotnetCommandWasCalled(ProcessProvider, "husky install");
+        AssertDotnetCommandWasCalled(ProcessProvider, "tool install versionize");
     }
 
     [Test]

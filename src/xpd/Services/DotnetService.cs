@@ -155,6 +155,7 @@ internal class DotnetService(
         _commandService.RunCommand("dotnet", "tool install csharpier", mainFolder.FullName);
         _commandService.RunCommand("dotnet", "tool install husky", mainFolder.FullName);
         _commandService.RunCommand("dotnet", "husky install", mainFolder.FullName);
+        _commandService.RunCommand("dotnet", "tool install versionize", mainFolder.FullName);
     }
 
     public void CreateGitIgnore(IDirectoryInfo mainFolder)

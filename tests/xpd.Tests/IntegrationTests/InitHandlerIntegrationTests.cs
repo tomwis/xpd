@@ -53,6 +53,7 @@ public class InitHandlerIntegrationTests
         var dotnetToolsManifest = path.Deserialize<DotnetToolsManifest>();
         dotnetToolsManifest.Tools.Should().ContainKey("csharpier");
         dotnetToolsManifest.Tools.Should().ContainKey("husky");
+        dotnetToolsManifest.Tools.Should().ContainKey("versionize");
     }
 
     [Test]
