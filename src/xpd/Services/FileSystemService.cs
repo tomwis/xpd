@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using xpd.Models;
 
 namespace xpd.Services;
 
@@ -58,5 +59,36 @@ internal class FileSystemService(
     {
         var content = ResourceProvider.GetResource(editorConfigFile.Name);
         _fileSystem.File.WriteAllText(editorConfigFile.FullName, content);
+    }
+
+    internal void AddReleaseNugetScript(string projectName)
+    {
+        var projectDir = _fileSystem.Path.GetRelativePath(
+            _pathProvider.MainFolder.FullName,
+            _pathProvider.GetProjectDir(projectName).FullName
+        );
+
+        new FileTemplate(_fileSystem)
+            .From("release-nuget.template")
+            .To(_pathProvider.ReleaseNugetScriptFile)
+            .WithTokens(
+                new Dictionary<string, string>
+                {
+                    ["{ProjectPath}"] = projectDir,
+                    ["{ProjectCsprojFileName}"] = $"{projectName}.csproj",
+                }
+            )
+            .Save(asExecutable: true);
+
+        AddEnvFiles();
+    }
+
+    private void AddEnvFiles()
+    {
+        var envContent = ResourceProvider.GetResource(".env");
+        _fileSystem.File.WriteAllText(_pathProvider.EnvFile.FullName, envContent);
+
+        var envExampleContent = ResourceProvider.GetResource(".env.example");
+        _fileSystem.File.WriteAllText(_pathProvider.EnvExampleFile.FullName, envExampleContent);
     }
 }

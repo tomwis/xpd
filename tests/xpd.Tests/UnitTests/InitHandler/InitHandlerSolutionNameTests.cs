@@ -134,6 +134,7 @@ public class InitHandlerSolutionNameTests : InitHandlerTestsBase
         {
             CreateSolution(fileSystem, currentDir, solutionNameFromArg);
             CreateTaskRunnerJson(fileSystem, currentDir, solutionNameFromArg);
+            CreateProjectCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
             CreateTestsCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
         });
 

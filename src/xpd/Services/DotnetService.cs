@@ -39,6 +39,26 @@ internal class DotnetService(
             $"sln add \"{projectPath.FullName}\" --in-root",
             solutionOutputDir.FullName
         );
+
+        AddNugetPropertiesToProject(projectName);
+    }
+
+    private void AddNugetPropertiesToProject(string projectName)
+    {
+        var projectFile = _pathProvider.GetProjectFile(projectName);
+        var projectContent = _fileSystem.File.ReadAllText(projectFile.FullName);
+        var xml = XDocument.Parse(projectContent);
+
+        xml.Root!.Add(
+            new XElement(
+                "PropertyGroup",
+                new XElement("PackageOutputPath", "./nupkg"),
+                new XElement("Version", "1.0.0"),
+                new XElement("PackageId", projectName)
+            )
+        );
+
+        _fileSystem.File.WriteAllText(projectFile.FullName, xml.ToString());
     }
 
     public string CreateTestProject(IDirectoryInfo solutionOutputDir, string projectName)

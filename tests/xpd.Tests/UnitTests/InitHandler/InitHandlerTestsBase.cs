@@ -64,6 +64,12 @@ public abstract class InitHandlerTestsBase
         {
             CreateSolution(fileSystem, currentDir, solutionName);
             CreateTaskRunnerJson(fileSystem, currentDir, solutionName);
+            CreateProjectCsproj(
+                fileSystem,
+                currentDir,
+                solutionName,
+                string.IsNullOrEmpty(projectName) ? solutionName : projectName
+            );
             CreateTestsCsproj(
                 fileSystem,
                 currentDir,
@@ -157,13 +163,7 @@ public abstract class InitHandlerTestsBase
         string projectName
     )
     {
-        if (fileSystem is not MockFileSystem mockFileSystem)
-        {
-            return;
-        }
-
         string testsCsproj = $"{projectName}.Tests.csproj";
-        var csproj = new XDocument(new XElement("Project"));
         var testProjectPath = Path.Combine(
             currentDir,
             solutionName,
@@ -172,6 +172,35 @@ public abstract class InitHandlerTestsBase
             testsCsproj
         );
 
-        mockFileSystem.AddFile(testProjectPath, new MockFileData(csproj.ToString()));
+        CreateCsproj(fileSystem, testProjectPath);
+    }
+
+    protected static void CreateProjectCsproj(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName,
+        string projectName
+    )
+    {
+        string csproj = $"{projectName}.csproj";
+        var testProjectPath = Path.Combine(currentDir, solutionName, SrcDir, projectName, csproj);
+
+        CreateCsproj(fileSystem, testProjectPath);
+    }
+
+    protected static void CreateCsproj(IFileSystem fileSystem, string path)
+    {
+        if (fileSystem is not MockFileSystem mockFileSystem)
+        {
+            return;
+        }
+
+        if (mockFileSystem.Path.Exists(path))
+        {
+            return;
+        }
+
+        var csproj = new XDocument(new XElement("Project"));
+        mockFileSystem.AddFile(path, new MockFileData(csproj.ToString()));
     }
 }

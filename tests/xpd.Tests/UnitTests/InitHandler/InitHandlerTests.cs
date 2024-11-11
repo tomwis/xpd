@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions.TestingHelpers;
+using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Exceptions;
+using xpd.Tests.Extensions;
 
 namespace xpd.Tests.UnitTests.InitHandler;
 
@@ -69,5 +73,125 @@ public class InitHandlerTests : InitHandlerTestsBase
 
         // Act && Assert
         initHandler.Invoking(i => i.Parse(new Init())).Should().Throw<CommandException>();
+    }
+
+    [Test]
+    public void WhenProjectIsCreated_ThenItHasNugetProperties()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var csproj = mockFileSystem
+            .Path.Combine(
+                result.MainFolder!,
+                "src",
+                result.ProjectName!,
+                $"{result.ProjectName}.csproj"
+            )
+            .ToFile()
+            .ReadAllText();
+        var xml = XDocument.Parse(csproj);
+
+        xml.Root!.Should()
+            .HaveElement("PropertyGroup")
+            .Which.Should()
+            .HaveElement("Version")
+            .And.HaveElement("PackageId")
+            .And.HaveElement("PackageOutputPath");
+    }
+
+    [Test]
+    public void ReleaseNugetScriptIsCreated()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var script = mockFileSystem
+            .Path.Combine(result.MainFolder!, "build", "release-nuget.sh")
+            .ToFile()
+            .ReadAllText();
+
+        script.Should().Contain("prepare()").And.Contain("publish()");
+        script.Should().NotContain("{ProjectPath}").And.NotContain("{ProjectCsprojFileName}");
+    }
+
+    [Test]
+    [Platform(Exclude = "Win")]
+    [SuppressMessage(
+        "Interoperability",
+        "CA1416:Validate platform compatibility",
+        Justification = "GetUnixFileMode works on Unix only"
+    )]
+    public void ReleaseNugetScript_ShouldBeExecutable()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var scriptPath = mockFileSystem.Path.Combine(
+            result.MainFolder!,
+            "build",
+            "release-nuget.sh"
+        );
+
+        mockFileSystem
+            .File.GetUnixFileMode(scriptPath)
+            .Should()
+            .HaveFlag(UnixFileMode.UserExecute)
+            .And.HaveFlag(UnixFileMode.GroupExecute)
+            .And.HaveFlag(UnixFileMode.OtherExecute);
+    }
+
+    [TestCase(".env")]
+    [TestCase(".env.example")]
+    public void EnvFilesAreCreated(string fileName)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        mockFileSystem
+            .Path.Combine(result.MainFolder!, "config", fileName)
+            .ToFile()
+            .Exists.Should()
+            .BeTrue();
+    }
+
+    [TestCase(".env")]
+    [TestCase(".env.example")]
+    public void EnvFilesContainNugetApiKey(string fileName)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        mockFileSystem
+            .Path.Combine(result.MainFolder!, "config", fileName)
+            .ToFile()
+            .ReadAllText()
+            .Should()
+            .Be("NUGET_API_KEY=");
     }
 }

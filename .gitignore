@@ -9,3 +9,4 @@ riderModule.iml
 **/TestResults/**
 **/nupkg/**
 .env
+!src/xpd/Resources/.env

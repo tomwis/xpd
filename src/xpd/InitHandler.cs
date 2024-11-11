@@ -105,6 +105,7 @@ public class InitHandler(
         fileSystemService.AddEditorConfig(_pathProvider.EditorConfigFile);
         AddSolutionSettingsFolderWithItems(solutionName);
         gitHubActionsService.AddBuildTestLintAction(selectedProjectType);
+        fileSystemService.AddReleaseNugetScript(projectName);
 
         return InitResult.Success(
             solutionName,

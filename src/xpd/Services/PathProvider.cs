@@ -18,6 +18,9 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
     internal IDirectoryInfo SrcDir =>
         AsDir(_fileSystem.Path.Combine(MainFolder.FullName, OptionalFoldersConstants.SrcDir));
 
+    internal IDirectoryInfo BuildDir =>
+        AsDir(_fileSystem.Path.Combine(MainFolder.FullName, OptionalFoldersConstants.BuildDir));
+
     internal IDirectoryInfo TestsDir =>
         AsDir(_fileSystem.Path.Combine(MainFolder.FullName, OptionalFoldersConstants.TestsDir));
 
@@ -33,6 +36,11 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
                 GetTestProjectDir(testProjectName).FullName,
                 $"{testProjectName}.csproj"
             )
+        );
+
+    internal IFileInfo GetProjectFile(string projectName) =>
+        AsFile(
+            _fileSystem.Path.Combine(GetProjectDir(projectName).FullName, $"{projectName}.csproj")
         );
 
     internal IFileInfo HuskyTaskRunnerJson =>
@@ -78,6 +86,33 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
             _fileSystem.Path.Combine(
                 GetTestProjectDir(testProjectName).FullName,
                 DirectoryConstants.IntegrationTestsDirName
+            )
+        );
+
+    internal IFileInfo ReleaseNugetScriptFile =>
+        AsFile(
+            _fileSystem.Path.Combine(
+                MainFolder.FullName,
+                OptionalFoldersConstants.BuildDir,
+                FileConstants.ReleaseNugetScript
+            )
+        );
+
+    internal IFileInfo EnvFile =>
+        AsFile(
+            _fileSystem.Path.Combine(
+                MainFolder.FullName,
+                OptionalFoldersConstants.ConfigDir,
+                FileConstants.Env
+            )
+        );
+
+    internal IFileInfo EnvExampleFile =>
+        AsFile(
+            _fileSystem.Path.Combine(
+                MainFolder.FullName,
+                OptionalFoldersConstants.ConfigDir,
+                FileConstants.EnvExample
             )
         );
 
