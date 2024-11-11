@@ -284,6 +284,30 @@ public class InitHandlerIntegrationTests
         xml.Should().HaveElementWithFolder(expectedFolder);
     }
 
+    [Test]
+    public void PackageReferencesInAllCsprojsHaveNoVersionAttribute()
+    {
+        // Arrange
+        var csprojPaths = Directory
+            .GetFiles(
+                Path.Combine(_outputPath, SolutionName),
+                "*.csproj",
+                SearchOption.AllDirectories
+            )
+            .ToList();
+
+        // Assert
+        csprojPaths.ForEach(csprojPath =>
+        {
+            var xml = XDocument.Load(csprojPath);
+            xml.Descendants()
+                .Where(d => d.Name == "PackageReference")
+                .Any(pr => pr.Attribute("Version") is not null)
+                .Should()
+                .BeFalse($"Csproj {csprojPath} has PackageReference with Version attribute.");
+        });
+    }
+
     private InitHandler GetSubject(
         IFileSystem fileSystem,
         IProcessProvider processProvider,

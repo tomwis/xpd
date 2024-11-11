@@ -136,6 +136,12 @@ public class InitHandlerSolutionNameTests : InitHandlerTestsBase
             CreateTaskRunnerJson(fileSystem, currentDir, solutionNameFromArg);
             CreateProjectCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
             CreateTestsCsproj(fileSystem, currentDir, solutionNameFromArg, solutionNameFromArg);
+            CreateConventionTestsCsproj(
+                fileSystem,
+                currentDir,
+                solutionNameFromArg,
+                solutionNameFromArg
+            );
         });
 
         var inputRequester = Substitute.For<IInputRequester>();

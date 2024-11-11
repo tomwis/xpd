@@ -76,6 +76,12 @@ public abstract class InitHandlerTestsBase
                 solutionName,
                 string.IsNullOrEmpty(projectName) ? solutionName : projectName
             );
+            CreateConventionTestsCsproj(
+                fileSystem,
+                currentDir,
+                solutionName,
+                string.IsNullOrEmpty(projectName) ? solutionName : projectName
+            );
         });
 
         var inputRequester = Substitute.For<IInputRequester>();
@@ -186,6 +192,25 @@ public abstract class InitHandlerTestsBase
             solutionName,
             TestsDir,
             $"{projectName}.Tests",
+            testsCsproj
+        );
+
+        CreateCsproj(fileSystem, testProjectPath);
+    }
+
+    protected static void CreateConventionTestsCsproj(
+        IFileSystem fileSystem,
+        string currentDir,
+        string solutionName,
+        string projectName
+    )
+    {
+        string testsCsproj = $"{projectName}.ConventionTests.csproj";
+        var testProjectPath = Path.Combine(
+            currentDir,
+            solutionName,
+            TestsDir,
+            $"{projectName}.ConventionTests",
             testsCsproj
         );
 

@@ -82,6 +82,11 @@ public class InitHandler(
         _msBuildService.MovePackageVersionsToDirectoryPackagesProps(
             _pathProvider.GetTestProjectFile(testProjectName)
         );
+
+        _msBuildService.MovePackageVersionsToDirectoryPackagesProps(
+            _pathProvider.GetTestProjectFile(conventionTestProjectName)
+        );
+
         InitializeGitRepository(mainFolder);
         fileSystemService.AddGitIgnore(mainFolder);
         _dotnetService.InstallDotnetTools(mainFolder);
