@@ -69,6 +69,7 @@ internal class GitHubActionsService(PathProvider pathProvider, IFileSystem fileS
             [ProjectTypes.AndroidLib] = ["android"],
             [ProjectTypes.AndroidBindingLib] = ["android"],
             [ProjectTypes.ConsoleApp] = [],
+            [ProjectTypes.ClassLib] = [],
         };
 
         var workloads = string.Join(" ", map[projectType]);

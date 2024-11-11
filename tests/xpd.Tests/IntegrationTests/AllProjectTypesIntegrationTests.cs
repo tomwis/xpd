@@ -14,6 +14,7 @@ public class AllProjectTypesIntegrationTests
     private static IEnumerable<ProjectType> ProjectTypes =>
         [
             "console",
+            "classlib",
             "maui",
             "mauilib",
             "ios",

@@ -15,7 +15,7 @@ public class Init
         'p',
         "project-type",
         Required = false,
-        HelpText = "Project type to be created. Supported values: console, maui, mauilib, ios, ios-tabbed, ioslib, iosbinding, android, androidlib, android-bindinglib"
+        HelpText = "Project type to be created. Supported values: console, classlib, maui, mauilib, ios, ios-tabbed, ioslib, iosbinding, android, androidlib, android-bindinglib"
     )]
     public string? ProjectType { get; set; }
 }

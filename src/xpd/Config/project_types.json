@@ -1,1 +1,1 @@
-["console", "maui", "mauilib", "ios", "ios-tabbed", "ioslib", "iosbinding", "android", "androidlib", "android-bindinglib"]
+["console", "classlib", "maui", "mauilib", "ios", "ios-tabbed", "ioslib", "iosbinding", "android", "androidlib", "android-bindinglib"]
