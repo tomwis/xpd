@@ -8,7 +8,7 @@ using static xpd.Constants.OptionalFoldersConstants;
 
 namespace xpd.Tests.UnitTests.InitHandler;
 
-public class InitHandlerTestProjectTests : InitHandlerTestsBase
+public class InitHandlerTestProjectsTests : InitHandlerTestsBase
 {
     [Test]
     public void TestProjectIsCreatedInTestsDir()
