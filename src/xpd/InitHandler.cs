@@ -106,6 +106,7 @@ public class InitHandler(
         AddSolutionSettingsFolderWithItems(solutionName);
         gitHubActionsService.AddBuildTestLintAction(selectedProjectType);
         fileSystemService.AddReleaseNugetScript(projectName);
+        gitHubActionsService.AddGitHubReleaseAction(projectName);
 
         return InitResult.Success(
             solutionName,

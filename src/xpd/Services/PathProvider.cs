@@ -81,6 +81,11 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
             )
         );
 
+    internal IFileInfo GithubReleaseActionFile =>
+        AsFile(
+            _fileSystem.Path.Combine(GitHubWorkflowsDir.FullName, FileConstants.CreateGithubRelease)
+        );
+
     internal IDirectoryInfo GetTestProjectIntegrationTestsDir(string testProjectName) =>
         AsDir(
             _fileSystem.Path.Combine(
@@ -113,6 +118,20 @@ internal sealed class PathProvider(IFileSystem fileSystem, Init init, string sol
                 MainFolder.FullName,
                 OptionalFoldersConstants.ConfigDir,
                 FileConstants.EnvExample
+            )
+        );
+
+    internal IFileInfo GetChangelogFile(string projectName) =>
+        AsFile(
+            _fileSystem.Path.Combine(GetProjectDir(projectName).FullName, FileConstants.Changelog)
+        );
+
+    internal IFileInfo ParseChangelogScriptFile =>
+        AsFile(
+            _fileSystem.Path.Combine(
+                MainFolder.FullName,
+                OptionalFoldersConstants.BuildDir,
+                FileConstants.ParseChangelogScript
             )
         );
 

@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions.TestingHelpers;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Models;
+using xpd.Tests.Assertions.Extensions;
 using xpd.Tests.Extensions;
 
 namespace xpd.Tests.UnitTests.InitHandler;
@@ -127,5 +129,65 @@ public class InitHandlerGitHubActionsTests : InitHandlerTestsBase
             .ReadAllText()
             .Should()
             .NotContain(notExpectedStep);
+    }
+
+    [Test]
+    public void GitHubActionFor_CreatingGitHubRelease_IsCreated()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        var file = mockFileSystem
+            .Path.Combine(result.MainFolder!, ".github", "workflows", "create-github-release.yml")
+            .ToFile();
+        file.Exists.Should().BeTrue();
+        file.ReadAllText().Should().NotContain("{ChangelogPath}");
+    }
+
+    [Test]
+    public void ScriptFor_ParsingChangelog_IsCreated()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        mockFileSystem
+            .Path.Combine(result.MainFolder!, "build", "parse-changelog.sh")
+            .ToFile()
+            .Exists.Should()
+            .BeTrue();
+    }
+
+    [Test]
+    [Platform(Exclude = "Win")]
+    [SuppressMessage(
+        "Interoperability",
+        "CA1416:Validate platform compatibility",
+        Justification = "GetUnixFileMode works on Unix only"
+    )]
+    public void ScriptFor_ParsingChangelog_IsExecutable()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem().WithExtensions();
+        var initHandler = GetSubject(fileSystem: mockFileSystem);
+
+        // Act
+        var result = initHandler.Parse(new Init());
+
+        // Assert
+        mockFileSystem
+            .Path.Combine(result.MainFolder!, "build", "parse-changelog.sh")
+            .ToFile()
+            .Should()
+            .BeExecutable();
     }
 }

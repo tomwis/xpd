@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using xpd.Exceptions;
+using xpd.Tests.Assertions.Extensions;
 using xpd.Tests.Extensions;
 
 namespace xpd.Tests.UnitTests.InitHandler;
@@ -148,12 +149,7 @@ public class InitHandlerTests : InitHandlerTestsBase
             "release-nuget.sh"
         );
 
-        mockFileSystem
-            .File.GetUnixFileMode(scriptPath)
-            .Should()
-            .HaveFlag(UnixFileMode.UserExecute)
-            .And.HaveFlag(UnixFileMode.GroupExecute)
-            .And.HaveFlag(UnixFileMode.OtherExecute);
+        scriptPath.ToFile().Should().BeExecutable();
     }
 
     [TestCase(".env")]

@@ -30,6 +30,8 @@
       <EmbeddedResource Include="Resources\release-nuget.template" />
       <EmbeddedResource Include="Resources\.env" />
       <EmbeddedResource Include="Resources\.env.example" />
+      <EmbeddedResource Include="Resources\create-github-release.yml.template" />
+      <EmbeddedResource Include="Resources\parse-changelog.template" />
     </ItemGroup>
 
 </Project>

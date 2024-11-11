@@ -83,4 +83,23 @@ internal class GitHubActionsService(PathProvider pathProvider, IFileSystem fileS
         string dotnetWorkloadInstall = $"dotnet workload install {workloads}";
         return string.Format(stepTemplate, dotnetWorkloadInstall);
     }
+
+    public void AddGitHubReleaseAction(string projectName)
+    {
+        var changelogPath = _fileSystem.Path.GetRelativePath(
+            _pathProvider.MainFolder.FullName,
+            _pathProvider.GetChangelogFile(projectName).FullName
+        );
+
+        new FileTemplate(_fileSystem)
+            .From("create-github-release.yml.template")
+            .To(_pathProvider.GithubReleaseActionFile)
+            .WithTokens(new Dictionary<string, string> { ["{ChangelogPath}"] = changelogPath })
+            .Save();
+
+        new FileTemplate(_fileSystem)
+            .From("parse-changelog.template")
+            .To(_pathProvider.ParseChangelogScriptFile)
+            .Save(asExecutable: true);
+    }
 }
