@@ -67,7 +67,7 @@
 #
 #                   git commit --no-verify -m "style: automatic code formatting by GitHub workflow"
 #                   echo "Pushing changes to branch $BRANCH_NAME"
-#                   git push origin HEAD:$BRANCH_NAME
+#                   git push origin HEAD:refs/heads/$BRANCH_NAME
 #             - name: Create Pull Request
 #               if: env.SOURCE_BRANCH != ''
 #               env:
