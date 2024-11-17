@@ -42,7 +42,7 @@ prepare() {
 publish() {
     VERSION=$(get_version)
 
-    if git diff --exit-code && git diff --cached --exit-code; then
+    if [ -z "$(git ls-files --others --exclude-standard)" ] && git diff --quiet --exit-code && git diff --quiet --cached --exit-code; then
         echo -n "
 There are no changes to commit.
 Usually you should run prepare command before publish to increment version number and generate changelog.
@@ -61,7 +61,7 @@ Version tag will be added to the last commit. [y/$(underline "n")] "
     fi
 
     echo "Tagging commit with version 'v$VERSION'..."
-    if git tag -l "v$VERSION" > /dev/null; then
+    if [ "$(git tag --list "v$VERSION")" ]; then
         print_error "Tag already exists. Exiting."
         exit 1
     else
