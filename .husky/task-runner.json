@@ -24,7 +24,7 @@
          "group": "commit-msg",
          "command": "dotnet",
          "args": [
-            "artifacts/xpd.CommitLinter.dll",
+            "commit-lint",
             "--commit-file",
             "${args}",
             "--commit-message-config-file",
