@@ -76,6 +76,14 @@ Version tag will be added to the last commit. [y/$(underline "n")] "
         print_error "NUGET_API_KEY is empty. Set it in config/.env file."
         exit 1
     fi
+
+    echo -n "All ready. Publish? [$(underline "y")/n] "
+
+    read -r response
+    if [[ "${response:l}" =~ ^(no|n)$ ]]; then
+        echo "Exiting without publishing."
+        exit 1
+    fi
     dotnet nuget push "$WORKING_DIR"/nupkg/*.nupkg --api-key "$NUGET_API_KEY" --source "$NUGET_SOURCE"
 
     PACKAGE_NAME=$(get_package_name)
