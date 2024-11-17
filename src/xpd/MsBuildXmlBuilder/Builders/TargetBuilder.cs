@@ -16,6 +16,12 @@ internal sealed class TargetBuilder
         return this;
     }
 
+    public TargetBuilder AddCondition(Condition condition)
+    {
+        _target.Add(new XAttribute("Condition", condition));
+        return this;
+    }
+
     public TargetBuilder AddBeforeTargets(params TargetName[] beforeTargets)
     {
         _target.Add(new XAttribute("BeforeTargets", string.Join(";", beforeTargets)));

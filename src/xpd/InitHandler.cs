@@ -98,7 +98,7 @@ public class InitHandler(
             return huskyHooksResult;
         }
 
-        huskyService.InitializeHuskyRestoreTarget();
+        huskyService.InitializeHuskyRestoreTarget(projectName);
 
         fileSystemService.AddReadme(
             mainFolder,

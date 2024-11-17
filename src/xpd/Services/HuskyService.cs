@@ -120,7 +120,7 @@ internal class HuskyService(
             ],
         };
 
-    public void InitializeHuskyRestoreTarget()
+    public void InitializeHuskyRestoreTarget(string projectName)
     {
         var msBuildXmlBuilder = new MsBuildXmlBuilder.Builders.MsBuildXmlBuilder();
         var toolListFileValue =
@@ -140,23 +140,32 @@ internal class HuskyService(
                 pg[CustomProperty.ToolListFile] = toolListFileValue;
                 pg[CustomProperty.MessageTag] = messageTagValue;
             })
-            .AddTarget(SetDotnetToolsRestoreAndInstallTarget)
+            .AddTarget(target => SetDotnetToolsRestoreAndInstallTarget(target, projectName))
             .AddTarget(SetHuskyRestoreAndInstallTarget);
 
         var contents = msBuildXmlBuilder.ToString();
         _fileSystem.File.WriteAllText(_pathProvider.DirectoryBuildTargetsFile.FullName, contents);
     }
 
-    private static void SetDotnetToolsRestoreAndInstallTarget(TargetBuilder target)
+    private static void SetDotnetToolsRestoreAndInstallTarget(
+        TargetBuilder target,
+        string projectName
+    )
     {
         const string outputItemName = "ToolLines";
         const string huskyInstalledTrue = "true";
+        const string outputItemIdentity = $"%({outputItemName}.Identity)";
         var messageTag = CustomProperty.MessageTag.ToUnevaluatedValue();
-        var outputItemIdentity = $"%({outputItemName}.Identity)";
 
         target
             .AddName(TargetName.DotnetToolsRestoreAndInstall)
             .AddBeforeTargets(TargetName.Restore, TargetName.CollectPackageReferences)
+            .AddCondition(
+                Condition.Equals(
+                    MsBuildProperty.MSBuildProjectName.ToUnevaluatedValue(),
+                    projectName
+                )
+            )
             .AddMessage(
                 $"{messageTag} DirectoryBuildTargetsDir: {CustomProperty.DirectoryBuildTargetsDir.ToUnevaluatedValue()}"
             )

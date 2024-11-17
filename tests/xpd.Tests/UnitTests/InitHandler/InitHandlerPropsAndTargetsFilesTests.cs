@@ -82,8 +82,9 @@ public class InitHandlerPropsAndTargetsFilesTests : InitHandlerTestsBase
     public void DirectoryBuildTargetsIsCorrectlyModified()
     {
         // Arrange
+        const string solutionName = "SolutionName";
         var mockFileSystem = new MockFileSystem();
-        var initHandler = GetSubject(fileSystem: mockFileSystem);
+        var initHandler = GetSubject(solutionName, fileSystem: mockFileSystem);
 
         // Act
         var result = initHandler.Parse(new Init());
@@ -99,6 +100,7 @@ public class InitHandlerPropsAndTargetsFilesTests : InitHandlerTestsBase
             .Should()
             .HaveAttribute("Name", "DotnetToolsRestoreAndInstall")
             .And.HaveAttribute("BeforeTargets", "Restore;CollectPackageReferences")
+            .And.HaveAttribute("Condition", $"'$(MSBuildProjectName)' == '{solutionName}'")
             .And.SetInstalledToolsFromCache()
             .And.CallHuskyInstallIfNotInstalled();
 
