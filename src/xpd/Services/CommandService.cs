@@ -41,7 +41,8 @@ public class CommandService(IProcessProvider processProvider)
         if (process.ExitCode != 0)
         {
             throw new CommandException(
-                $"Command {command} {arguments} exited with code {process.ExitCode}"
+                $"Command {command} {arguments} exited with code {process.ExitCode}",
+                process.ExitCode
             );
         }
     }

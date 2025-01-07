@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using System.Xml.Linq;
 using xpd.Constants;
+using xpd.Exceptions;
 using xpd.Models;
 
 namespace xpd.Services;
@@ -23,6 +24,7 @@ internal class DotnetService(
         ProjectType projectType
     )
     {
+        CheckTemplate(projectType);
         _commandService.RunCommand(
             "dotnet",
             $"new sln --name \"{solutionName}\" --output \"{solutionOutputDir.FullName}\""
@@ -99,6 +101,7 @@ internal class DotnetService(
         IDirectoryInfo testProjectDir
     )
     {
+        CheckTemplate("nunit");
         _commandService.RunCommand(
             "dotnet",
             $"new nunit --name {testProjectName}",
@@ -181,5 +184,51 @@ internal class DotnetService(
     public void CreateGitIgnore(IDirectoryInfo mainFolder)
     {
         _commandService.RunCommand("dotnet", "new gitignore", mainFolder.FullName);
+    }
+
+    private void CheckTemplate(string templateShortName)
+    {
+        var supportedTemplates = new Dictionary<string, string>
+        {
+            ["android"] = "Microsoft.Android.Templates",
+            ["androidlib"] = "Microsoft.Android.Templates",
+            ["android-bindinglib"] = "Microsoft.Android.Templates",
+            ["ios"] = "Microsoft.iOS.Templates",
+            ["ios-tabbed"] = "Microsoft.iOS.Templates",
+            ["ioslib"] = "Microsoft.iOS.Templates",
+            ["iosbinding"] = "Microsoft.iOS.Templates",
+            ["maui"] = "Microsoft.Maui.Templates",
+            ["mauilib"] = "Microsoft.Maui.Templates",
+            ["nunit"] = "NUnit3.DotNetNew.Template",
+        };
+
+        try
+        {
+            _commandService.RunCommand("dotnet", $"new list {templateShortName}");
+        }
+        catch (CommandException ex)
+        {
+            const int templateNotFoundCode = 103;
+            if (ex.ProcessExitCode == templateNotFoundCode)
+            {
+                string message =
+                    $"Seems like '{templateShortName}' template is not installed. You need to install it to use it.";
+                if (supportedTemplates.TryGetValue(templateShortName, out var template))
+                {
+                    message +=
+                        $"{Environment.NewLine}Use \"dotnet new install {template}\" to install it.";
+                }
+
+                message +=
+                    $"{Environment.NewLine}Use \"dotnet new search {templateShortName}\" to find out more.";
+
+                throw new DotnetTemplateNotFoundException(message);
+            }
+
+            throw new CommandException(
+                $"Unknown error occurred while checking for template. Exit code: {ex.ProcessExitCode}",
+                ex.ProcessExitCode
+            );
+        }
     }
 }
