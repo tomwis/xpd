@@ -42,7 +42,6 @@ public class AllProjectTypesIntegrationTests
             );
     }
 
-    [Parallelizable(ParallelScope.All)]
     [TestCaseSource(nameof(ProjectTypes))]
     public void WhenInitIsCalled_AndSupportedProjectTypeIsProvided_ThenCommandReturnsSuccess(
         ProjectType projectType
